@@ -44,7 +44,6 @@ export function Lobby({ topic, year, sessionId }: LobbyProps) {
   return (
     <View style={s.root}>
       <PlayerList data={players} playerCount={playerCount} maxPlayerCount={maxPlayerCount} />
-
       <View style={s.footer}>
         <Button label="Share Invite" onPress={onShareInvite} />
         {isHost && <Button label="Start" onPress={onStartGame} disabled={canStart} />}

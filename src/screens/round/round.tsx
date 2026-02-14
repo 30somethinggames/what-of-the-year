@@ -17,6 +17,7 @@ interface Props {
   onClose: () => void;
 }
 
+// TODO move usePlayers to PlayerList
 export function Round({ topic, year, sessionId, roundNumber, drawerVisible, onClose }: Props) {
   const s = useStyles();
   const { isLoading, error, session, round, players, completedUids, isHost } = useRoundState({
