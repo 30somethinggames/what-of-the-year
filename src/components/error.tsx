@@ -27,11 +27,11 @@ export function Error({ message = "Something went wrong", onRetry }: Props) {
 const useStyles = createStyles((t) => ({
   root: {
     flex: 1,
-    backgroundColor: t.colors.background,
-    paddingHorizontal: t.spacing.lg,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    paddingHorizontal: t.spacing.lg,
+    backgroundColor: t.colors.background,
     gap: t.spacing.lg,
   },
   content: {
