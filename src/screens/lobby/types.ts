@@ -1,7 +1,7 @@
-import { Topic } from "constants/topics";
+import { TopicType } from "constants/topics";
 
 export interface LobbyProps {
-  topic: Topic;
+  topic: TopicType;
   year: string;
   sessionId: string;
 }

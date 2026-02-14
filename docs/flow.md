@@ -1,36 +1,39 @@
 # Flow
 
-## Host Creates Session
+```mermaid
+flowchart TD
+    Start([Home Screen]) --> PickTopic[Pick Topic + Year]
+    PickTopic --> HostPath{User Type}
 
-```
-Home (pick topic + year)
-  → Topic Screen (pick avatar + name, hit Start)
-      → onSubmit:
-          1. signInAnonymously()     ← get a UID
-          2. createSession()         ← batch write session/player/rounds
-          3. router.replace()        ← navigate to lobby
-  → Lobby Screen (/[topic]/[year]/[session])
-      - Real-time listener on players subcollection
-      - Host sees player list update as friends join
-      - Share button builds deep link from sessionId
-          whatoftheyear://games/2025/{sessionId}
-          or https://whatoftheyear.com/games/2025/{sessionId}
-      - "Start Game" button (host only)
-          → sets session.isOpen = false
-          → router.replace() → round 1
-```
+    %% Host Flow
+    HostPath -->|Host Creates| TopicScreenHost[Topic Screen: Pick Avatar + Name]
+    TopicScreenHost --> StartButton[Click Start Button]
+    StartButton --> SignInHost[signInAnonymously - Get UID]
+    SignInHost --> CreateSession[createSession - Batch write session/player/rounds]
+    CreateSession --> NavLobbyHost[router.replace to Lobby]
+    NavLobbyHost --> LobbyHost[Lobby Screen: /topic/year/session]
 
-## Friend Joins Session
+    LobbyHost --> HostActions[Real-time listener on players]
+    HostActions --> ShareLink[Share Deep Link:<br/>whatoftheyear://games/year/sessionId]
+    HostActions --> WaitPlayers[See players join in real-time]
+    WaitPlayers --> StartGame[Click Start Game]
+    StartGame --> CloseSession[Set session.isOpen = false]
+    CloseSession --> NavRound1Host[router.replace to Round 1]
 
-```
-Friend taps deep link → Topic Screen with session param
-  → they enter name + avatar, hit Join
-      → onSubmit:
-          1. signInAnonymously()
-          2. joinSession()           ← write to players subcollection
-          3. router.replace()        ← navigate to lobby
-  → Lobby Screen (same as host's)
-      - Sees player list in real-time
-      - Waits for host to start
-      - When session.isOpen flips to false → router.replace() → round 1
+    %% Friend Flow
+    HostPath -->|Friend Joins| DeepLink[Friend taps deep link]
+    DeepLink --> TopicScreenFriend[Topic Screen with session param]
+    TopicScreenFriend --> JoinButton[Enter Name + Avatar, Click Join]
+    JoinButton --> SignInFriend[signInAnonymously]
+    SignInFriend --> JoinSession[joinSession - Write to players subcollection]
+    JoinSession --> NavLobbyFriend[router.replace to Lobby]
+    NavLobbyFriend --> LobbyFriend[Lobby Screen]
+
+    LobbyFriend --> FriendWait[See player list in real-time]
+    FriendWait --> WaitHost[Wait for host to start]
+    WaitHost --> ListenClose[Listen for session.isOpen = false]
+    ListenClose --> NavRound1Friend[router.replace to Round 1]
+
+    NavRound1Host --> Round1([Round 1])
+    NavRound1Friend --> Round1
 ```

@@ -17,5 +17,8 @@ fi
 # Check for unused styles
 bun run lint:styles
 
+# Check TypeScript types
+bun run check:types
+
 # Run all tests
 bun test

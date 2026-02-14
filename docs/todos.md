@@ -1,24 +1,6 @@
 # TODOs
 
-## Tomorrow's Agenda
-
-### 1. Refactor: Hybrid Approach for Game State
-
-Implement composite hooks to reduce boilerplate while maintaining performance.
-
-**Tasks:**
-
-- Create `useGameState(sessionId, roundNumber)` - wraps session + round + players + selections
-- Create `useLobbyState(sessionId)` - wraps session + players
-- Update Round screen to use `useGameState`
-- Update Lobby screen to use `useLobbyState`
-- Keep granular hooks (`useSession`, `useRound`, `usePlayers`, `useSelections`) for flexibility
-
-**Reference:** See [docs/game-state.md](./game-state.md) for full details
-
----
-
-### 2. Add Tests for Today's Work
+### 1. Add Tests for Today's Work
 
 Need test coverage for all new functionality added today.
 
@@ -46,7 +28,7 @@ Follow existing test structure in `src/db/__tests__/`:
 
 ---
 
-### 3. E2E Multiplayer Testing Strategy
+### 2. E2E Multiplayer Testing Strategy
 
 Figure out how to test multi-device interactions in a multiplayer game.
 

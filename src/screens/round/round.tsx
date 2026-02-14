@@ -5,11 +5,11 @@ import { RoundDrawer } from "screens/round/round-drawer";
 import { useRoundState } from "./use-round-state";
 import { Error } from "components/error";
 import { Loading } from "components/loading";
-import { Topic } from "constants/topics";
+import { TopicType } from "constants/topics";
 import { createStyles } from "utils/theme";
 
 interface Props {
-  topic: Topic;
+  topic: TopicType;
   year: string;
   sessionId: string;
   roundNumber: number;

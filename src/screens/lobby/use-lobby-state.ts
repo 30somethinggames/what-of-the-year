@@ -18,17 +18,19 @@ export function useLobbyState({ sessionId, topic, year }: LobbyProps) {
   const isLoading = sessionLoading || playersLoading;
   const error = sessionError || playersError;
 
-  const canStart = players.length < 2;
+  const playerCount = players.length;
+  const maxPlayerCount = session?.maxPlayers;
+  const canStart = playerCount < 2;
 
   // Auto-navigate non-host players when game starts
   useEffect(() => {
     if (!isLoading && !error && session && !session.isOpen && !isHost) {
       router.replace({
-        pathname: "/[topic]/[year]/[session]/[round]",
-        params: { topic: topic.value, year, session: sessionId, round: "1" },
+        pathname: "/[topic]/[year]/[sessionId]/[round]",
+        params: { topic: topic.value, year, sessionId, round: "1" },
       });
     }
   }, [session?.isOpen, isHost, isLoading, error, topic.value, year, sessionId]);
 
-  return { isLoading, error, session, players, isHost, canStart };
+  return { isLoading, error, session, players, isHost, playerCount, maxPlayerCount, canStart };
 }

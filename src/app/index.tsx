@@ -5,17 +5,17 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Button } from "components/button";
 import { Picker } from "components/picker";
-import { Topics, topics } from "constants/topics";
+import { TopicType, topics } from "constants/topics";
 import { Year, years } from "constants/years";
 import { createStyles, useTheme } from "utils/theme";
 
 export default function Index() {
-  const [topic, setTopic] = useState<Topics>(topics[0]);
+  const [topic, setTopic] = useState<TopicType>(topics[0]);
   const [year, setYear] = useState<Year>(years[0]);
   const { setTheme } = useTheme();
   const s = useStyles();
 
-  const onTopicChange = (v: Topics) => {
+  const onTopicChange = (v: TopicType) => {
     setTopic(v);
     setTheme(v.value);
   };

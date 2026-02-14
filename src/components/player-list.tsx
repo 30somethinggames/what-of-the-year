@@ -1,15 +1,18 @@
 import { FlatList, Text, View } from "react-native";
 
-import { Avatar } from "./avatar";
+import { Avatar } from "./avatar/avatar";
 import { PlayerWithId } from "db/use-players";
 import { createStyles } from "utils/theme";
 
 interface Props {
   data: PlayerWithId[];
   completedUids?: Set<string>;
+  playerCount: number;
+  maxPlayerCount?: number;
 }
-export function PlayerList({ data, completedUids }: Props) {
+export function PlayerList({ data, completedUids, playerCount, maxPlayerCount }: Props) {
   const s = useStyles();
+
   return (
     <FlatList
       data={data}
@@ -26,6 +29,11 @@ export function PlayerList({ data, completedUids }: Props) {
           </View>
         );
       }}
+      ListFooterComponent={
+        <View style={s.footer}>
+          <Text style={s.count}>{`${playerCount} of ${maxPlayerCount}`}</Text>
+        </View>
+      }
     />
   );
 }
@@ -56,5 +64,12 @@ const useStyles = createStyles((t) => ({
   status: {
     fontSize: t.text.size.xl,
     color: t.colors.primary,
+  },
+  footer: {
+    alignItems: "flex-end",
+  },
+  count: {
+    fontSize: t.text.size.sm,
+    color: t.colors.secondary,
   },
 }));

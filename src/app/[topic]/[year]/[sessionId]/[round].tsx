@@ -8,11 +8,11 @@ import { useParams } from "hooks/use-params";
 import { createStyles } from "utils/theme";
 
 export default function RoundIndex() {
-  const { topic, year, session, round } = useParams();
+  const { topic, year, sessionId, round } = useParams();
   const s = useStyles();
   const [drawerVisible, setDrawerVisible] = useState(false);
 
-  if (!topic || !year || !session || !round) {
+  if (!topic || !year || !sessionId || !round) {
     return <Redirect href="/" />;
   }
 
@@ -35,7 +35,7 @@ export default function RoundIndex() {
       <Round
         topic={topic}
         year={year}
-        sessionId={session}
+        sessionId={sessionId}
         roundNumber={roundNumber}
         drawerVisible={drawerVisible}
         onClose={onClose}

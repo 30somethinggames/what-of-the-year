@@ -1,6 +1,6 @@
 import * as Linking from "expo-linking";
 import { router } from "expo-router";
-import { Share, View } from "react-native";
+import { Share, Text, View } from "react-native";
 
 import { LobbyProps } from "./types";
 import { useLobbyState } from "./use-lobby-state";
@@ -13,18 +13,19 @@ import { createStyles } from "utils/theme";
 
 export function Lobby({ topic, year, sessionId }: LobbyProps) {
   const s = useStyles();
-  const { isLoading, error, session, players, isHost, canStart } = useLobbyState({
-    topic,
-    year,
-    sessionId,
-  });
+  const { isLoading, error, session, players, isHost, playerCount, maxPlayerCount, canStart } =
+    useLobbyState({
+      topic,
+      year,
+      sessionId,
+    });
 
   if (isLoading) return <Loading />;
   if (error || !session) return <Error />;
 
   const onShareInvite = async () => {
     const url = Linking.createURL(`/${topic.value}/${year}`, {
-      queryParams: { session: sessionId! },
+      queryParams: { sessionId },
     });
 
     await Share.share({
@@ -33,26 +34,21 @@ export function Lobby({ topic, year, sessionId }: LobbyProps) {
   };
 
   const onStartGame = async () => {
-    await startSession({ sessionId: sessionId! });
+    await startSession({ sessionId });
     router.replace({
-      pathname: "/[topic]/[year]/[session]/[round]",
-      params: { topic: topic.value, year: year!, session: sessionId!, round: "1" },
+      pathname: "/[topic]/[year]/[sessionId]/[round]",
+      params: { topic: topic.value, year, sessionId, round: "1" },
     });
   };
 
   return (
     <View style={s.root}>
-      <View style={s.header}>
-        <Button style={s.shareBtn} label="Share Invite" onPress={onShareInvite} />
+      <PlayerList data={players} playerCount={playerCount} maxPlayerCount={maxPlayerCount} />
+
+      <View style={s.footer}>
+        <Button label="Share Invite" onPress={onShareInvite} />
+        {isHost && <Button label="Start" onPress={onStartGame} disabled={canStart} />}
       </View>
-
-      <PlayerList data={players} />
-
-      {isHost && (
-        <View style={s.footer}>
-          <Button label="Start" onPress={onStartGame} disabled={canStart} />
-        </View>
-      )}
     </View>
   );
 }
@@ -62,14 +58,8 @@ const useStyles = createStyles((t) => ({
     flex: 1,
     backgroundColor: t.colors.background,
   },
-  header: {
-    alignItems: "center",
-    paddingBottom: t.spacing.md,
-  },
-  shareBtn: {
-    width: 200,
-  },
   footer: {
     padding: t.spacing.lg,
+    gap: t.spacing.md,
   },
 }));

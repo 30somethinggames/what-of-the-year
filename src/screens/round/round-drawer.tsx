@@ -59,7 +59,12 @@ export function RoundDrawer({
             </Pressable>
           </View>
 
-          <PlayerList data={players} completedUids={completedUids} />
+          <PlayerList
+            data={players}
+            completedUids={completedUids}
+            playerCount={players.length}
+            maxPlayerCount={10}
+          />
 
           <View style={s.footer}>
             {isHost && (

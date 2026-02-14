@@ -4,9 +4,9 @@ import { Lobby } from "screens/lobby";
 import { useParams } from "hooks/use-params";
 
 export default function LobbyIndex() {
-  const { topic, year, session } = useParams();
+  const { topic, year, sessionId } = useParams();
 
-  if (!topic || !year || !session) {
+  if (!topic || !year || !sessionId) {
     return <Redirect href="/" />;
   }
 
@@ -17,7 +17,7 @@ export default function LobbyIndex() {
           title: `Lobby ${topic.label} of ${year}`,
         }}
       />
-      <Lobby topic={topic} year={year} sessionId={session} />
+      <Lobby topic={topic} year={year} sessionId={sessionId} />
     </>
   );
 }

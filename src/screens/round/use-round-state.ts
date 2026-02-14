@@ -1,7 +1,7 @@
 import { router } from "expo-router";
 import { useEffect } from "react";
 
-import { Topic } from "constants/topics";
+import { TopicType } from "constants/topics";
 import { usePlayers } from "db/use-players";
 import { useRound } from "db/use-round";
 import { useSelections } from "db/use-selections";
@@ -10,7 +10,7 @@ import { useSession } from "db/use-session";
 interface Props {
   sessionId: string;
   roundNumber: number;
-  topic: Topic;
+  topic: TopicType;
   year: string;
 }
 export function useRoundState({ sessionId, roundNumber, topic, year }: Props) {
@@ -30,11 +30,11 @@ export function useRoundState({ sessionId, roundNumber, topic, year }: Props) {
   useEffect(() => {
     if (session && roundNumber && session.activeRoundNumber !== roundNumber) {
       router.replace({
-        pathname: "/[topic]/[year]/[session]/[round]",
+        pathname: "/[topic]/[year]/[sessionId]/[round]",
         params: {
           topic: topic.value,
           year,
-          session: sessionId!,
+          sessionId,
           round: String(session.activeRoundNumber),
         },
       });
