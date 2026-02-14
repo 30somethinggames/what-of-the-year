@@ -1,7 +1,7 @@
 import { Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { RoundDrawer } from "screens/round/round-drawer";
 
+import { RoundModal } from "./round-modal";
 import { useRoundState } from "./use-round-state";
 import { Error } from "components/error";
 import { Loading } from "components/loading";
@@ -36,7 +36,7 @@ export function Round({ topic, year, sessionId, roundNumber, drawerVisible, onCl
         <Text>Round {roundNumber} - TODO: Implement picking UI</Text>
       </SafeAreaView>
 
-      <RoundDrawer
+      <RoundModal
         visible={drawerVisible}
         onClose={onClose}
         players={players}

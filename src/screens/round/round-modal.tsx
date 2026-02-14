@@ -1,8 +1,9 @@
 import { router } from "expo-router";
-import { Modal, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
 import { PlayerList } from "../../components/player-list";
 import { Button } from "components/button";
+import { Modal } from "components/modal";
 import { advanceRound } from "db/advance-round";
 import type { PlayerWithId } from "db/use-players";
 import { createStyles } from "utils/theme";
@@ -18,7 +19,7 @@ interface Props {
   maxRounds: number;
 }
 
-export function RoundDrawer({
+export function RoundModal({
   visible,
   onClose,
   players,
@@ -47,54 +48,38 @@ export function RoundDrawer({
   };
 
   return (
-    <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
-      <Pressable style={s.backdrop} onPress={onClose}>
-        <View style={s.drawer} onStartShouldSetResponder={() => true}>
-          <View style={s.header}>
-            <Text style={s.title}>
-              Round {roundNumber} of {maxRounds}
-            </Text>
-            <Pressable onPress={onClose} hitSlop={8}>
-              <Text style={s.closeBtn}>✕</Text>
-            </Pressable>
-          </View>
+    <Modal isVisible={visible} onClose={onClose}>
+      <View style={s.header}>
+        <Text style={s.title}>
+          Round {roundNumber} of {maxRounds}
+        </Text>
+        <Pressable onPress={onClose} hitSlop={8}>
+          <Text style={s.closeBtn}>✕</Text>
+        </Pressable>
+      </View>
 
-          <PlayerList
-            data={players}
-            completedUids={completedUids}
-            playerCount={players.length}
-            maxPlayerCount={10}
+      <PlayerList
+        data={players}
+        completedUids={completedUids}
+        playerCount={players.length}
+        maxPlayerCount={10}
+      />
+
+      <View style={s.footer}>
+        {isHost && (
+          <Button
+            label={roundNumber < maxRounds ? "Next Round" : "End Game"}
+            onPress={onNextRound}
+            style={s.nextBtn}
           />
-
-          <View style={s.footer}>
-            {isHost && (
-              <Button
-                label={roundNumber < maxRounds ? "Next Round" : "End Game"}
-                onPress={onNextRound}
-                style={s.nextBtn}
-              />
-            )}
-            <Button label="Leave Game" onPress={onLeaveGame} style={s.leaveBtn} />
-          </View>
-        </View>
-      </Pressable>
+        )}
+        <Button label="Leave Game" onPress={onLeaveGame} style={s.leaveBtn} />
+      </View>
     </Modal>
   );
 }
 
 const useStyles = createStyles((t) => ({
-  backdrop: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "flex-end",
-  },
-  drawer: {
-    backgroundColor: t.colors.background,
-    borderTopLeftRadius: t.border.radius.lg * 2,
-    borderTopRightRadius: t.border.radius.lg * 2,
-    maxHeight: "80%",
-    paddingBottom: t.spacing.lg * 2,
-  },
   header: {
     flexDirection: "row",
     alignItems: "center",
