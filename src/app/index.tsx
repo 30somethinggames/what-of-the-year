@@ -20,9 +20,7 @@ export default function Index() {
     setTheme(v.value);
   };
 
-  const onYearChange = (v: Year) => {
-    setYear(v);
-  };
+  const onYearChange = (v: Year) => setYear(v);
 
   return (
     <SafeAreaView style={s.root}>
