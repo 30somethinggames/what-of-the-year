@@ -1,6 +1,6 @@
 import * as Linking from "expo-linking";
 import { router } from "expo-router";
-import { Share, Text, View } from "react-native";
+import { Share, View } from "react-native";
 
 import { LobbyProps } from "./types";
 import { useLobbyState } from "./use-lobby-state";
