@@ -2,7 +2,6 @@ import { router } from "expo-router";
 import { useEffect } from "react";
 
 import type { TopicType } from "constants/topics";
-import { usePlayers } from "db/hooks/use-players";
 import { useRound } from "db/hooks/use-round";
 import { useSelections } from "db/hooks/use-selections";
 import { useSession } from "db/hooks/use-session";
