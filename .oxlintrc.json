@@ -5,6 +5,26 @@
     "react/no-children-prop": "error",
     "react-perf/jsx-no-new-object-as-prop": "off",
     "typescript/no-explicit-any": "error",
-    "no-console": "warn"
-  }
+    "no-console": "warn",
+    "import/no-default-export": "error",
+    "no-restricted-imports": [
+      "error",
+      {
+        "patterns": [
+          {
+            "group": ["screens/*/*"],
+            "message": "Screen internals are private. Move shared functionality to a top-level dir (hooks/, utils/, db/, etc.)."
+          }
+        ]
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["src/app/**/*.tsx"],
+      "rules": {
+        "import/no-default-export": "off"
+      }
+    }
+  ]
 }

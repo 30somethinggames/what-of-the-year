@@ -1,8 +1,8 @@
 # TODOs
 
-### 1. Add Tests for Today's Work
+## 1. Tests
 
-Need test coverage for all new functionality added today.
+Need test coverage for all new functionality added
 
 **New Files to Test:**
 
@@ -28,7 +28,7 @@ Follow existing test structure in `src/db/__tests__/`:
 
 ---
 
-### 2. E2E Multiplayer Testing Strategy
+## 2. E2E Multiplayer Testing Strategy
 
 Figure out how to test multi-device interactions in a multiplayer game.
 
@@ -75,7 +75,7 @@ Figure out how to test multi-device interactions in a multiplayer game.
 
 ---
 
-### 3. Implement Leave Session Functionality
+## 3. Implement Leave Session Functionality
 
 Add ability for players to leave a session and clean up properly.
 
@@ -114,3 +114,15 @@ Add ability for players to leave a session and clean up properly.
    - Test playerCount decrement
    - Test host reassignment
    - Test full session cleanup when last player leaves
+
+## 4. theme set on player join
+
+## 5. refactor expensive query calls
+
+## 6. games query - how much to fetch
+
+## 7. security
+
+## 8. round flow
+
+## 9. repo rules - oxlint
