@@ -12,17 +12,17 @@ import { useSession } from "db/hooks/use-session";
  * and automatically navigates non-host players to round 1 when the host starts the game.
  */
 export function useLobbyState({ sessionId, topic, year }: LobbyProps) {
-  const { session, isLoading: sessionLoading, error: sessionError } = useSession(sessionId);
+  const { session, isLoading: sessionLoading, isError: sessionError } = useSession(sessionId);
   const {
+    isLoading: playersLoading,
+    isError: playersError,
     players,
     currentUser,
     isHost,
-    isLoading: playersLoading,
-    error: playersError,
   } = usePlayers(sessionId);
 
   const isLoading = sessionLoading || playersLoading;
-  const error = sessionError || playersError;
+  const isError = sessionError || playersError;
 
   const playerCount = players.length;
   const maxPlayerCount = session?.maxPlayers;
@@ -30,17 +30,17 @@ export function useLobbyState({ sessionId, topic, year }: LobbyProps) {
 
   // Auto-navigate non-host players when game starts
   useEffect(() => {
-    if (!isLoading && !error && session && !session.isOpen && !isHost) {
+    if (!isLoading && !isError && session && !session.isOpen && !isHost) {
       router.replace({
         pathname: "/[topic]/[year]/[sessionId]/[round]",
         params: { topic: topic.value, year, sessionId, round: "1" },
       });
     }
-  }, [session?.isOpen, isHost, isLoading, error, topic.value, year, sessionId]);
+  }, [session?.isOpen, isHost, isLoading, isError, topic.value, year, sessionId]);
 
   return {
     isLoading,
-    error,
+    isError,
     session,
     currentUser,
     players,

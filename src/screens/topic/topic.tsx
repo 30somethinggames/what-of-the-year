@@ -23,7 +23,7 @@ interface Props {
 export function Topic({ topic, year, existingSessionId }: Props) {
   const s = useStyles();
   const headerHeight = useHeaderHeight();
-  const { isLoading, isError, refetch } = useTopicData({ key: topic.value, year: year! });
+  const { isLoading, isError, refetch } = useTopicData({ key: topic.value, year });
   const { avatar, randomizeAvatar } = useRandomAvatar();
   const [name, setName] = useState("");
   const { mutateAsync: signIn, isPending } = useAuth();

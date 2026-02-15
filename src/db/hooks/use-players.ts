@@ -17,7 +17,7 @@ import type { Player } from "types/session";
 export function usePlayers(sessionId: string | undefined) {
   const [players, setPlayers] = useState<Player[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+  const [isError, setIsError] = useState<Error | null>(null);
 
   useEffect(() => {
     if (!sessionId) return;
@@ -35,7 +35,7 @@ export function usePlayers(sessionId: string | undefined) {
         setIsLoading(false);
       },
       (err) => {
-        setError(err);
+        setIsError(err);
         setIsLoading(false);
       },
     );
@@ -46,5 +46,5 @@ export function usePlayers(sessionId: string | undefined) {
   const currentUser = auth.currentUser;
   const isHost = players.some((p) => p.uid === currentUser?.uid && p.isHost);
 
-  return { players, currentUser, isHost, isLoading, error };
+  return { isLoading, isError, currentUser, isHost, players };
 }

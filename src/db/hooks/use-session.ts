@@ -16,7 +16,7 @@ import type { Session } from "types/session";
 export function useSession(sessionId: string | undefined) {
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+  const [isError, setIsError] = useState<Error | null>(null);
 
   useEffect(() => {
     if (!sessionId) return;
@@ -27,12 +27,12 @@ export function useSession(sessionId: string | undefined) {
         if (snapshot.exists()) {
           setSession(snapshot.data() as Session);
         } else {
-          setError(new Error("Session not found"));
+          setIsError(new Error("Session not found"));
         }
         setIsLoading(false);
       },
       (err) => {
-        setError(err);
+        setIsError(err);
         setIsLoading(false);
       },
     );
@@ -40,5 +40,5 @@ export function useSession(sessionId: string | undefined) {
     return unsubscribe;
   }, [sessionId]);
 
-  return { session, isLoading, error };
+  return { session, isLoading, isError };
 }

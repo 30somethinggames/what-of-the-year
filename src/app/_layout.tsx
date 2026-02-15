@@ -10,6 +10,9 @@ import { ThemeProvider } from "utils/theme";
 
 const VALID_TOPICS = new Set<string>(Object.values(TOPIC_KEY));
 
+/**
+ * when users come from invite link we determine the theme
+ */
 function getTopicFromURL(): TOPIC_KEY | undefined {
   const url = getLinkingURL();
   if (!url) return undefined;

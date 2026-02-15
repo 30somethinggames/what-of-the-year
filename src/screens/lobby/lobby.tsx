@@ -16,7 +16,7 @@ export function Lobby({ topic, year, sessionId }: LobbyProps) {
   const s = useStyles();
   const {
     isLoading,
-    error,
+    isError,
     session,
     players,
     isHost,
@@ -31,7 +31,7 @@ export function Lobby({ topic, year, sessionId }: LobbyProps) {
   });
 
   if (isLoading) return <Loading />;
-  if (error || !session) return <Error />;
+  if (isError || !session) return <Error />;
 
   const onShare = async () => {
     const url = Linking.createURL(`/${topic.value}/${year}`, {

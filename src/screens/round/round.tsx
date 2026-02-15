@@ -19,7 +19,7 @@ interface Props {
 
 export function Round({ topic, year, sessionId, roundNumber, isVisible, onClose }: Props) {
   const s = useStyles();
-  const { isLoading, error, session, round, players, completedUids, isHost } = useRoundState({
+  const { isLoading, isError, session, round, completedUids } = useRoundState({
     sessionId,
     roundNumber,
     topic,
@@ -27,7 +27,7 @@ export function Round({ topic, year, sessionId, roundNumber, isVisible, onClose 
   });
 
   if (isLoading) return <Loading />;
-  if (error || !session || !round || !roundNumber) return <Error />;
+  if (isError || !session || !round) return <Error />;
 
   return (
     <>
@@ -38,9 +38,7 @@ export function Round({ topic, year, sessionId, roundNumber, isVisible, onClose 
       <RoundModal
         isVisible={isVisible}
         onClose={onClose}
-        players={players}
         completedUids={completedUids}
-        isHost={isHost}
         sessionId={sessionId}
         roundNumber={roundNumber}
         maxRounds={session.maxRounds}

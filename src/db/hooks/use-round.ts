@@ -17,7 +17,7 @@ import type { Round } from "types/session";
 export function useRound(sessionId: string | undefined, roundNumber: number | undefined) {
   const [round, setRound] = useState<Round | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+  const [isError, setIsError] = useState<Error | null>(null);
 
   useEffect(() => {
     if (!sessionId || !roundNumber) return;
@@ -28,12 +28,12 @@ export function useRound(sessionId: string | undefined, roundNumber: number | un
         if (snapshot.exists()) {
           setRound(snapshot.data() as Round);
         } else {
-          setError(new Error("Round not found"));
+          setIsError(new Error("Round not found"));
         }
         setIsLoading(false);
       },
       (err) => {
-        setError(err);
+        setIsError(err);
         setIsLoading(false);
       },
     );
@@ -41,5 +41,5 @@ export function useRound(sessionId: string | undefined, roundNumber: number | un
     return unsubscribe;
   }, [sessionId, roundNumber]);
 
-  return { round, isLoading, error };
+  return { round, isLoading, isError };
 }

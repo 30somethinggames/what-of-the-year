@@ -14,17 +14,16 @@ interface Props {
   year: string;
 }
 export function useRoundState({ sessionId, roundNumber, topic, year }: Props) {
-  const { session, isLoading: sessionLoading, error: sessionError } = useSession(sessionId);
-  const { round, isLoading: roundLoading, error: roundError } = useRound(sessionId, roundNumber);
-  const { players, isHost, isLoading: playersLoading, error: playersError } = usePlayers(sessionId);
+  const { session, isLoading: sessionLoading, isError: sessionError } = useSession(sessionId);
+  const { round, isLoading: roundLoading, isError: roundError } = useRound(sessionId, roundNumber);
   const {
     selections,
     isLoading: selectionsLoading,
-    error: selectionsError,
+    isError: selectionsError,
   } = useSelections(sessionId, roundNumber);
 
-  const isLoading = sessionLoading || roundLoading || playersLoading || selectionsLoading;
-  const error = sessionError || roundError || playersError || selectionsError;
+  const isLoading = sessionLoading || roundLoading || selectionsLoading;
+  const isError = sessionError || roundError || selectionsError;
 
   // Sync URL with session.activeRoundNumber
   useEffect(() => {
@@ -43,5 +42,5 @@ export function useRoundState({ sessionId, roundNumber, topic, year }: Props) {
 
   const completedUids = new Set(selections.map((s) => s.uid));
 
-  return { isLoading, error, session, round, completedUids, players, isHost };
+  return { isLoading, isError, session, round, completedUids };
 }

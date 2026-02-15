@@ -3,17 +3,16 @@ import { Pressable, Text, View } from "react-native";
 
 import { PlayerList } from "../../components/player-list";
 import { Button } from "components/button";
+import { Loading } from "components/loading";
 import { Modal } from "components/modal";
+import { usePlayers } from "db/hooks/use-players";
 import { advanceRound } from "db/utils/advance-round";
-import type { Player } from "types/session";
 import { createStyles } from "utils/theme";
 
 interface Props {
   isVisible: boolean;
   onClose: () => void;
-  players: Player[];
   completedUids: Set<string>;
-  isHost: boolean;
   sessionId: string;
   roundNumber: number;
   maxRounds: number;
@@ -22,14 +21,13 @@ interface Props {
 export function RoundModal({
   isVisible,
   onClose,
-  players,
   completedUids,
-  isHost,
   sessionId,
   roundNumber,
   maxRounds,
 }: Props) {
   const s = useStyles();
+  const { players, isHost, isLoading, isError } = usePlayers(sessionId);
 
   const onNextRound = async () => {
     await advanceRound({
@@ -49,32 +47,36 @@ export function RoundModal({
 
   return (
     <Modal isVisible={isVisible} onClose={onClose}>
-      <View style={s.header}>
-        <Text style={s.title}>
-          Round {roundNumber} of {maxRounds}
-        </Text>
-        <Pressable onPress={onClose} hitSlop={8}>
-          <Text style={s.closeBtn}>✕</Text>
-        </Pressable>
-      </View>
-
-      <PlayerList
-        data={players}
-        completedUids={completedUids}
-        playerCount={players.length}
-        maxPlayerCount={10}
-      />
-
-      <View style={s.footer}>
-        {isHost && (
-          <Button
-            label={roundNumber < maxRounds ? "Next Round" : "End Game"}
-            onPress={onNextRound}
-            style={s.nextBtn}
+      {isLoading ? (
+        <Loading />
+      ) : (
+        <>
+          <View style={s.header}>
+            <Text style={s.title}>
+              Round {roundNumber} of {maxRounds}
+            </Text>
+            <Pressable onPress={onClose} hitSlop={8}>
+              <Text style={s.closeBtn}>✕</Text>
+            </Pressable>
+          </View>
+          <PlayerList
+            data={players}
+            completedUids={completedUids}
+            playerCount={players.length}
+            maxPlayerCount={10}
           />
-        )}
-        <Button label="Leave Game" onPress={onLeaveGame} style={s.leaveBtn} />
-      </View>
+          <View style={s.footer}>
+            {isHost && (
+              <Button
+                label={roundNumber < maxRounds ? "Next Round" : "End Game"}
+                onPress={onNextRound}
+                style={s.nextBtn}
+              />
+            )}
+            <Button label="Leave Game" onPress={onLeaveGame} style={s.leaveBtn} />
+          </View>
+        </>
+      )}
     </Modal>
   );
 }

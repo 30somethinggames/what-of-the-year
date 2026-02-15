@@ -21,7 +21,7 @@ export interface SelectionWithUid extends Selection {
 export function useSelections(sessionId: string | undefined, roundNumber: number | undefined) {
   const [selections, setSelections] = useState<SelectionWithUid[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+  const [isError, setIsError] = useState<Error | null>(null);
 
   useEffect(() => {
     if (!sessionId || !roundNumber) return;
@@ -37,7 +37,7 @@ export function useSelections(sessionId: string | undefined, roundNumber: number
         setIsLoading(false);
       },
       (err) => {
-        setError(err);
+        setIsError(err);
         setIsLoading(false);
       },
     );
@@ -45,5 +45,5 @@ export function useSelections(sessionId: string | undefined, roundNumber: number
     return unsubscribe;
   }, [sessionId, roundNumber]);
 
-  return { selections, isLoading, error };
+  return { selections, isLoading, isError };
 }
