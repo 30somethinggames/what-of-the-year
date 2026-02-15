@@ -46,4 +46,3 @@ tags:
 # Verify the app loaded and theme initialized without crashing
 - assertVisible: "Error"
 - assertVisible: "Retry"
-
