@@ -14,6 +14,7 @@ const VALID_TOPICS = new Set<string>(Object.values(TOPIC_KEY));
 
 // Prevent splash screen from auto-hiding until app is ready
 SplashScreen.preventAutoHideAsync().catch((e) => {
+  // oxlint-disable-next-line no-console
   console.warn("Failed to prevent splash screen auto-hide:", e);
 });
 
@@ -52,12 +53,14 @@ export default function Root() {
           setInitialTheme(topic);
         }
       } catch (e) {
+        // oxlint-disable-next-line no-console
         console.warn("Failed to get initial URL:", e);
       } finally {
         if (isMounted) {
           try {
             await SplashScreen.hideAsync();
           } catch (e) {
+            // oxlint-disable-next-line no-console
             console.warn("Failed to hide splash screen:", e);
           }
           setIsReady(true);
