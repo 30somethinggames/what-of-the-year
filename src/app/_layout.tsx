@@ -1,7 +1,9 @@
 import { useReactQueryDevTools } from "@dev-plugins/react-query";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { getLinkingURL, parse } from "expo-linking";
+import { getInitialURL, parse } from "expo-linking";
 import { Stack } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
+import { useEffect, useState } from "react";
 
 import { WebContainer } from "components/web-container";
 import { TOPIC_KEY } from "constants/topics";
@@ -10,11 +12,14 @@ import { ThemeProvider } from "utils/theme";
 
 const VALID_TOPICS = new Set<string>(Object.values(TOPIC_KEY));
 
+// Prevent splash screen from auto-hiding
+SplashScreen.preventAutoHideAsync();
+
 /**
  * when users come from invite link we determine the theme
  */
-function getTopicFromURL(): TOPIC_KEY | undefined {
-  const url = getLinkingURL();
+async function getTopicFromURL(): Promise<TOPIC_KEY | undefined> {
+  const url = await getInitialURL();
   if (!url) return undefined;
   const { path } = parse(url);
   const topic = path?.split("/")[0];
@@ -32,10 +37,32 @@ const queryClient = new QueryClient({
 
 export default function Root() {
   useReactQueryDevTools(queryClient);
+  const [initialTheme, setInitialTheme] = useState<TOPIC_KEY | undefined>(undefined);
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    async function prepare() {
+      try {
+        const topic = await getTopicFromURL();
+        setInitialTheme(topic);
+      } catch (e) {
+        console.warn("Failed to get initial URL:", e);
+      } finally {
+        setIsReady(true);
+        await SplashScreen.hideAsync();
+      }
+    }
+
+    prepare();
+  }, []);
+
+  if (!isReady) {
+    return null;
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider initialTheme={getTopicFromURL()}>
+      <ThemeProvider initialTheme={initialTheme}>
         <WebContainer>
           <Stack
             screenOptions={{

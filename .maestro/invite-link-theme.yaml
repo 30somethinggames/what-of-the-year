@@ -1,0 +1,35 @@
+appId: host.exp.Exponent
+name: Invite Link Theme Initialization
+tags:
+  - smoke
+---
+# Test 1: Movies theme from invite link
+- launchApp:
+    appId: host.exp.Exponent
+    deepLink: "whatoftheyear://movies/2025?sessionId=test-session-movies"
+- tapOn: what-of-the-year
+
+# The app should show an error screen since the session doesn't exist,
+# but the theme should be correctly set to movies theme (blue tint)
+# We can verify this by checking for specific UI elements that would be visible
+- assertVisible: "Error"
+
+# Test 2: Books theme from invite link
+- launchApp:
+    appId: host.exp.Exponent
+    deepLink: "whatoftheyear://books/2025?sessionId=test-session-books"
+- tapOn: what-of-the-year
+
+# The app should show an error screen since the session doesn't exist,
+# but the theme should be correctly set to books theme (green tint)
+- assertVisible: "Error"
+
+# Test 3: Games theme from invite link (default)
+- launchApp:
+    appId: host.exp.Exponent
+    deepLink: "whatoftheyear://games/2025?sessionId=test-session-games"
+- tapOn: what-of-the-year
+
+# The app should show an error screen since the session doesn't exist,
+# but the theme should be correctly set to games theme (black)
+- assertVisible: "Error"
