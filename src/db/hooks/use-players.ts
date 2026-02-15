@@ -1,14 +1,9 @@
 import { onSnapshot, orderBy, query } from "firebase/firestore";
 import { useEffect, useState } from "react";
 
-import { auth } from "./config";
+import { auth } from "../config";
 import { playersRef } from "db/collections";
-import type { Player } from "db/types";
-
-/** A {@link Player} enriched with the Firestore document ID. */
-export interface PlayerWithId extends Player {
-  uid: string;
-}
+import type { Player } from "types/session";
 
 /**
  * Subscribes to the players collection for a given session in real time.
@@ -20,7 +15,7 @@ export interface PlayerWithId extends Player {
  * @returns An object containing the `players` array, an `isLoading` flag, and any `error`.
  */
 export function usePlayers(sessionId: string | undefined) {
-  const [players, setPlayers] = useState<PlayerWithId[]>([]);
+  const [players, setPlayers] = useState<Player[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -33,8 +28,8 @@ export function usePlayers(sessionId: string | undefined) {
       q,
       (snapshot) => {
         const updated = snapshot.docs.map((doc) => ({
-          uid: doc.id,
           ...(doc.data() as Player),
+          uid: doc.id,
         }));
         setPlayers(updated);
         setIsLoading(false);

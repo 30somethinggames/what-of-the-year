@@ -4,14 +4,14 @@ import { Pressable, Text, View } from "react-native";
 import { PlayerList } from "../../components/player-list";
 import { Button } from "components/button";
 import { Modal } from "components/modal";
-import { advanceRound } from "db/advance-round";
-import type { PlayerWithId } from "db/use-players";
+import { advanceRound } from "db/utils/advance-round";
+import type { Player } from "types/session";
 import { createStyles } from "utils/theme";
 
 interface Props {
   visible: boolean;
   onClose: () => void;
-  players: PlayerWithId[];
+  players: Player[];
   completedUids: Set<string>;
   isHost: boolean;
   sessionId: string;

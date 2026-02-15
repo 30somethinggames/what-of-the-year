@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { handleError, STALE_TIME } from "./utils";
 import { TOPIC_KEY } from "constants/topics";
 import type { Option } from "types/option";
-import { QUERY_ARGS } from "types/query-args";
+import type { QUERY_ARGS } from "types/query-args";
 import { currentYear } from "utils/dates";
 
 const TMDB_API_URL = process.env.EXPO_PUBLIC_TMDB_TMDB_API_URL;

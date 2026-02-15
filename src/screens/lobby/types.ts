@@ -1,4 +1,4 @@
-import { TopicType } from "constants/topics";
+import type { TopicType } from "constants/topics";
 
 export interface LobbyProps {
   topic: TopicType;

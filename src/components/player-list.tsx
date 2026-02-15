@@ -1,11 +1,11 @@
 import { FlatList, Text, View } from "react-native";
 
 import { Avatar } from "./avatar/avatar";
-import { PlayerWithId } from "db/use-players";
+import type { Player } from "types/session";
 import { createStyles } from "utils/theme";
 
 interface Props {
-  data: PlayerWithId[];
+  data: Player[];
   completedUids?: Set<string>;
   playerCount: number;
   maxPlayerCount?: number;

@@ -17,6 +17,7 @@ export interface Session {
 
 // --- sessions/{sessionId}/players/{uid} ---
 export interface Player {
+  uid: string;
   name: string;
   avatar: string;
   joinedAt: Timestamp;

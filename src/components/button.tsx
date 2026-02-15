@@ -1,4 +1,5 @@
-import { Pressable, PressableProps, PressableStateCallbackType, Text } from "react-native";
+import type { PressableProps, PressableStateCallbackType } from "react-native";
+import { Pressable, Text } from "react-native";
 
 import { flatten } from "utils/styles";
 import { createStyles } from "utils/theme";

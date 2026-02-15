@@ -5,7 +5,7 @@ import { RoundModal } from "./round-modal";
 import { useRoundState } from "./use-round-state";
 import { Error } from "components/error";
 import { Loading } from "components/loading";
-import { TopicType } from "constants/topics";
+import type { TopicType } from "constants/topics";
 import { createStyles } from "utils/theme";
 
 interface Props {

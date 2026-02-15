@@ -33,7 +33,7 @@ mock.module("firebase/firestore", () => ({
 }));
 
 // Import AFTER mocks are registered
-const { createSession } = await import("../create-session");
+const { createSession } = await import("../utils/create-session");
 
 describe("createSession", () => {
   afterEach(() => {

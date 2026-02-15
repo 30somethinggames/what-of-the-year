@@ -1,25 +1,21 @@
 import { onSnapshot } from "firebase/firestore";
 import { useEffect, useState } from "react";
 
-import { selectionsRef } from "db/collections";
-import type { Selection } from "db/types";
-
-export interface SelectionWithUid extends Selection {
-  uid: string;
-}
+import { roundRef } from "db/collections";
+import type { Round } from "types/session";
 
 /**
- * Subscribes to all selections for a given round in real time.
+ * Subscribes to a single round document in real time.
  *
  * The subscription is automatically cleaned up when the component unmounts or
- * parameters change.
+ * parameters change. If the document does not exist, `error` is set.
  *
  * @param sessionId - The session ID. Pass `undefined` to skip subscribing.
  * @param roundNumber - The round number. Pass `undefined` to skip subscribing.
- * @returns An object containing the `selections` array, an `isLoading` flag, and any `error`.
+ * @returns An object containing the `round` data, an `isLoading` flag, and any `error`.
  */
-export function useSelections(sessionId: string | undefined, roundNumber: number | undefined) {
-  const [selections, setSelections] = useState<SelectionWithUid[]>([]);
+export function useRound(sessionId: string | undefined, roundNumber: number | undefined) {
+  const [round, setRound] = useState<Round | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -27,13 +23,13 @@ export function useSelections(sessionId: string | undefined, roundNumber: number
     if (!sessionId || !roundNumber) return;
 
     const unsubscribe = onSnapshot(
-      selectionsRef(sessionId, roundNumber),
+      roundRef(sessionId, roundNumber),
       (snapshot) => {
-        const data = snapshot.docs.map((doc) => ({
-          uid: doc.id,
-          ...(doc.data() as Selection),
-        }));
-        setSelections(data);
+        if (snapshot.exists()) {
+          setRound(snapshot.data() as Round);
+        } else {
+          setError(new Error("Round not found"));
+        }
         setIsLoading(false);
       },
       (err) => {
@@ -45,5 +41,5 @@ export function useSelections(sessionId: string | undefined, roundNumber: number
     return unsubscribe;
   }, [sessionId, roundNumber]);
 
-  return { selections, isLoading, error };
+  return { round, isLoading, error };
 }

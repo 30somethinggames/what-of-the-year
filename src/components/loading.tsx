@@ -1,4 +1,5 @@
-import { ActivityIndicator, ActivityIndicatorProps, View } from "react-native";
+import type { ActivityIndicatorProps } from "react-native";
+import { ActivityIndicator, View } from "react-native";
 
 import { createStyles } from "utils/theme";
 

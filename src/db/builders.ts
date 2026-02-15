@@ -1,5 +1,4 @@
-const MAX_ROUNDS = 10;
-const MAX_PLAYERS = 10;
+import { MAX_PLAYERS, MAX_ROUNDS } from "constants/session";
 
 /** Session TTL in milliseconds (24 hours) */
 export const SESSION_TTL_MS = 24 * 60 * 60 * 1000;

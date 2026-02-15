@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Pressable, Text } from "react-native";
 import { Round } from "screens/round";
 
-import { MAX_ROUNDS } from "db/builders";
+import { MAX_ROUNDS } from "constants/session";
 import { useParams } from "hooks/use-params";
 import { createStyles } from "utils/theme";
 

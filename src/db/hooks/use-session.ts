@@ -2,7 +2,7 @@ import { onSnapshot } from "firebase/firestore";
 import { useEffect, useState } from "react";
 
 import { sessionRef } from "db/collections";
-import type { Session } from "db/types";
+import type { Session } from "types/session";
 
 /**
  * Subscribes to a single session document in real time.

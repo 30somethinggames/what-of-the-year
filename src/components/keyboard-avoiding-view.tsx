@@ -1,9 +1,6 @@
-import { FC } from "react";
-import {
-  KeyboardAvoidingView as RNKeyboardAvoidingView,
-  KeyboardAvoidingViewProps,
-  Platform,
-} from "react-native";
+import type { FC } from "react";
+import type { KeyboardAvoidingViewProps } from "react-native";
+import { KeyboardAvoidingView as RNKeyboardAvoidingView, Platform } from "react-native";
 
 const baseBehavior = Platform.OS === "ios" ? "padding" : "height";
 

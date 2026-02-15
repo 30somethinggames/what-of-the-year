@@ -1,34 +1,6 @@
 # TODOs
 
-## 1. Tests
-
-Need test coverage for all new functionality added
-
-**New Files to Test:**
-
-- `useRound` hook - real-time round document subscription
-- `useSelections` hook - real-time selections subcollection
-- `advanceRound` function - closes current round, opens next, updates session
-- `startSession` function - closes lobby, opens round 1
-
-**Testing Pattern:**
-Follow existing test structure in `src/db/__tests__/`:
-
-- Mock Firestore functions (`onSnapshot`, `writeBatch`, etc.)
-- Test success cases
-- Test error handling
-- Test state transitions
-
-**Files to Create:**
-
-- `src/db/__tests__/use-round.test.ts`
-- `src/db/__tests__/use-selections.test.ts`
-- `src/db/__tests__/advance-round.test.ts`
-- `src/db/__tests__/start-session.test.ts`
-
----
-
-## 2. E2E Multiplayer Testing Strategy
+## 1. E2E Multiplayer Testing Strategy
 
 Figure out how to test multi-device interactions in a multiplayer game.
 
@@ -75,7 +47,7 @@ Figure out how to test multi-device interactions in a multiplayer game.
 
 ---
 
-## 3. Implement Leave Session Functionality
+## 2. Implement Leave Session Functionality
 
 Add ability for players to leave a session and clean up properly.
 
@@ -115,14 +87,14 @@ Add ability for players to leave a session and clean up properly.
    - Test host reassignment
    - Test full session cleanup when last player leaves
 
-## 4. theme set on player join
+## 3. theme set on player join
 
-## 5. refactor expensive query calls
+## 4. refactor expensive query calls
 
-## 6. games query - how much to fetch
+## 5. games query - how much to fetch
 
-## 7. security
+## 6. security
 
-## 8. round flow
+## 7. round flow
 
-## 9. repo rules - oxlint
+## 8. repo rules - oxlint

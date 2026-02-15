@@ -1,6 +1,7 @@
 import { useLocalSearchParams } from "expo-router";
 
-import { getTopic, TOPIC_KEY } from "constants/topics";
+import type { TOPIC_KEY } from "constants/topics";
+import { getTopic } from "constants/topics";
 
 export type Params = {
   /** The topic key (e.g., 'movies', 'games', 'books') */

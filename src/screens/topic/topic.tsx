@@ -8,10 +8,10 @@ import { Button } from "components/button";
 import { Error } from "components/error";
 import { Input } from "components/input";
 import { KeyboardAvoidingView } from "components/keyboard-avoiding-view";
-import { TopicType } from "constants/topics";
-import { createSession } from "db/create-session";
-import { joinSession } from "db/join-session";
-import { useAuth } from "db/use-auth";
+import type { TopicType } from "constants/topics";
+import { useAuth } from "db/hooks/use-auth";
+import { createSession } from "db/utils/create-session";
+import { joinSession } from "db/utils/join-session";
 import { useTopicData } from "queries/use-topic-data";
 import { createStyles } from "utils/theme";
 

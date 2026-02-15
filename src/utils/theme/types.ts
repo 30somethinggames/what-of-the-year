@@ -1,4 +1,4 @@
-import { TOPIC_KEY } from "constants/topics";
+import type { TOPIC_KEY } from "constants/topics";
 
 export interface Theme {
   colors: {

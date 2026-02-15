@@ -40,7 +40,7 @@ mock.module("firebase/firestore", () => ({
   increment: (n: number) => ({ _type: "increment", value: n }),
 }));
 
-const { joinSession } = await import("../join-session");
+const { joinSession } = await import("../utils/join-session");
 
 describe("joinSession", () => {
   afterEach(() => {

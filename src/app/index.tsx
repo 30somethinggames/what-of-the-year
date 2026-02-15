@@ -5,8 +5,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Button } from "components/button";
 import { Picker } from "components/picker";
-import { TopicType, topics } from "constants/topics";
-import { Year, years } from "constants/years";
+import type { TopicType } from "constants/topics";
+import { topics } from "constants/topics";
+import type { Year } from "constants/years";
+import { years } from "constants/years";
 import { createStyles, useTheme } from "utils/theme";
 
 export default function Index() {

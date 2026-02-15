@@ -24,7 +24,7 @@ Pre-commit runs: `oxfmt` → `oxlint --fix` → unused styles check → type che
 - **Formatter**: oxfmt (NOT prettier). **Linter**: oxlint (NOT eslint). Disable rules with `// oxlint-disable <rule>`.
 - **Files**: kebab-case. **Components**: PascalCase functions. **Hooks**: `use` prefix, camelCase.
 - **Imports**: Use path aliases (`utils/theme`, `db/collections`, `types/option`). Relative imports only for siblings (`./types`). Use `import type` for type-only imports.
-- **Module boundaries**: Top-level shared dirs (`db/`, `hooks/`, `utils/`, `components/`, `constants/`, `types/`, `queries/`) can be imported from anywhere. Screen internals (e.g., `screens/lobby/types`, `screens/lobby/use-lobby-state`) must NOT be imported from outside that screen — import from the barrel (`screens/lobby`) instead. Enforced by `no-restricted-imports` in [.oxlintrc.json](.oxlintrc.json).
+- **Module boundaries**: Top-level shared dirs (`hooks/`, `utils/`, `components/`, `constants/`, `types/`, `queries/`) can be imported from anywhere. Screen internals (e.g., `screens/lobby/types`, `screens/lobby/use-lobby-state`) must NOT be imported from outside that screen — import from the barrel (`screens/lobby`) instead. Only `db/hooks/*` and `db/utils/*` are public; internal db files (`db/config`, `db/collections`, `db/builders`) must not be imported outside `db/`. Shared types and constants belong in `types/` and `constants/`. Enforced by `no-restricted-imports` in [.oxlintrc.json](.oxlintrc.json).
 - **Exports**: Named exports everywhere. `export default` only in route files under `src/app/`.
 - **Types**: `interface` for object shapes, `type` for unions/aliases.
 
