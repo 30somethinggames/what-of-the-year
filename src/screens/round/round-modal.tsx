@@ -9,7 +9,7 @@ import type { Player } from "types/session";
 import { createStyles } from "utils/theme";
 
 interface Props {
-  visible: boolean;
+  isVisible: boolean;
   onClose: () => void;
   players: Player[];
   completedUids: Set<string>;
@@ -20,7 +20,7 @@ interface Props {
 }
 
 export function RoundModal({
-  visible,
+  isVisible,
   onClose,
   players,
   completedUids,
@@ -48,7 +48,7 @@ export function RoundModal({
   };
 
   return (
-    <Modal isVisible={visible} onClose={onClose}>
+    <Modal isVisible={isVisible} onClose={onClose}>
       <View style={s.header}>
         <Text style={s.title}>
           Round {roundNumber} of {maxRounds}

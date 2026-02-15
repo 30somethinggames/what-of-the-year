@@ -13,7 +13,13 @@ import { useSession } from "db/hooks/use-session";
  */
 export function useLobbyState({ sessionId, topic, year }: LobbyProps) {
   const { session, isLoading: sessionLoading, error: sessionError } = useSession(sessionId);
-  const { players, isHost, isLoading: playersLoading, error: playersError } = usePlayers(sessionId);
+  const {
+    players,
+    currentUser,
+    isHost,
+    isLoading: playersLoading,
+    error: playersError,
+  } = usePlayers(sessionId);
 
   const isLoading = sessionLoading || playersLoading;
   const error = sessionError || playersError;
@@ -32,5 +38,15 @@ export function useLobbyState({ sessionId, topic, year }: LobbyProps) {
     }
   }, [session?.isOpen, isHost, isLoading, error, topic.value, year, sessionId]);
 
-  return { isLoading, error, session, players, isHost, playerCount, maxPlayerCount, canStart };
+  return {
+    isLoading,
+    error,
+    session,
+    currentUser,
+    players,
+    isHost,
+    playerCount,
+    maxPlayerCount,
+    canStart,
+  };
 }

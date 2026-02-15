@@ -13,11 +13,11 @@ interface Props {
   year: string;
   sessionId: string;
   roundNumber: number;
-  drawerVisible: boolean;
+  isVisible: boolean;
   onClose: () => void;
 }
 
-export function Round({ topic, year, sessionId, roundNumber, drawerVisible, onClose }: Props) {
+export function Round({ topic, year, sessionId, roundNumber, isVisible, onClose }: Props) {
   const s = useStyles();
   const { isLoading, error, session, round, players, completedUids, isHost } = useRoundState({
     sessionId,
@@ -36,7 +36,7 @@ export function Round({ topic, year, sessionId, roundNumber, drawerVisible, onCl
       </SafeAreaView>
 
       <RoundModal
-        visible={drawerVisible}
+        isVisible={isVisible}
         onClose={onClose}
         players={players}
         completedUids={completedUids}

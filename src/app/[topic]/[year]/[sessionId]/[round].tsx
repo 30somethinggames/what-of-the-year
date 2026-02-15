@@ -1,35 +1,31 @@
 import { Redirect, Stack } from "expo-router";
 import { useState } from "react";
-import { Pressable, Text } from "react-native";
-import { Round } from "screens/round";
 
+import { SettingsButton } from "components/settings-button";
 import { MAX_ROUNDS } from "constants/session";
 import { useParams } from "hooks/use-params";
-import { createStyles } from "utils/theme";
+import { Round } from "screens/round";
 
 export default function RoundIndex() {
   const { topic, year, sessionId, round } = useParams();
-  const s = useStyles();
-  const [drawerVisible, setDrawerVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
 
   if (!topic || !year || !sessionId || !round) {
     return <Redirect href="/" />;
   }
 
-  const roundNumber = parseInt(round, 10);
+  const onPress = () => setIsVisible(true);
+  const onClose = () => setIsVisible(false);
 
-  const onClose = () => setDrawerVisible(false);
+  const roundNumber = parseInt(round, 10);
+  const title = `Round ${roundNumber} of ${MAX_ROUNDS}`;
 
   return (
     <>
       <Stack.Screen
         options={{
-          headerLeft: () => (
-            <Pressable onPress={() => setDrawerVisible(true)} hitSlop={8}>
-              <Text style={s.menuBtn}>☰</Text>
-            </Pressable>
-          ),
-          title: `Round ${roundNumber} of ${MAX_ROUNDS}`,
+          headerLeft: () => <SettingsButton onPress={onPress} />,
+          title,
         }}
       />
       <Round
@@ -37,17 +33,9 @@ export default function RoundIndex() {
         year={year}
         sessionId={sessionId}
         roundNumber={roundNumber}
-        drawerVisible={drawerVisible}
+        isVisible={isVisible}
         onClose={onClose}
       />
     </>
   );
 }
-
-const useStyles = createStyles((t) => ({
-  menuBtn: {
-    fontSize: t.text.size.xxl,
-    color: t.text.color.primary,
-    paddingHorizontal: t.spacing.md,
-  },
-}));

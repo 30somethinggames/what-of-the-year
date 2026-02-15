@@ -96,5 +96,3 @@ Add ability for players to leave a session and clean up properly.
 ## 6. security
 
 ## 7. round flow
-
-## 8. repo rules - oxlint

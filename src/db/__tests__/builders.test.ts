@@ -1,14 +1,7 @@
 import { describe, expect, it } from "bun:test";
 
-import {
-  MAX_PLAYERS,
-  MAX_ROUNDS,
-  buildAllRounds,
-  buildPlayer,
-  buildRound,
-  buildSession,
-  getRoundWeight,
-} from "../builders";
+import { buildAllRounds, buildPlayer, buildRound, buildSession, getRoundWeight } from "../builders";
+import { MAX_PLAYERS, MAX_ROUNDS } from "constants/session";
 
 describe("getRoundWeight", () => {
   it("returns the round number as the weight", () => {

@@ -8,22 +8,32 @@ import { Button } from "components/button";
 import { Error } from "components/error";
 import { Loading } from "components/loading";
 import { PlayerList } from "components/player-list";
+import { leaveSession } from "db/utils/leave-session";
 import { startSession } from "db/utils/start-session";
 import { createStyles } from "utils/theme";
 
 export function Lobby({ topic, year, sessionId }: LobbyProps) {
   const s = useStyles();
-  const { isLoading, error, session, players, isHost, playerCount, maxPlayerCount, canStart } =
-    useLobbyState({
-      topic,
-      year,
-      sessionId,
-    });
+  const {
+    isLoading,
+    error,
+    session,
+    players,
+    isHost,
+    playerCount,
+    maxPlayerCount,
+    canStart,
+    currentUser,
+  } = useLobbyState({
+    topic,
+    year,
+    sessionId,
+  });
 
   if (isLoading) return <Loading />;
   if (error || !session) return <Error />;
 
-  const onShareInvite = async () => {
+  const onShare = async () => {
     const url = Linking.createURL(`/${topic.value}/${year}`, {
       queryParams: { sessionId },
     });
@@ -33,7 +43,7 @@ export function Lobby({ topic, year, sessionId }: LobbyProps) {
     });
   };
 
-  const onStartGame = async () => {
+  const onStart = async () => {
     await startSession({ sessionId });
     router.replace({
       pathname: "/[topic]/[year]/[sessionId]/[round]",
@@ -41,12 +51,24 @@ export function Lobby({ topic, year, sessionId }: LobbyProps) {
     });
   };
 
+  const onLeave = async () => {
+    await leaveSession({ sessionId, uid: currentUser?.uid });
+    router.replace("/");
+  };
+
   return (
     <View style={s.root}>
       <PlayerList data={players} playerCount={playerCount} maxPlayerCount={maxPlayerCount} />
+
       <View style={s.footer}>
-        <Button label="Share Invite" onPress={onShareInvite} />
-        {isHost && <Button label="Start" onPress={onStartGame} disabled={canStart} />}
+        {isHost ? (
+          <>
+            <Button label="Invite" onPress={onShare} />
+            <Button label="Start" onPress={onStart} disabled={canStart} />
+          </>
+        ) : (
+          <Button label="Leave" onPress={onLeave} />
+        )}
       </View>
     </View>
   );

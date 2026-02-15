@@ -37,5 +37,3 @@ export const buildRound = (roundNumber: number) => ({
 /** Build all round documents for a session */
 export const buildAllRounds = (maxRounds: number = MAX_ROUNDS) =>
   Array.from({ length: maxRounds }, (_, i) => buildRound(i + 1));
-
-export { MAX_ROUNDS, MAX_PLAYERS };

@@ -43,8 +43,8 @@ export function usePlayers(sessionId: string | undefined) {
     return unsubscribe;
   }, [sessionId]);
 
-  const currentUid = auth.currentUser?.uid;
-  const isHost = players.some((p) => p.uid === currentUid && p.isHost);
+  const currentUser = auth.currentUser;
+  const isHost = players.some((p) => p.uid === currentUser?.uid && p.isHost);
 
-  return { players, isHost, isLoading, error };
+  return { players, currentUser, isHost, isLoading, error };
 }

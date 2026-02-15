@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, mock } from "bun:test";
 
-import { MAX_ROUNDS } from "../builders";
+import { MAX_ROUNDS } from "constants/session";
 
 // --- Mock Firestore and config BEFORE importing createSession ---
 const mockSessionBatchSet = mock(() => {});

@@ -29,7 +29,8 @@ service cloud.firestore {
       allow update: if isHost(sessionId)
         || (isAuthenticated()
             && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["playerCount"])
-            && request.resource.data.playerCount == resource.data.playerCount + 1);
+            && (request.resource.data.playerCount == resource.data.playerCount + 1
+                || request.resource.data.playerCount == resource.data.playerCount - 1));
       allow delete: if isHost(sessionId);
 
       // --- Players ---
@@ -37,7 +38,7 @@ service cloud.firestore {
         allow read: if isPlayer(sessionId) || isOwner(uid);
         allow create: if isOwner(uid);
         allow update: if isOwner(uid);
-        allow delete: if isHost(sessionId);
+        allow delete: if isHost(sessionId) || isOwner(uid);
       }
 
       // --- Rounds ---

@@ -3,6 +3,15 @@
   "experimentalSortImports": {
     "groups": [["builtin"], ["external"], [""], ["internal", "parent", "sibling", "index"]],
     "newlinesBetween": true,
-    "internalPattern": ["constants", "queries", "components", "utils", "types", "hooks", "db"]
+    "internalPattern": [
+      "constants",
+      "queries",
+      "components",
+      "utils",
+      "types",
+      "hooks",
+      "db",
+      "screens"
+    ]
   }
 }
