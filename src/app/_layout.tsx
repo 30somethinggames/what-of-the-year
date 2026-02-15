@@ -12,6 +12,11 @@ import { ThemeProvider } from "utils/theme";
 
 const VALID_TOPICS = new Set<string>(Object.values(TOPIC_KEY));
 
+// Prevent splash screen from auto-hiding until app is ready
+SplashScreen.preventAutoHideAsync().catch((e) => {
+  console.warn("Failed to prevent splash screen auto-hide:", e);
+});
+
 /**
  * when users come from invite link we determine the theme
  */
@@ -41,13 +46,6 @@ export default function Root() {
     let isMounted = true;
 
     async function prepare() {
-      try {
-        // Prevent splash screen from auto-hiding
-        await SplashScreen.preventAutoHideAsync();
-      } catch (e) {
-        console.warn("Failed to prevent splash screen auto-hide:", e);
-      }
-
       try {
         const topic = await getTopicFromURL();
         if (isMounted) {
