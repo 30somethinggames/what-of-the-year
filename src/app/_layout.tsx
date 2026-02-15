@@ -55,12 +55,12 @@ export default function Root() {
         console.warn("Failed to get initial URL:", e);
       } finally {
         if (isMounted) {
+          try {
+            await SplashScreen.hideAsync();
+          } catch (e) {
+            console.warn("Failed to hide splash screen:", e);
+          }
           setIsReady(true);
-        }
-        try {
-          await SplashScreen.hideAsync();
-        } catch (e) {
-          console.warn("Failed to hide splash screen:", e);
         }
       }
     }
