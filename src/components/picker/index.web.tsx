@@ -4,8 +4,6 @@ import { ScrollView, Text, View, type ViewStyle } from "react-native";
 import { useStyles } from "./styles";
 import { ITEM_HEIGHT, type PickerItem, type PickerProps } from "./types";
 
-export type { PickerItem, PickerProps } from "./types";
-
 /**
  * Web picker using a `ScrollView` with CSS `scroll-snap-type` for native-feeling
  * snap behavior. Listens for the `scrollend` event to detect the final resting

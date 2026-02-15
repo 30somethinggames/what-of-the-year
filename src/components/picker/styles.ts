@@ -24,4 +24,7 @@ export const useStyles = createStyles((t) => ({
     fontWeight: t.text.weight.bold,
     color: t.colors.primary,
   },
+  contentContainerStyle: {
+    paddingVertical: 0,
+  },
 }));
