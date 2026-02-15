@@ -1,7 +1,7 @@
 import { Redirect, Stack } from "expo-router";
-import { Topic } from "screens/topic";
 
 import { useParams } from "hooks/use-params";
+import { Topic } from "screens/topic";
 
 export default function TopicIndex() {
   const { topic, year, sessionId } = useParams();
@@ -9,6 +9,7 @@ export default function TopicIndex() {
   if (!topic || !year) {
     return <Redirect href="/" />;
   }
+
   return (
     <>
       <Stack.Screen
