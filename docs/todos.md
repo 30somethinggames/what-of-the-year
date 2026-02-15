@@ -47,45 +47,11 @@ Figure out how to test multi-device interactions in a multiplayer game.
 
 ---
 
-## 2. Implement Leave Session Functionality
+## 2. Deeplinks
 
-Add ability for players to leave a session and clean up properly.
+Figure out [deeplinks](./universal-links.md)
 
-**Current Gap:**
-
-- `joinSession` increments `playerCount` when joining
-- No corresponding `leaveSession` to decrement and cleanup
-- `usePlayers` subscription would handle UI updates, but backend cleanup is missing
-
-**Implementation Requirements:**
-
-1. **Create `src/db/leave-session.ts`:**
-   - Transaction to delete player document
-   - Decrement `session.playerCount` by 1
-   - Handle host leaving scenarios (reassign or close session)
-
-2. **Host Leaving Logic:**
-   - If host leaves while `session.isOpen = true` (lobby):
-     - Option A: Reassign host to first remaining player
-     - Option B: Close/delete the session entirely
-   - If host leaves during active game:
-     - Keep session alive, reassign host for game control
-
-3. **UI Updates Needed:**
-   - Add "Leave" button in lobby screen
-   - Handle navigation after leaving (back to home?)
-   - Show notification if host leaves/session closes
-
-4. **Edge Cases to Handle:**
-   - Last player leaving → cleanup entire session?
-   - Player leaving during active round → keep their selections?
-   - Disconnection vs explicit leaving (Firebase `onDisconnect()` API?)
-
-5. **Testing:**
-   - Create `src/db/__tests__/leave-session.test.ts`
-   - Test playerCount decrement
-   - Test host reassignment
-   - Test full session cleanup when last player leaves
+---
 
 ## 3. theme set on player join
 

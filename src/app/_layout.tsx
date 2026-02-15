@@ -27,9 +27,7 @@ export default function Root() {
               headerBackButtonDisplayMode: "minimal",
               headerShadowVisible: false,
             }}
-          >
-            <Stack.Screen name="index" options={{ headerShown: false }} />
-          </Stack>
+          />
         </WebContainer>
       </ThemeProvider>
     </QueryClientProvider>
