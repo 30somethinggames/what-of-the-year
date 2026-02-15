@@ -12,9 +12,6 @@ import { ThemeProvider } from "utils/theme";
 
 const VALID_TOPICS = new Set<string>(Object.values(TOPIC_KEY));
 
-// Prevent splash screen from auto-hiding
-SplashScreen.preventAutoHideAsync();
-
 /**
  * when users come from invite link we determine the theme
  */
@@ -41,14 +38,27 @@ export default function Root() {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
+    let isMounted = true;
+
     async function prepare() {
       try {
+        // Prevent splash screen from auto-hiding
+        await SplashScreen.preventAutoHideAsync();
+      } catch (e) {
+        console.warn("Failed to prevent splash screen auto-hide:", e);
+      }
+
+      try {
         const topic = await getTopicFromURL();
-        setInitialTheme(topic);
+        if (isMounted) {
+          setInitialTheme(topic);
+        }
       } catch (e) {
         console.warn("Failed to get initial URL:", e);
       } finally {
-        setIsReady(true);
+        if (isMounted) {
+          setIsReady(true);
+        }
         try {
           await SplashScreen.hideAsync();
         } catch (e) {
@@ -58,6 +68,10 @@ export default function Root() {
     }
 
     prepare();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   if (!isReady) {
