@@ -49,7 +49,11 @@ export default function Root() {
         console.warn("Failed to get initial URL:", e);
       } finally {
         setIsReady(true);
-        await SplashScreen.hideAsync();
+        try {
+          await SplashScreen.hideAsync();
+        } catch (e) {
+          console.warn("Failed to hide splash screen:", e);
+        }
       }
     }
 
