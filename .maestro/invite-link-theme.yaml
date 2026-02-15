@@ -3,33 +3,47 @@ name: Invite Link Theme Initialization
 tags:
   - smoke
 ---
+# This test validates that themes initialize correctly when launching from deep links.
+# Each topic (games, movies, books) has a distinct theme with different primary colors:
+# - games: pure black (#000000)
+# - movies: black with blue tint
+# - books: black with green tint
+#
+# Since Maestro cannot directly validate color values, we verify the app successfully
+# launches, initializes the theme context, and navigates to the session screen without
+# crashing. If theme initialization fails, the app would crash or behave unexpectedly.
+
 # Test 1: Movies theme from invite link
 - launchApp:
     appId: host.exp.Exponent
     deepLink: "whatoftheyear://movies/2025?sessionId=test-session-movies"
 - tapOn: what-of-the-year
+- waitForAnimationToEnd
 
-# The app should show an error screen since the session doesn't exist,
-# but the theme should be correctly set to movies theme (blue tint)
-# We can verify this by checking for specific UI elements that would be visible
+# Verify the app loaded and theme initialized without crashing
 - assertVisible: "Error"
+# Verify we can interact with the error screen
+- assertVisible: "Retry"
 
 # Test 2: Books theme from invite link
 - launchApp:
     appId: host.exp.Exponent
     deepLink: "whatoftheyear://books/2025?sessionId=test-session-books"
 - tapOn: what-of-the-year
+- waitForAnimationToEnd
 
-# The app should show an error screen since the session doesn't exist,
-# but the theme should be correctly set to books theme (green tint)
+# Verify the app loaded and theme initialized without crashing
 - assertVisible: "Error"
+- assertVisible: "Retry"
 
 # Test 3: Games theme from invite link (default)
 - launchApp:
     appId: host.exp.Exponent
     deepLink: "whatoftheyear://games/2025?sessionId=test-session-games"
 - tapOn: what-of-the-year
+- waitForAnimationToEnd
 
-# The app should show an error screen since the session doesn't exist,
-# but the theme should be correctly set to games theme (black)
+# Verify the app loaded and theme initialized without crashing
 - assertVisible: "Error"
+- assertVisible: "Retry"
+
