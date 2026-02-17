@@ -38,16 +38,6 @@ mock.module("db/collections", () => ({
   }),
 }));
 
-mock.module("db/builders", () => ({
-  SESSION_TTL_MS: 24 * 60 * 60 * 1000,
-  getRoundWeight: (roundNumber: number) => roundNumber,
-  buildSession: (topic: string, year: number) => ({ topic, year }),
-  buildPlayer: (name: string, avatar: string, isHost: boolean) => ({ name, avatar, isHost }),
-  buildRound: (roundNumber: number) => ({ number: roundNumber, state: "pending" }),
-  buildAllRounds: (maxRounds = 10) =>
-    Array.from({ length: maxRounds }, (_, i) => ({ number: i + 1, state: "pending" })),
-}));
-
 mock.module("firebase/firestore", () => ({
   writeBatch: () => ({
     set: mock(() => {}),
