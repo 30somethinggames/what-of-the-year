@@ -17,10 +17,24 @@ mock.module("db/config", () => ({
 }));
 
 mock.module("db/collections", () => ({
+  sessionsRef: () => ({ path: "sessions" }),
   sessionRef: (id: string) => ({ path: `sessions/${id}`, id }),
+  playersRef: (sessionId: string) => ({ path: `sessions/${sessionId}/players` }),
   playerRef: (sessionId: string, uid: string) => ({
     path: `sessions/${sessionId}/players/${uid}`,
     id: uid,
+  }),
+  roundsRef: (sessionId: string) => ({ path: `sessions/${sessionId}/rounds` }),
+  roundRef: (sessionId: string, roundNumber: number) => ({
+    _type: "roundRef",
+    sessionId,
+    roundNumber,
+  }),
+  selectionsRef: (sessionId: string, roundNumber: number) => ({
+    path: `sessions/${sessionId}/rounds/${roundNumber}/selections`,
+  }),
+  selectionRef: (sessionId: string, roundNumber: number, uid: string) => ({
+    path: `sessions/${sessionId}/rounds/${roundNumber}/selections/${uid}`,
   }),
 }));
 
