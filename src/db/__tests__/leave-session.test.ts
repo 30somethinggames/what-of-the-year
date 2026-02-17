@@ -17,14 +17,37 @@ mock.module("db/config", () => ({
 }));
 
 mock.module("db/collections", () => ({
+  sessionsRef: () => ({ path: "sessions" }),
   sessionRef: (id: string) => ({ path: `sessions/${id}`, id }),
+  playersRef: (sessionId: string) => ({ path: `sessions/${sessionId}/players` }),
   playerRef: (sessionId: string, uid: string) => ({
     path: `sessions/${sessionId}/players/${uid}`,
     id: uid,
   }),
+  roundsRef: (sessionId: string) => ({ path: `sessions/${sessionId}/rounds` }),
+  roundRef: (sessionId: string, roundNumber: number) => ({
+    _type: "roundRef",
+    sessionId,
+    roundNumber,
+  }),
+  selectionsRef: (sessionId: string, roundNumber: number) => ({
+    path: `sessions/${sessionId}/rounds/${roundNumber}/selections`,
+  }),
+  selectionRef: (sessionId: string, roundNumber: number, uid: string) => ({
+    path: `sessions/${sessionId}/rounds/${roundNumber}/selections/${uid}`,
+  }),
 }));
 
 mock.module("firebase/firestore", () => ({
+  writeBatch: () => ({
+    set: mock(() => {}),
+    update: mock(() => {}),
+    commit: mock(() => Promise.resolve()),
+  }),
+  serverTimestamp: () => ({ _type: "serverTimestamp" }),
+  Timestamp: { fromMillis: (ms: number) => ({ _type: "timestamp", ms }) },
+  doc: (...segments: string[]) => ({ path: segments.join("/") }),
+  collection: (...segments: string[]) => ({ path: segments.join("/") }),
   runTransaction: (_db: unknown, fn: (transaction: unknown) => Promise<void>) => {
     return fn({
       get: mockTransactionGet,
