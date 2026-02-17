@@ -43,6 +43,15 @@ mock.module("db/builders", () => ({
 }));
 
 mock.module("firebase/firestore", () => ({
+  writeBatch: () => ({
+    set: mock(() => {}),
+    update: mock(() => {}),
+    commit: mock(() => Promise.resolve()),
+  }),
+  serverTimestamp: () => ({ _type: "serverTimestamp" }),
+  Timestamp: { fromMillis: (ms: number) => ({ _type: "timestamp", ms }) },
+  doc: (...segments: string[]) => ({ path: segments.join("/") }),
+  collection: (...segments: string[]) => ({ path: segments.join("/") }),
   runTransaction: (_db: unknown, fn: (transaction: unknown) => Promise<void>) => {
     return fn({
       get: mockTransactionGet,
@@ -50,7 +59,6 @@ mock.module("firebase/firestore", () => ({
       update: mockTransactionUpdate,
     });
   },
-  serverTimestamp: () => ({ _type: "serverTimestamp" }),
   increment: (n: number) => ({ _type: "increment", value: n }),
 }));
 
