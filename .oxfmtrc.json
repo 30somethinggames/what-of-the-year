@@ -4,12 +4,13 @@
     "groups": [["builtin"], ["external"], [""], ["internal", "parent", "sibling", "index"]],
     "newlinesBetween": true,
     "internalPattern": [
-      "constants",
-      "queries",
+      "app",
       "components",
-      "utils",
-      "types",
+      "constants",
       "hooks",
+      "queries",
+      "types",
+      "utils",
       "db",
       "screens"
     ]
