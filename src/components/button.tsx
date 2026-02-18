@@ -8,7 +8,6 @@ interface Props extends PressableProps {
   label: string;
 }
 
-// focus
 export function Button({ label, style, disabled, ...props }: Props) {
   const s = useStyles();
   const fStyle = (state: PressableStateCallbackType) => {

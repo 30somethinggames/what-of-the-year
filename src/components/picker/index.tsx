@@ -1,9 +1,10 @@
 import * as Haptics from "expo-haptics";
-import { useCallback, useEffect, useRef } from "react";
+import { memo, useCallback, useEffect, useRef } from "react";
 import type { FlatList } from "react-native";
 import { Text } from "react-native";
 import Animated, {
   type SharedValue,
+  useAnimatedScrollHandler,
   useAnimatedStyle,
   useSharedValue,
   interpolate,
@@ -23,10 +24,31 @@ interface ItemProps {
 }
 
 /**
- * A single row in the picker. Fades and scales based on its distance
- * from the currently centered scroll position.
+ * Returns the layout metadata for a given item index. Defined outside the
+ * component since it only depends on the `ITEM_HEIGHT` constant, making it a
+ * stable reference that never triggers FlatList re-renders.
  */
-function Item({ label, index, scrollOffset }: ItemProps) {
+function getItemLayout(_data: unknown, index: number) {
+  return { length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index };
+}
+
+/**
+ * Extracts a stable string key for each picker item. Defined outside the
+ * component to avoid creating a new function reference on every render.
+ */
+function keyExtractor(item: PickerItem) {
+  return String(item.value);
+}
+
+/**
+ * A single row in the picker. Fades and scales based on its distance from the
+ * currently centered scroll position. The animation runs entirely on the UI
+ * thread via `useAnimatedStyle`, so no JS re-renders occur during scroll.
+ *
+ * Wrapped in `memo` so that React skips re-rendering rows whose `label` and
+ * `index` props haven't changed when the parent `Picker` re-renders.
+ */
+const Item = memo(function Item({ label, index, scrollOffset }: ItemProps) {
   const s = useStyles();
 
   const animatedStyle = useAnimatedStyle(() => {
@@ -46,12 +68,19 @@ function Item({ label, index, scrollOffset }: ItemProps) {
       </Text>
     </Animated.View>
   );
-}
+});
 
 /**
  * Scroll-based picker for native platforms. Uses a snapping `FlatList` with
  * animated opacity/scale on each row and haptic feedback on selection changes.
  * Syncs to external `value` changes by scrolling programmatically.
+ *
+ * Performance considerations:
+ * - `Item` is memoized to prevent JS re-renders of rows during parent updates.
+ * - `getItemLayout` and `keyExtractor` are module-level stable references.
+ * - `onScroll` uses `useAnimatedScrollHandler` (runs on UI thread, no JS bridge overhead).
+ * - `renderItem` is wrapped in `useCallback` for a stable FlatList prop reference.
+ * - The combined `style` array is memoized to avoid creating a new object each render.
  */
 export function Picker<T extends PickerItem>({
   data,
@@ -64,6 +93,10 @@ export function Picker<T extends PickerItem>({
   const scrollOffset = useSharedValue(0);
   const activeIndex = useRef(data.findIndex((d) => d.value === value.value));
 
+  /**
+   * Syncs the list scroll position whenever the external `value` prop changes
+   * (e.g. parent resets the selection programmatically).
+   */
   useEffect(() => {
     const index = data.findIndex((d) => d.value === value.value);
     if (index >= 0 && index !== activeIndex.current) {
@@ -72,6 +105,19 @@ export function Picker<T extends PickerItem>({
     }
   }, [data, value]);
 
+  /**
+   * UI-thread scroll handler that keeps `scrollOffset` in sync without
+   * crossing the JS bridge on every frame.
+   */
+  const handleScroll = useAnimatedScrollHandler((e) => {
+    scrollOffset.value = e.contentOffset.y;
+  });
+
+  /**
+   * Fires after the scroll animation settles on a snap point. Derives the
+   * selected index from the final offset, triggers haptics, and notifies the
+   * parent only when the selection actually changes.
+   */
   const handleMomentumScrollEnd = useCallback(
     (e: { nativeEvent: { contentOffset: { y: number } } }) => {
       const index = Math.round(e.nativeEvent.contentOffset.y / ITEM_HEIGHT);
@@ -85,34 +131,39 @@ export function Picker<T extends PickerItem>({
     [data, onValueChange],
   );
 
+  /**
+   * Stable render function for each row. `useCallback` prevents FlatList from
+   * treating every render as a full list re-render due to a changed prop reference.
+   */
+  const renderItem = useCallback(
+    ({ item, index }: { item: T; index: number }) => (
+      <Item label={item.label} index={index} scrollOffset={scrollOffset} />
+    ),
+    [scrollOffset],
+  );
+
+  const initialScrollIndex = Math.max(
+    0,
+    data.findIndex((d) => d.value === value.value),
+  );
+
   return (
     <Animated.FlatList
       ref={flatListRef}
       testID={testID}
       data={data}
-      keyExtractor={(item) => String(item.value)}
-      renderItem={({ item, index }) => (
-        <Item label={item.label} index={index} scrollOffset={scrollOffset} />
-      )}
+      keyExtractor={keyExtractor}
+      renderItem={renderItem}
       showsVerticalScrollIndicator={false}
       snapToInterval={ITEM_HEIGHT}
       decelerationRate="fast"
-      onScroll={(e) => {
-        scrollOffset.value = e.nativeEvent.contentOffset.y;
-      }}
+      onScroll={handleScroll}
       onMomentumScrollEnd={handleMomentumScrollEnd}
       scrollEventThrottle={16}
       contentContainerStyle={s.contentContainerStyle}
-      style={[s.list, { height: ITEM_HEIGHT }]}
-      getItemLayout={(_data, index) => ({
-        length: ITEM_HEIGHT,
-        offset: ITEM_HEIGHT * index,
-        index,
-      })}
-      initialScrollIndex={Math.max(
-        0,
-        data.findIndex((d) => d.value === value.value),
-      )}
+      style={s.list}
+      getItemLayout={getItemLayout}
+      initialScrollIndex={initialScrollIndex}
     />
   );
 }

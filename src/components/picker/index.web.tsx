@@ -19,7 +19,7 @@ export function Picker<T extends PickerItem>({
   const scrollRef = useRef<ScrollView>(null);
   const activeIndex = useRef(data.findIndex((d) => d.value === value.value));
 
-  // Sync scroll position when value changes externally
+  /** Syncs the scroll position when `value` changes externally. */
   useEffect(() => {
     const index = data.findIndex((d) => d.value === value.value);
     if (index >= 0 && index !== activeIndex.current) {
@@ -28,7 +28,11 @@ export function Picker<T extends PickerItem>({
     }
   }, [data, value]);
 
-  // Attach a native `scrollend` listener to reliably detect when scrolling settles
+  /**
+   * Attaches a native `scrollend` listener to detect when scrolling settles.
+   * Separated from the value-sync effect so the listener is only re-attached
+   * when `data` or `onValueChange` changes, not on every value update.
+   */
   useEffect(() => {
     const node = (
       scrollRef.current as unknown as { getScrollableNode?: () => HTMLElement }
@@ -36,9 +40,8 @@ export function Picker<T extends PickerItem>({
     if (!node) return;
 
     const handleScrollEnd = () => {
-      const index = Math.round(node.scrollTop / ITEM_HEIGHT);
-      const clamped = Math.max(0, Math.min(index, data.length - 1));
-
+      const snappedIndex = Math.round(node.scrollTop / ITEM_HEIGHT);
+      const clamped = Math.max(0, Math.min(snappedIndex, data.length - 1));
       if (clamped !== activeIndex.current) {
         activeIndex.current = clamped;
         onValueChange(data[clamped]);
@@ -65,7 +68,6 @@ export function Picker<T extends PickerItem>({
       }}
       style={[
         s.list,
-        { height: ITEM_HEIGHT },
         // CSS scroll-snap for reliable snapping on web
         {
           scrollSnapType: "y mandatory",

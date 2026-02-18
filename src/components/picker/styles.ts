@@ -7,6 +7,7 @@ export const useStyles = createStyles((t) => ({
   list: {
     flexGrow: 0,
     width: "100%",
+    height: ITEM_HEIGHT,
     backgroundColor: t.colors.background,
     ...Platform.select({
       web: {
