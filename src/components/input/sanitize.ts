@@ -7,11 +7,12 @@ export const MAX_NAME_LENGTH = 20;
  */
 const ALLOWED_CHARS = /[^a-zA-Z0-9 '\-.]/g;
 
-/** Matches control characters (C0, C1, and misc Unicode control/format chars) */
-const CONTROL_CHARS = /[\u0000-\u001F\u007F-\u009F\u200B-\u200F\u2028-\u202F\uFEFF]/g;
+/** Control characters: C0, C1, zero-width, and BOM */
+const CONTROL_CHAR_PATTERN =
+  "[\\u0000-\\u001F\\u007F-\\u009F\\u200B-\\u200F\\u2028-\\u202F\\uFEFF]";
 
-/** Non-global versions for use with .test() (avoids stateful lastIndex) */
-const HAS_CONTROL_CHARS = /[\u0000-\u001F\u007F-\u009F\u200B-\u200F\u2028-\u202F\uFEFF]/;
+const CONTROL_CHARS = new RegExp(CONTROL_CHAR_PATTERN, "g");
+const HAS_CONTROL_CHARS = new RegExp(CONTROL_CHAR_PATTERN);
 const HAS_DISALLOWED_CHARS = /[^a-zA-Z0-9 '\-.]/;
 
 /**
