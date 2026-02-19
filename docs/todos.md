@@ -12,7 +12,6 @@
 - user roster not updated on leaving - works on lobby
 
 4. games query - how much to fetch
-5. security
-6. round flow
-7. handle host duties
-8. theme still borked. move to listener
+5. round flow
+6. handle host duties
+7. theme still borked. move to listener

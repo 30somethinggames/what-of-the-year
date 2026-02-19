@@ -2,6 +2,7 @@ import { tintColor } from "./tintColor";
 import type { Theme } from "./types";
 
 const PRIMARY = "#000000";
+const SECONDARY = "#666666";
 
 const baseSpacing = {
   sm: 8,
@@ -25,7 +26,7 @@ const baseBorder = {
 const baseText = {
   color: {
     primary: PRIMARY,
-    secondary: "#666666",
+    secondary: SECONDARY,
   },
   size: {
     xs: 12,
@@ -45,7 +46,7 @@ const baseText = {
 };
 
 const baseColors = {
-  secondary: "#666666",
+  secondary: SECONDARY,
   background: "#fff",
   backgroundSecondary: "#F0F0F0",
   surface: "#F5F5F5",
