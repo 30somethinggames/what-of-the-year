@@ -2,6 +2,7 @@
   "oxc.enable": true,
   "oxc.lint.run": "onType",
   "editor.codeActionsOnSave": {
+    "source.organizeImports.oxc": "always",
     "source.fixAll.oxc": "explicit"
   },
   "editor.formatOnSave": true,
