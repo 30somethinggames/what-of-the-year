@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { FlatList, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 import { RoundModal } from "./round-modal";
 import { useRoundState } from "./use-round-state";
@@ -47,9 +46,12 @@ export function Round({ topic, year, sessionId, roundNumber, isVisible, onClose 
   };
 
   // 1. keyboard avoiding
+  // 2. button next to lock in the pick or edit
+  // 3. drag and drop placement
+  // 4. move modal to screen
   return (
     <>
-      <SafeAreaView style={s.root}>
+      <Container>
         <Text style={s.title}>Round {roundNumber}</Text>
 
         <FlatList
@@ -75,7 +77,7 @@ export function Round({ topic, year, sessionId, roundNumber, isVisible, onClose 
             <Button label="Enter" onPress={onEnter} disabled={isDisabled} />
           </View>
         </KeyboardAvoidingView>
-      </SafeAreaView>
+      </Container>
 
       <RoundModal
         isVisible={isVisible}
@@ -90,10 +92,6 @@ export function Round({ topic, year, sessionId, roundNumber, isVisible, onClose 
 }
 
 const useStyles = createStyles((t) => ({
-  root: {
-    flex: 1,
-    paddingHorizontal: t.spacing.lg,
-  },
   title: {
     fontSize: t.text.size.xl,
     fontWeight: t.text.weight.bold,
