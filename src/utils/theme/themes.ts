@@ -1,8 +1,9 @@
 import { tintColor } from "./tintColor";
 import type { Theme } from "./types";
 
-const PRIMARY = "#000000";
 const SECONDARY = "#666666";
+const black100 = "#000000";
+const white100 = "#fff";
 
 const baseSpacing = {
   sm: 8,
@@ -12,9 +13,9 @@ const baseSpacing = {
 
 const baseBorder = {
   size: {
-    sm: 0.5,
-    md: 1,
-    lg: 1.5,
+    sm: 1,
+    md: 1.5,
+    lg: 2,
   },
   radius: {
     sm: 4,
@@ -24,10 +25,6 @@ const baseBorder = {
 };
 
 const baseText = {
-  color: {
-    primary: PRIMARY,
-    secondary: SECONDARY,
-  },
   size: {
     xs: 12,
     sm: 14,
@@ -47,11 +44,14 @@ const baseText = {
 
 const baseColors = {
   secondary: SECONDARY,
-  background: "#fff",
+  background: white100,
   backgroundSecondary: "#F0F0F0",
   surface: "#F5F5F5",
   error: "#DC2626",
   success: "#16A34A",
+  transparent: "transparent",
+  black100,
+  white100,
 };
 
 const baseCollections = {
@@ -59,7 +59,7 @@ const baseCollections = {
   border: baseBorder,
   text: baseText,
   shadow: {
-    shadowColor: "#000",
+    shadowColor: black100,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -69,7 +69,7 @@ const baseCollections = {
 export const gamesTheme: Theme = {
   ...baseCollections,
   colors: {
-    primary: PRIMARY,
+    primary: black100,
     ...baseColors,
   },
 };
@@ -77,7 +77,7 @@ export const gamesTheme: Theme = {
 export const moviesTheme: Theme = {
   ...baseCollections,
   colors: {
-    primary: tintColor(PRIMARY, "#3B82F6", 0.3),
+    primary: tintColor(black100, "#3B82F6", 0.3),
     ...baseColors,
   },
 };
@@ -85,7 +85,7 @@ export const moviesTheme: Theme = {
 export const booksTheme: Theme = {
   ...baseCollections,
   colors: {
-    primary: tintColor(PRIMARY, "#3bf673", 0.3),
+    primary: tintColor(black100, "#3bf673", 0.3),
     ...baseColors,
   },
 };

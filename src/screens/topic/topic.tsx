@@ -5,6 +5,7 @@ import { View } from "react-native";
 
 import { Avatar, useRandomAvatar } from "components/avatar";
 import { Button } from "components/button";
+import { Container } from "components/container";
 import { Error } from "components/error";
 import { Input } from "components/input";
 import { KeyboardAvoidingView } from "components/keyboard-avoiding-view";
@@ -86,14 +87,14 @@ export function Topic({ topic, year, existingSessionId }: Props) {
 
   return (
     <KeyboardAvoidingView style={s.root} keyboardVerticalOffset={headerHeight}>
-      <View style={[s.container, { marginTop: -headerHeight / 2 }]}>
+      <Container style={[s.container, { marginTop: -headerHeight / 2 }]}>
         <View style={s.avatar}>
           <Avatar source={avatar} size={120} />
           <Button style={s.btn} label="Random" onPress={randomizeAvatar} />
         </View>
         <Input placeholder="User name" value={name} onChangeText={onChangeText} />
         <Button label={label} disabled={disabled} onPress={onSubmit} />
-      </View>
+      </Container>
     </KeyboardAvoidingView>
   );
 }
@@ -101,9 +102,6 @@ export function Topic({ topic, year, existingSessionId }: Props) {
 const useStyles = createStyles((t) => ({
   root: {
     flex: 1,
-    justifyContent: "center",
-    backgroundColor: t.colors.background,
-    paddingHorizontal: t.spacing.md,
   },
   container: {
     alignItems: "center",

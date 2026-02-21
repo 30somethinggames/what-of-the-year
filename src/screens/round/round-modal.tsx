@@ -90,11 +90,11 @@ const useStyles = createStyles((t) => ({
   title: {
     fontSize: t.text.size.xl,
     fontWeight: t.text.weight.bold,
-    color: t.text.color.primary,
+    color: t.colors.primary,
   },
   closeBtn: {
     fontSize: t.text.size.xxl,
-    color: t.text.color.secondary,
+    color: t.colors.secondary,
   },
   footer: {
     paddingTop: t.spacing.lg,

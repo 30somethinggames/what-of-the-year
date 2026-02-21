@@ -1,9 +1,9 @@
 import { Link } from "expo-router";
 import { useState } from "react";
 import { Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Button } from "components/button";
+import { Container } from "components/container";
 import { Picker } from "components/picker";
 import type { TopicType } from "constants/topics";
 import { topics } from "constants/topics";
@@ -25,8 +25,8 @@ export function Home() {
   const onYearChange = (v: Year) => setYear(v);
 
   return (
-    <SafeAreaView style={s.root}>
-      <View style={s.content}>
+    <Container>
+      <View style={s.root}>
         <Picker testID="topic-picker" data={topics} value={topic} onValueChange={onTopicChange} />
         <Text style={s.of}>of</Text>
         <Picker testID="year-picker" data={years} value={year} onValueChange={onYearChange} />
@@ -41,17 +41,12 @@ export function Home() {
       >
         <Button label="Start" />
       </Link>
-    </SafeAreaView>
+    </Container>
   );
 }
 
 const useStyles = createStyles((t) => ({
   root: {
-    flex: 1,
-    backgroundColor: t.colors.background,
-    padding: t.spacing.lg,
-  },
-  content: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
@@ -59,7 +54,7 @@ const useStyles = createStyles((t) => ({
   of: {
     fontSize: 52,
     fontWeight: t.text.weight.bold,
-    color: t.text.color.primary,
+    color: t.colors.primary,
     marginVertical: t.spacing.lg,
   },
 }));

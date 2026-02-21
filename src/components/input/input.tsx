@@ -53,13 +53,13 @@ const useStyles = createStyles((t) => ({
     paddingHorizontal: t.spacing.md,
     paddingVertical: t.spacing.sm,
     fontSize: t.text.size.md,
-    color: t.text.color.primary,
+    color: t.colors.primary,
   },
   rootError: {
     borderColor: t.colors.error,
   },
   placeholder: {
-    color: t.text.color.secondary,
+    color: t.colors.secondary,
   },
   error: {
     color: t.colors.error,

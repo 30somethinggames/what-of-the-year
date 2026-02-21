@@ -9,6 +9,9 @@ export interface Theme {
     surface: string;
     error: string;
     success: string;
+    transparent: string;
+    black100: string;
+    white100: string;
   };
   spacing: {
     sm: number;
@@ -28,10 +31,6 @@ export interface Theme {
     };
   };
   text: {
-    color: {
-      primary: string;
-      secondary: string;
-    };
     size: {
       xs: number;
       sm: number;
