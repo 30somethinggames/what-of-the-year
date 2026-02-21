@@ -47,19 +47,19 @@ describe("startSession", () => {
     mockCommit.mockClear();
   });
 
-  it("closes the lobby by setting isOpen to false", async () => {
+  it("closes the lobby by setting isOpen to false and setting starting round", async () => {
     await startSession({ sessionId: "session-1" });
 
     const sessionCall = mockUpdate.mock.calls[0] as unknown[];
     expect(sessionCall[0]).toEqual({ _type: "sessionRef", sessionId: "session-1" });
-    expect(sessionCall[1]).toEqual({ isOpen: false });
+    expect(sessionCall[1]).toEqual({ isOpen: false, activeRoundNumber: 10 });
   });
 
-  it("opens round 1", async () => {
+  it("opens round 10", async () => {
     await startSession({ sessionId: "session-1" });
 
     const roundCall = mockUpdate.mock.calls[1] as unknown[];
-    expect(roundCall[0]).toEqual({ _type: "roundRef", sessionId: "session-1", roundNumber: 1 });
+    expect(roundCall[0]).toEqual({ _type: "roundRef", sessionId: "session-1", roundNumber: 10 });
     expect(roundCall[1]).toEqual({
       state: "open",
       startedAt: { _type: "serverTimestamp" },

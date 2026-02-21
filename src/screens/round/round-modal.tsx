@@ -33,7 +33,6 @@ export function RoundModal({
     await advanceRound({
       sessionId,
       currentRoundNumber: roundNumber,
-      maxRounds,
     });
 
     // Navigation will be handled by the useEffect in the round screen
@@ -68,7 +67,7 @@ export function RoundModal({
           <View style={s.footer}>
             {isHost && (
               <Button
-                label={roundNumber < maxRounds ? "Next Round" : "End Game"}
+                label={roundNumber > 1 ? "Next Round" : "End Game"}
                 onPress={onNextRound}
                 style={s.nextBtn}
               />

@@ -6,7 +6,6 @@ import { db } from "db/config";
 interface AdvanceRoundArgs {
   sessionId: string;
   currentRoundNumber: number;
-  maxRounds: number;
 }
 
 /**
@@ -18,7 +17,7 @@ interface AdvanceRoundArgs {
  * Uses a batch write so all updates succeed or fail atomically.
  * If already at maxRounds, only closes the current round.
  */
-export async function advanceRound({ sessionId, currentRoundNumber, maxRounds }: AdvanceRoundArgs) {
+export async function advanceRound({ sessionId, currentRoundNumber }: AdvanceRoundArgs) {
   const batch = writeBatch(db);
 
   // Close current round
@@ -27,10 +26,10 @@ export async function advanceRound({ sessionId, currentRoundNumber, maxRounds }:
     closedAt: serverTimestamp(),
   });
 
-  const hasNextRound = currentRoundNumber < maxRounds;
+  const hasNextRound = currentRoundNumber > 1;
 
   if (hasNextRound) {
-    const nextRoundNumber = currentRoundNumber + 1;
+    const nextRoundNumber = currentRoundNumber - 1;
 
     // Open next round
     batch.update(roundRef(sessionId, nextRoundNumber), {

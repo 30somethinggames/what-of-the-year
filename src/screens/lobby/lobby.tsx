@@ -8,6 +8,7 @@ import { Button } from "components/button";
 import { Error } from "components/error";
 import { Loading } from "components/loading";
 import { PlayerList } from "components/player-list";
+import { MAX_ROUNDS } from "constants/session";
 import { leaveSession } from "db/utils/leave-session";
 import { startSession } from "db/utils/start-session";
 import { createStyles } from "utils/theme";
@@ -30,6 +31,8 @@ export function Lobby({ topic, year, sessionId }: LobbyProps) {
     sessionId,
   });
 
+  const isDisabled = false;
+
   if (isLoading) return <Loading />;
   if (isError || !session) return <Error />;
 
@@ -47,7 +50,7 @@ export function Lobby({ topic, year, sessionId }: LobbyProps) {
     await startSession({ sessionId });
     router.replace({
       pathname: "/[topic]/[year]/[sessionId]/[round]",
-      params: { topic: topic.value, year, sessionId, round: "1" },
+      params: { topic: topic.value, year, sessionId, round: String(MAX_ROUNDS) },
     });
   };
 
@@ -64,7 +67,7 @@ export function Lobby({ topic, year, sessionId }: LobbyProps) {
         {isHost ? (
           <>
             <Button label="Invite" onPress={onShare} />
-            <Button label="Start" onPress={onStart} disabled={canStart} />
+            <Button label="Start" onPress={onStart} disabled={isDisabled} />
           </>
         ) : (
           <Button label="Leave" onPress={onLeave} />

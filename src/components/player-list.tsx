@@ -70,6 +70,6 @@ const useStyles = createStyles((t) => ({
   },
   count: {
     fontSize: t.text.size.sm,
-    color: t.colors.secondary,
+    color: t.colors.background,
   },
 }));
