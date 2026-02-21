@@ -2,6 +2,7 @@ import { router } from "expo-router";
 import { useEffect } from "react";
 
 import type { LobbyProps } from "./types";
+import { MAX_ROUNDS } from "constants/session";
 import { usePlayers } from "db/hooks/use-players";
 import { useSession } from "db/hooks/use-session";
 
@@ -9,7 +10,7 @@ import { useSession } from "db/hooks/use-session";
  * Composite hook for managing lobby state.
  *
  * Combines session and player data, handles loading/error states,
- * and automatically navigates non-host players to round 1 when the host starts the game.
+ * and automatically navigates non-host players to round MAX_ROUNDS when the host starts the game.
  */
 export function useLobbyState({ sessionId, topic, year }: LobbyProps) {
   const { session, isLoading: sessionLoading, isError: sessionError } = useSession(sessionId);
@@ -33,7 +34,7 @@ export function useLobbyState({ sessionId, topic, year }: LobbyProps) {
     if (!isLoading && !isError && session && !session.isOpen && !isHost) {
       router.replace({
         pathname: "/[topic]/[year]/[sessionId]/[round]",
-        params: { topic: topic.value, year, sessionId, round: "1" },
+        params: { topic: topic.value, year, sessionId, round: String(MAX_ROUNDS) },
       });
     }
   }, [session?.isOpen, isHost, isLoading, isError, topic.value, year, sessionId]);

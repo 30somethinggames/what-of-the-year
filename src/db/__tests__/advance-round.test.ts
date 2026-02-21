@@ -47,11 +47,10 @@ describe("advanceRound", () => {
     mockCommit.mockClear();
   });
 
-  it("closes current round, opens next round, and updates session when not at max", async () => {
+  it("closes current round, opens next round, and updates session when not at min", async () => {
     const result = await advanceRound({
       sessionId: "session-1",
       currentRoundNumber: 3,
-      maxRounds: 10,
     });
 
     expect(result).toEqual({ hasNextRound: true });
@@ -66,9 +65,9 @@ describe("advanceRound", () => {
       closedAt: { _type: "serverTimestamp" },
     });
 
-    // Open next round
+    // Open next round (decrementing)
     const openCall = mockUpdate.mock.calls[1] as unknown[];
-    expect(openCall[0]).toEqual({ _type: "roundRef", sessionId: "session-1", roundNumber: 4 });
+    expect(openCall[0]).toEqual({ _type: "roundRef", sessionId: "session-1", roundNumber: 2 });
     expect(openCall[1]).toEqual({
       state: "open",
       startedAt: { _type: "serverTimestamp" },
@@ -77,14 +76,13 @@ describe("advanceRound", () => {
     // Update session activeRoundNumber
     const sessionCall = mockUpdate.mock.calls[2] as unknown[];
     expect(sessionCall[0]).toEqual({ _type: "sessionRef", sessionId: "session-1" });
-    expect(sessionCall[1]).toEqual({ activeRoundNumber: 4 });
+    expect(sessionCall[1]).toEqual({ activeRoundNumber: 2 });
   });
 
-  it("only closes the current round when at max rounds", async () => {
+  it("only closes the current round when at round 1 (last round)", async () => {
     const result = await advanceRound({
       sessionId: "session-2",
-      currentRoundNumber: 10,
-      maxRounds: 10,
+      currentRoundNumber: 1,
     });
 
     expect(result).toEqual({ hasNextRound: false });
@@ -92,7 +90,7 @@ describe("advanceRound", () => {
     expect(mockUpdate).toHaveBeenCalledTimes(1);
 
     const closeCall = mockUpdate.mock.calls[0] as unknown[];
-    expect(closeCall[0]).toEqual({ _type: "roundRef", sessionId: "session-2", roundNumber: 10 });
+    expect(closeCall[0]).toEqual({ _type: "roundRef", sessionId: "session-2", roundNumber: 1 });
     expect(closeCall[1]).toEqual({
       state: "closed",
       closedAt: { _type: "serverTimestamp" },
@@ -103,7 +101,6 @@ describe("advanceRound", () => {
     await advanceRound({
       sessionId: "session-3",
       currentRoundNumber: 1,
-      maxRounds: 5,
     });
 
     expect(mockCommit).toHaveBeenCalledTimes(1);
