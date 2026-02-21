@@ -3,7 +3,9 @@ import type { Theme } from "./types";
 
 const SECONDARY = "#666666";
 const black100 = "#000000";
-const white100 = "#fff";
+export const white100 = "#fff";
+export const blue100 = "#7ec8e3";
+const blue200 = "#0a3d6b";
 
 const baseSpacing = {
   sm: 8,
@@ -52,6 +54,8 @@ const baseColors = {
   transparent: "transparent",
   black100,
   white100,
+  blue100,
+  blue200,
 };
 
 const baseCollections = {

@@ -5,6 +5,7 @@ import { Share, View } from "react-native";
 import type { LobbyProps } from "./types";
 import { useLobbyState } from "./use-lobby-state";
 import { Button } from "components/button";
+import { Container } from "components/container";
 import { Error } from "components/error";
 import { Loading } from "components/loading";
 import { PlayerList } from "components/player-list";
@@ -60,7 +61,7 @@ export function Lobby({ topic, year, sessionId }: LobbyProps) {
   };
 
   return (
-    <View style={s.root}>
+    <Container style={s.root}>
       <PlayerList data={players} playerCount={playerCount} maxPlayerCount={maxPlayerCount} />
 
       <View style={s.footer}>
@@ -73,14 +74,13 @@ export function Lobby({ topic, year, sessionId }: LobbyProps) {
           <Button label="Leave" onPress={onLeave} />
         )}
       </View>
-    </View>
+    </Container>
   );
 }
 
 const useStyles = createStyles((t) => ({
   root: {
     flex: 1,
-    backgroundColor: t.colors.background,
   },
   footer: {
     padding: t.spacing.lg,

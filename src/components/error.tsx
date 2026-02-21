@@ -31,7 +31,6 @@ const useStyles = createStyles((t) => ({
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: t.spacing.lg,
-    backgroundColor: t.colors.background,
     gap: t.spacing.lg,
   },
   content: {

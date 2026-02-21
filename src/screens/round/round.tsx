@@ -5,6 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { RoundModal } from "./round-modal";
 import { useRoundState } from "./use-round-state";
 import { Button } from "components/button";
+import { Container } from "components/container";
 import { Error } from "components/error";
 import { Input } from "components/input";
 import { KeyboardAvoidingView } from "components/keyboard-avoiding-view";
@@ -91,13 +92,12 @@ export function Round({ topic, year, sessionId, roundNumber, isVisible, onClose 
 const useStyles = createStyles((t) => ({
   root: {
     flex: 1,
-    backgroundColor: t.colors.background,
     paddingHorizontal: t.spacing.lg,
   },
   title: {
     fontSize: t.text.size.xl,
     fontWeight: t.text.weight.bold,
-    color: t.text.color.primary,
+    color: t.colors.primary,
     paddingVertical: t.spacing.md,
   },
   list: {
@@ -121,7 +121,7 @@ const useStyles = createStyles((t) => ({
   pick: {
     flex: 1,
     fontSize: t.text.size.md,
-    color: t.text.color.primary,
+    color: t.colors.primary,
   },
   footer: {
     paddingVertical: t.spacing.md,

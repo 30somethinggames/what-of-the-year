@@ -17,7 +17,6 @@ export function Loading({ size = "large", ...props }: Props) {
 const useStyles = createStyles((t) => ({
   root: {
     flex: 1,
-    backgroundColor: t.colors.background,
     paddingHorizontal: t.spacing.lg,
     alignItems: "center",
     justifyContent: "center",

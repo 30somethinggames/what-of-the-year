@@ -5,6 +5,7 @@ import { Stack } from "expo-router";
 import { WebContainer } from "components/web-container";
 import { STALE_TIME } from "queries/utils";
 import { ThemeProvider } from "utils/theme";
+import { blue100, white100 } from "utils/theme/themes";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -26,6 +27,8 @@ export default function Root() {
             screenOptions={{
               headerBackButtonDisplayMode: "minimal",
               headerShadowVisible: false,
+              headerStyle: { backgroundColor: blue100 },
+              headerTintColor: white100,
             }}
           />
         </WebContainer>
