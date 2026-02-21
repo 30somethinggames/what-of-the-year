@@ -31,6 +31,8 @@ export function Lobby({ topic, year, sessionId }: LobbyProps) {
     sessionId,
   });
 
+  const isDisabled = false;
+
   if (isLoading) return <Loading />;
   if (isError || !session) return <Error />;
 
@@ -65,7 +67,7 @@ export function Lobby({ topic, year, sessionId }: LobbyProps) {
         {isHost ? (
           <>
             <Button label="Invite" onPress={onShare} />
-            <Button label="Start" onPress={onStart} disabled={canStart} />
+            <Button label="Start" onPress={onStart} disabled={isDisabled} />
           </>
         ) : (
           <Button label="Leave" onPress={onLeave} />

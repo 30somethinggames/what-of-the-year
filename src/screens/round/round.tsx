@@ -9,7 +9,7 @@ import { Error } from "components/error";
 import { Input } from "components/input";
 import { KeyboardAvoidingView } from "components/keyboard-avoiding-view";
 import { Loading } from "components/loading";
-import { MAX_PICK_LENGTH } from "constants/session";
+// import { MAX_PICK_LENGTH } from "constants/session";
 import type { TopicType } from "constants/topics";
 import { createStyles } from "utils/theme";
 
@@ -37,12 +37,15 @@ export function Round({ topic, year, sessionId, roundNumber, isVisible, onClose 
   if (isLoading) return <Loading />;
   if (isError || !session || !round) return <Error />;
 
+  const isDisabled = !inputValue.trim();
+
   const onEnter = () => {
-    if (!inputValue.trim()) return;
+    if (isDisabled) return;
     setPicks((prev) => [...prev, inputValue.trim()]);
     setInputValue("");
   };
 
+  // 1. keyboard avoiding
   return (
     <>
       <SafeAreaView style={s.root}>
@@ -66,9 +69,9 @@ export function Round({ topic, year, sessionId, roundNumber, isVisible, onClose 
               value={inputValue}
               onChangeText={setInputValue}
               placeholder="Enter your pick"
-              maxLength={MAX_PICK_LENGTH}
+              // maxLength={MAX_PICK_LENGTH}
             />
-            <Button label="Enter" onPress={onEnter} disabled={!inputValue.trim()} />
+            <Button label="Enter" onPress={onEnter} disabled={isDisabled} />
           </View>
         </KeyboardAvoidingView>
       </SafeAreaView>

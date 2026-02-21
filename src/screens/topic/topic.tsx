@@ -29,7 +29,8 @@ export function Topic({ topic, year, existingSessionId }: Props) {
   const { mutateAsync: signIn, isPending } = useAuth();
 
   const isJoining = !!existingSessionId;
-  const disabled = isLoading || isPending || name.length < 1;
+  // const disabled = isLoading || isPending || name.length < 1;
+  const disabled = false;
   const label = isPending ? "Loading..." : isJoining ? "Join" : "Create";
 
   const onChangeText = (text: string) => setName(text);
