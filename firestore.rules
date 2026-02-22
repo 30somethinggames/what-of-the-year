@@ -51,7 +51,7 @@ service cloud.firestore {
         match /selections/{uid} {
           allow read: if isPlayer(sessionId);
           allow create: if isOwner(uid);
-          allow update: if false;
+          allow update: if isOwner(uid);
           allow delete: if false;
         }
       }

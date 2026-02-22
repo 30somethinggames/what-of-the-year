@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { handleError, STALE_TIME } from "./utils";
+import { handleError, getStaleTime } from "./utils";
 import { TOPIC_KEY } from "constants/topics";
 import type { Option } from "types/option";
 import type { QUERY_ARGS } from "types/query-args";
@@ -88,10 +88,10 @@ const BOOK_QUERY_KEY = TOPIC_KEY.BOOKS;
 export function useBooks({ key, year }: QUERY_ARGS) {
   const enabled = key === BOOK_QUERY_KEY;
   return useQuery({
-    queryKey: [BOOK_QUERY_KEY],
+    queryKey: [BOOK_QUERY_KEY, year],
     queryFn: () => getBooksForYear(year),
     select: formBookOptions,
-    staleTime: STALE_TIME,
+    staleTime: getStaleTime(year),
     enabled,
   });
 }

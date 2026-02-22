@@ -1,14 +1,16 @@
 import { increment, runTransaction, serverTimestamp } from "firebase/firestore";
 
-import { buildPick, getRoundWeight } from "db/builders";
+import { buildPick, buildPickFromOption, getRoundWeight } from "db/builders";
 import { roundRef, selectionRef } from "db/collections";
 import { db } from "db/config";
+import type { Option } from "types/option";
 
 interface SaveSelectionArgs {
   sessionId: string;
   roundNumber: number;
   uid: string;
   name: string;
+  option?: Option;
 }
 
 /**
@@ -21,7 +23,13 @@ interface SaveSelectionArgs {
  *
  * Points are computed deterministically from the round weight.
  */
-export async function saveSelection({ sessionId, roundNumber, uid, name }: SaveSelectionArgs) {
+export async function saveSelection({
+  sessionId,
+  roundNumber,
+  uid,
+  name,
+  option,
+}: SaveSelectionArgs) {
   const selRef = selectionRef(sessionId, roundNumber, uid);
   const rndRef = roundRef(sessionId, roundNumber);
 
@@ -32,7 +40,7 @@ export async function saveSelection({ sessionId, roundNumber, uid, name }: SaveS
     }
 
     transaction.set(selRef, {
-      pick: buildPick(name),
+      pick: option ? buildPickFromOption(option) : buildPick(name),
       points: getRoundWeight(roundNumber),
       savedAt: serverTimestamp(),
     });

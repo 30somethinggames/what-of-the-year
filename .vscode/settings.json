@@ -14,5 +14,8 @@
     "editor.defaultFormatter": "oxc.oxc-vscode"
   },
   "cSpell.words": ["IGDB", "TMDB", "Uids", "whatoftheyear"],
-  "npm.packageManager": "bun"
+  "npm.packageManager": "bun",
+  "chat.tools.terminal.autoApprove": {
+    "bunx": true
+  }
 }

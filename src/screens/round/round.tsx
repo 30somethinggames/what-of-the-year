@@ -1,26 +1,31 @@
 import { useState } from "react";
-import { FlatList, Text, View } from "react-native";
+import { FlatList, Pressable, Text, View } from "react-native";
 
 import { RoundModal } from "./round-modal";
 import { useRoundState } from "./use-round-state";
+import { Autocomplete } from "components/autocomplete";
 import { Button } from "components/button";
 import { Container } from "components/container";
 import { Error } from "components/error";
-import { Input } from "components/input";
 import { KeyboardAvoidingView } from "components/keyboard-avoiding-view";
 import { Loading } from "components/loading";
-// import { MAX_PICK_LENGTH } from "constants/session";
+import type { TOPIC_KEY } from "constants/topics";
 import type { MySelection } from "db/hooks/use-my-selections";
+import { editSelection } from "db/utils/edit-selection";
 import { saveSelection } from "db/utils/save-selection";
+import { useTopicData } from "queries/use-topic-data";
+import type { Option } from "types/option";
 import { createStyles } from "utils/theme";
 
 interface Props {
   sessionId: string;
+  topic: TOPIC_KEY;
+  year: string;
   isVisible: boolean;
   onClose: () => void;
 }
 
-export function Round({ sessionId, isVisible, onClose }: Props) {
+export function Round({ sessionId, topic, year, isVisible, onClose }: Props) {
   const s = useStyles();
   const {
     isLoading,
@@ -34,25 +39,52 @@ export function Round({ sessionId, isVisible, onClose }: Props) {
     hasPickedThisRound,
   } = useRoundState({ sessionId });
 
+  const { data: options = [] } = useTopicData({ key: topic, year });
+
   const [inputValue, setInputValue] = useState("");
+  const [editingRound, setEditingRound] = useState<number | null>(null);
+  const [selectedOption, setSelectedOption] = useState<Option | null>(null);
 
   if (isLoading) return <Loading />;
   if (isError || !session || !round || !activeRound) return <Error />;
 
-  const isDisabled = !inputValue.trim() || !uid || hasPickedThisRound;
+  const isEditing = editingRound !== null;
+  const isDisabled = !inputValue.trim() || !uid || (!isEditing && hasPickedThisRound);
 
   const onEnter = async () => {
     if (isDisabled || !uid) return;
+    const name = inputValue.trim();
+    const option = selectedOption?.name === name ? selectedOption : undefined;
     try {
-      await saveSelection({ sessionId, roundNumber: activeRound, uid, name: inputValue.trim() });
+      if (isEditing) {
+        await editSelection({ sessionId, roundNumber: editingRound, uid, name, option });
+        setEditingRound(null);
+      } else {
+        await saveSelection({ sessionId, roundNumber: activeRound, uid, name, option });
+      }
     } catch {
-      // Selection already exists or write failed — ignored since
-      // the real-time listener will reflect the current state
+      // Write failed — ignored since the real-time listener will reflect the current state
     }
     setInputValue("");
+    setSelectedOption(null);
   };
 
-  // 2. button next to lock in the pick or edit
+  const onSelectOption = (option: Option) => {
+    setSelectedOption(option);
+  };
+
+  const onEdit = (item: MySelection) => {
+    setEditingRound(item.roundNumber);
+    setInputValue(item.pick.name);
+    setSelectedOption(null);
+  };
+
+  const onCancelEdit = () => {
+    setEditingRound(null);
+    setInputValue("");
+    setSelectedOption(null);
+  };
+
   // 3. drag and drop placement
   // 4. move modal to screen
   return (
@@ -68,13 +100,23 @@ export function Round({ sessionId, isVisible, onClose }: Props) {
               <View style={s.row}>
                 <Text style={s.rank}>#{item.roundNumber}</Text>
                 <Text style={s.pick}>{item.pick.name}</Text>
+                <Pressable onPress={() => onEdit(item)} hitSlop={8}>
+                  <Text style={s.editButton}>Edit</Text>
+                </Pressable>
               </View>
             )}
           />
 
           <View style={s.footer}>
-            <Input value={inputValue} onChangeText={setInputValue} placeholder="Enter your pick" />
-            <Button label="Enter" onPress={onEnter} disabled={isDisabled} />
+            <Autocomplete
+              value={inputValue}
+              onChangeText={setInputValue}
+              onSelectOption={onSelectOption}
+              options={options}
+              placeholder={isEditing ? "Edit your pick" : "Enter your pick"}
+            />
+            <Button label={isEditing ? "Save" : "Enter"} onPress={onEnter} disabled={isDisabled} />
+            {isEditing && <Button label="Cancel" onPress={onCancelEdit} />}
           </View>
         </Container>
       </KeyboardAvoidingView>
@@ -121,6 +163,11 @@ const useStyles = createStyles((t) => ({
     flex: 1,
     fontSize: t.text.size.md,
     color: t.colors.primary,
+  },
+  editButton: {
+    fontSize: t.text.size.sm,
+    fontWeight: t.text.weight.bold,
+    color: t.colors.secondary,
   },
   footer: {
     paddingTop: t.spacing.md,

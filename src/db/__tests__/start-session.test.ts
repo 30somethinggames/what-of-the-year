@@ -30,6 +30,7 @@ mock.module("db/collections", () => ({
 }));
 
 mock.module("firebase/firestore", () => ({
+  updateDoc: () => Promise.resolve(),
   writeBatch: () => ({ update: mockUpdate, commit: mockCommit }),
   serverTimestamp: () => ({ _type: "serverTimestamp" }),
   Timestamp: { fromMillis: (ms: number) => ({ _type: "timestamp", ms }) },

@@ -39,6 +39,7 @@ mock.module("db/collections", () => ({
 }));
 
 mock.module("firebase/firestore", () => ({
+  updateDoc: () => Promise.resolve(),
   writeBatch: () => ({
     set: mock(() => {}),
     update: mock(() => {}),

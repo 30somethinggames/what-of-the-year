@@ -1,4 +1,6 @@
 import { MAX_PLAYERS, MAX_ROUNDS } from "constants/session";
+import type { Option } from "types/option";
+import type { Pick } from "types/session";
 
 /** Session TTL in milliseconds (24 hours) */
 export const SESSION_TTL_MS = 24 * 60 * 60 * 1000;
@@ -39,7 +41,17 @@ export const buildAllRounds = (maxRounds: number = MAX_ROUNDS) =>
   Array.from({ length: maxRounds }, (_, i) => buildRound(i + 1));
 
 /** Build a pick object from a name (generates a simple ID) */
-export const buildPick = (name: string): { id: string; name: string } => ({
+export const buildPick = (name: string): Pick => ({
   id: name.toLowerCase().replace(/\s+/g, "-"),
   name,
+});
+
+/** Build a pick object from a full Option (preserves all metadata) */
+export const buildPickFromOption = (option: Option): Pick => ({
+  id: String(option.id),
+  name: option.name,
+  cover: option.cover,
+  rating: option.rating,
+  first_release_date: option.first_release_date,
+  summary: option.summary,
 });

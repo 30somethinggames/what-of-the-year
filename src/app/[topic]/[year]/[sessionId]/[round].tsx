@@ -26,7 +26,13 @@ export default function RoundIndex() {
           title,
         }}
       />
-      <Round sessionId={sessionId} isVisible={isVisible} onClose={onClose} />
+      <Round
+        sessionId={sessionId}
+        topic={topic.value}
+        year={year}
+        isVisible={isVisible}
+        onClose={onClose}
+      />
     </>
   );
 }

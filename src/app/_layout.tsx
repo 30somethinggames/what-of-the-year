@@ -3,7 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 
 import { WebContainer } from "components/web-container";
-import { STALE_TIME } from "queries/utils";
+import { DEFAULT_STALE_TIME } from "queries/utils";
 import { ThemeProvider } from "utils/theme";
 import { blue100, white100 } from "utils/theme/themes";
 
@@ -11,7 +11,7 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: 2,
-      staleTime: STALE_TIME,
+      staleTime: DEFAULT_STALE_TIME,
     },
   },
 });

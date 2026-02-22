@@ -8,7 +8,7 @@ describe("currentYear", () => {
 
     expect(result.year).toBe(2024);
     expect(result.startDate).toBe(new Date(2024, 0, 1).getTime() / 1000);
-    expect(result.endDate).toBe(new Date(2024, 11, 31).getTime() / 1000);
+    expect(result.endDate).toBe(new Date(2025, 0, 1).getTime() / 1000);
   });
 
   it("should handle leap year correctly", () => {

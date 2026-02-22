@@ -15,6 +15,7 @@ mock.module("db/config", () => ({
 }));
 
 mock.module("firebase/firestore", () => ({
+  updateDoc: () => Promise.resolve(),
   Timestamp: {
     fromMillis: (ms: number) => ({ _type: "timestamp", ms }),
   },

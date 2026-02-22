@@ -9,6 +9,7 @@ const mockGame = {
   rating: 85.5,
   aggregated_rating: 90.0,
   total_rating: 87.75,
+  category: 0,
   first_release_date: 1704067200,
   summary: "Test summary",
 };
@@ -19,6 +20,7 @@ const mockGameWithoutCover = {
   rating: 70.0,
   aggregated_rating: 75.0,
   total_rating: 72.5,
+  category: 0,
   first_release_date: 1709251200,
   summary: "Game without cover",
 };

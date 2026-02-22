@@ -33,6 +33,7 @@ mock.module("db/collections", () => ({
 }));
 
 mock.module("firebase/firestore", () => ({
+  updateDoc: () => Promise.resolve(),
   runTransaction: (_db: unknown, fn: (t: unknown) => Promise<void>) =>
     fn({ get: mockGet, set: mockSet, update: mockTransactionUpdate }),
   serverTimestamp: () => ({ _type: "serverTimestamp" }),

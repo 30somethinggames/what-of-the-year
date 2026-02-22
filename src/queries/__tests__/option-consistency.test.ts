@@ -16,6 +16,7 @@ describe("Option type consistency", () => {
       rating: 80,
       aggregated_rating: 85,
       total_rating: 82.5,
+      category: 0,
       first_release_date: 1704067200,
       summary: "Test",
     };
@@ -77,6 +78,7 @@ describe("Option type consistency", () => {
       rating: 80,
       aggregated_rating: 85,
       total_rating: 82.5,
+      category: 0,
       first_release_date: 1704067200,
       summary: "Test",
       cover: undefined,
