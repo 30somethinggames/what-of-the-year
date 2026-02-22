@@ -10,88 +10,89 @@ import { Input } from "components/input";
 import { KeyboardAvoidingView } from "components/keyboard-avoiding-view";
 import { Loading } from "components/loading";
 // import { MAX_PICK_LENGTH } from "constants/session";
-import type { TopicType } from "constants/topics";
+import type { MySelection } from "db/hooks/use-my-selections";
+import { saveSelection } from "db/utils/save-selection";
 import { createStyles } from "utils/theme";
 
 interface Props {
-  topic: TopicType;
-  year: string;
   sessionId: string;
-  roundNumber: number;
   isVisible: boolean;
   onClose: () => void;
 }
 
-export function Round({ topic, year, sessionId, roundNumber, isVisible, onClose }: Props) {
+export function Round({ sessionId, isVisible, onClose }: Props) {
   const s = useStyles();
-  const { isLoading, isError, session, round, completedUids } = useRoundState({
-    sessionId,
-    roundNumber,
-    topic,
-    year,
-  });
+  const {
+    isLoading,
+    isError,
+    session,
+    round,
+    activeRound,
+    completedUids,
+    mySelections,
+    uid,
+    hasPickedThisRound,
+  } = useRoundState({ sessionId });
 
   const [inputValue, setInputValue] = useState("");
-  const [picks, setPicks] = useState<string[]>([]);
 
   if (isLoading) return <Loading />;
-  if (isError || !session || !round) return <Error />;
+  if (isError || !session || !round || !activeRound) return <Error />;
 
-  const isDisabled = !inputValue.trim();
+  const isDisabled = !inputValue.trim() || !uid || hasPickedThisRound;
 
-  const onEnter = () => {
-    if (isDisabled) return;
-    setPicks((prev) => [...prev, inputValue.trim()]);
+  const onEnter = async () => {
+    if (isDisabled || !uid) return;
+    try {
+      await saveSelection({ sessionId, roundNumber: activeRound, uid, name: inputValue.trim() });
+    } catch {
+      // Selection already exists or write failed — ignored since
+      // the real-time listener will reflect the current state
+    }
     setInputValue("");
   };
 
-  // 1. keyboard avoiding
   // 2. button next to lock in the pick or edit
   // 3. drag and drop placement
   // 4. move modal to screen
   return (
     <>
-      <Container>
-        <Text style={s.title}>Round {roundNumber}</Text>
+      <KeyboardAvoidingView style={s.root}>
+        <Container>
+          <Text style={s.title}>Round {activeRound}</Text>
+          <FlatList
+            data={mySelections}
+            keyExtractor={(item) => String(item.roundNumber)}
+            contentContainerStyle={s.list}
+            renderItem={({ item }: { item: MySelection }) => (
+              <View style={s.row}>
+                <Text style={s.rank}>#{item.roundNumber}</Text>
+                <Text style={s.pick}>{item.pick.name}</Text>
+              </View>
+            )}
+          />
 
-        <FlatList
-          data={picks}
-          keyExtractor={(_, index) => String(index)}
-          contentContainerStyle={s.list}
-          renderItem={({ item, index }) => (
-            <View style={s.row}>
-              <Text style={s.rank}>#{index + 1}</Text>
-              <Text style={s.pick}>{item}</Text>
-            </View>
-          )}
-        />
-
-        <KeyboardAvoidingView>
           <View style={s.footer}>
-            <Input
-              value={inputValue}
-              onChangeText={setInputValue}
-              placeholder="Enter your pick"
-              // maxLength={MAX_PICK_LENGTH}
-            />
+            <Input value={inputValue} onChangeText={setInputValue} placeholder="Enter your pick" />
             <Button label="Enter" onPress={onEnter} disabled={isDisabled} />
           </View>
-        </KeyboardAvoidingView>
-      </Container>
-
+        </Container>
+      </KeyboardAvoidingView>
       <RoundModal
         isVisible={isVisible}
         onClose={onClose}
         completedUids={completedUids}
         sessionId={sessionId}
-        roundNumber={roundNumber}
-        maxRounds={session.maxRounds}
+        roundNumber={activeRound}
       />
     </>
   );
 }
 
 const useStyles = createStyles((t) => ({
+  root: {
+    flex: 1,
+  },
   title: {
     fontSize: t.text.size.xl,
     fontWeight: t.text.weight.bold,
@@ -122,7 +123,7 @@ const useStyles = createStyles((t) => ({
     color: t.colors.primary,
   },
   footer: {
-    paddingVertical: t.spacing.md,
+    paddingTop: t.spacing.md,
     gap: t.spacing.md,
   },
 }));

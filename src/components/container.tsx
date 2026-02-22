@@ -15,7 +15,9 @@ export const Container = ({ children, style }: PropsWithChildren<Props>) => {
 
   return (
     <LinearGradient colors={[theme.colors.blue100, theme.colors.blue200]} style={s.gradient}>
-      <SafeAreaView style={[s.root, style]}>{children}</SafeAreaView>
+      <SafeAreaView edges={["bottom"]} style={[s.root, style]}>
+        {children}
+      </SafeAreaView>
     </LinearGradient>
   );
 };

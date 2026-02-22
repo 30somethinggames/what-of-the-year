@@ -137,7 +137,7 @@ describe("createSession", () => {
       const roundData = roundCall?.[1] as unknown as Record<string, unknown>;
 
       expect(roundData.number).toBe(i + 1);
-      expect(roundData.weight).toBe(i + 1);
+      expect(roundData.weight).toBe(MAX_ROUNDS - i);
       expect(roundData.state).toBe("pending");
       expect(roundData.selectionsComplete).toBe(0);
     }

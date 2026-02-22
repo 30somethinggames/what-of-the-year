@@ -1,13 +1,20 @@
 import { describe, expect, it } from "bun:test";
 
-import { buildAllRounds, buildPlayer, buildRound, buildSession, getRoundWeight } from "../builders";
+import {
+  buildAllRounds,
+  buildPick,
+  buildPlayer,
+  buildRound,
+  buildSession,
+  getRoundWeight,
+} from "../builders";
 import { MAX_PLAYERS, MAX_ROUNDS } from "constants/session";
 
 describe("getRoundWeight", () => {
-  it("returns the round number as the weight", () => {
-    expect(getRoundWeight(1)).toBe(1);
-    expect(getRoundWeight(5)).toBe(5);
-    expect(getRoundWeight(10)).toBe(10);
+  it("returns inverted weight (round 10 = 1pt, round 1 = 10pt)", () => {
+    expect(getRoundWeight(1)).toBe(10);
+    expect(getRoundWeight(5)).toBe(6);
+    expect(getRoundWeight(10)).toBe(1);
   });
 });
 
@@ -71,7 +78,7 @@ describe("buildRound", () => {
     expect(round).toEqual({
       number: 3,
       state: "pending",
-      weight: 3,
+      weight: 8,
       selectionsComplete: 0,
       startedAt: null,
       closedAt: null,
@@ -102,10 +109,10 @@ describe("buildAllRounds", () => {
     expect(numbers).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
   });
 
-  it("assigns incrementing weights", () => {
+  it("assigns inverted weights (round 1 = 10pt, round 10 = 1pt)", () => {
     const rounds = buildAllRounds();
     const weights = rounds.map((r) => r.weight);
-    expect(weights).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    expect(weights).toEqual([10, 9, 8, 7, 6, 5, 4, 3, 2, 1]);
   });
 
   it("all rounds start as pending", () => {
@@ -124,5 +131,36 @@ describe("buildAllRounds", () => {
     const totalPoints = rounds.reduce((sum, r) => sum + r.weight, 0);
     // sum of 1..10 = 55
     expect(totalPoints).toBe(55);
+  });
+});
+
+describe("buildPick", () => {
+  it("creates a pick with name and kebab-case id", () => {
+    const pick = buildPick("The Last of Us");
+
+    expect(pick).toEqual({
+      id: "the-last-of-us",
+      name: "The Last of Us",
+    });
+  });
+
+  it("lowercases the id", () => {
+    const pick = buildPick("Elden Ring");
+    expect(pick.id).toBe("elden-ring");
+  });
+
+  it("preserves original casing in name", () => {
+    const pick = buildPick("Elden Ring");
+    expect(pick.name).toBe("Elden Ring");
+  });
+
+  it("collapses multiple spaces into a single hyphen", () => {
+    const pick = buildPick("Red   Dead   Redemption");
+    expect(pick.id).toBe("red-dead-redemption");
+  });
+
+  it("handles single word", () => {
+    const pick = buildPick("Concord");
+    expect(pick).toEqual({ id: "concord", name: "Concord" });
   });
 });

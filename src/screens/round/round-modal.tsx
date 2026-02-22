@@ -15,17 +15,9 @@ interface Props {
   completedUids: Set<string>;
   sessionId: string;
   roundNumber: number;
-  maxRounds: number;
 }
 
-export function RoundModal({
-  isVisible,
-  onClose,
-  completedUids,
-  sessionId,
-  roundNumber,
-  maxRounds,
-}: Props) {
+export function RoundModal({ isVisible, onClose, completedUids, sessionId, roundNumber }: Props) {
   const s = useStyles();
   const { players, isHost, isLoading, isError } = usePlayers(sessionId);
 
@@ -51,9 +43,7 @@ export function RoundModal({
       ) : (
         <>
           <View style={s.header}>
-            <Text style={s.title}>
-              Round {roundNumber} of {maxRounds}
-            </Text>
+            <Text style={s.title}>Round {roundNumber}</Text>
             <Pressable onPress={onClose} hitSlop={8}>
               <Text style={s.closeBtn}>✕</Text>
             </Pressable>

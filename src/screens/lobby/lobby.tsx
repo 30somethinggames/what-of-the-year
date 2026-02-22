@@ -24,7 +24,7 @@ export function Lobby({ topic, year, sessionId }: LobbyProps) {
     isHost,
     playerCount,
     maxPlayerCount,
-    canStart,
+    isDisabled,
     currentUser,
   } = useLobbyState({
     topic,
@@ -66,7 +66,7 @@ export function Lobby({ topic, year, sessionId }: LobbyProps) {
         {isHost ? (
           <>
             <Button label="Invite" onPress={onShare} />
-            <Button label="Start" onPress={onStart} disabled={canStart} />
+            <Button label="Start" onPress={onStart} disabled={isDisabled} />
           </>
         ) : (
           <Button label="Leave" onPress={onLeave} />

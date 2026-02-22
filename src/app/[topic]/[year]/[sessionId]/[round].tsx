@@ -2,7 +2,6 @@ import { Redirect, Stack } from "expo-router";
 import { useState } from "react";
 
 import { SettingsButton } from "components/settings-button";
-import { MAX_ROUNDS } from "constants/session";
 import { useParams } from "hooks/use-params";
 import { Round } from "screens/round";
 
@@ -17,8 +16,7 @@ export default function RoundIndex() {
   const onPress = () => setIsVisible(true);
   const onClose = () => setIsVisible(false);
 
-  const roundNumber = parseInt(round, 10);
-  const title = `Round ${roundNumber} of ${MAX_ROUNDS}`;
+  const title = `${topic.label} of ${year}`;
 
   return (
     <>
@@ -28,14 +26,7 @@ export default function RoundIndex() {
           title,
         }}
       />
-      <Round
-        topic={topic}
-        year={year}
-        sessionId={sessionId}
-        roundNumber={roundNumber}
-        isVisible={isVisible}
-        onClose={onClose}
-      />
+      <Round sessionId={sessionId} isVisible={isVisible} onClose={onClose} />
     </>
   );
 }

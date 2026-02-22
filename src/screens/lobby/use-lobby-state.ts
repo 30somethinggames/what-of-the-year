@@ -5,6 +5,7 @@ import type { LobbyProps } from "./types";
 import { MAX_ROUNDS } from "constants/session";
 import { usePlayers } from "db/hooks/use-players";
 import { useSession } from "db/hooks/use-session";
+import { isDev } from "utils/dev/isDev";
 
 /**
  * Composite hook for managing lobby state.
@@ -27,7 +28,7 @@ export function useLobbyState({ sessionId, topic, year }: LobbyProps) {
 
   const playerCount = players.length;
   const maxPlayerCount = session?.maxPlayers;
-  const canStart = playerCount < 2;
+  const isDisabled = isDev ? false : playerCount < 2;
 
   // Auto-navigate non-host players when game starts
   useEffect(() => {
@@ -48,6 +49,6 @@ export function useLobbyState({ sessionId, topic, year }: LobbyProps) {
     isHost,
     playerCount,
     maxPlayerCount,
-    canStart,
+    isDisabled,
   };
 }

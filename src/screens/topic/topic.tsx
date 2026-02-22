@@ -85,7 +85,7 @@ export function Topic({ topic, year, existingSessionId }: Props) {
   if (isError) return <Error onRetry={refetch} />;
 
   return (
-    <KeyboardAvoidingView style={s.root} keyboardVerticalOffset={headerHeight}>
+    <KeyboardAvoidingView style={s.root}>
       <Container style={[s.container, { marginTop: -headerHeight / 2 }]}>
         <View style={s.avatar}>
           <Avatar source={avatar} size={120} />
