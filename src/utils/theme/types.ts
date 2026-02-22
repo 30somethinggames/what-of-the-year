@@ -1,5 +1,8 @@
 import type { TOPIC_KEY } from "constants/topics";
-
+interface ShadowOffset {
+  width: number;
+  height: number;
+}
 export interface Theme {
   colors: {
     primary: string;
@@ -14,6 +17,7 @@ export interface Theme {
     white100: string;
     blue100: string;
     blue200: string;
+    yellow100: string;
   };
   spacing: {
     sm: number;
@@ -50,10 +54,17 @@ export interface Theme {
     };
   };
   shadow: {
-    shadowColor: string;
-    shadowOffset: { width: number; height: number };
-    shadowOpacity: number;
-    shadowRadius: number;
+    container: {
+      shadowColor: string;
+      shadowOffset: ShadowOffset;
+      shadowOpacity: number;
+      shadowRadius: number;
+    };
+    text: {
+      textShadowColor: string;
+      textShadowOffset: ShadowOffset;
+      textShadowRadius: number;
+    };
   };
 }
 

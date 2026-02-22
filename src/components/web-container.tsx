@@ -20,7 +20,7 @@ const useStyles = createStyles((t) => ({
     alignItems: "center",
   },
   container: {
-    ...t.shadow,
+    ...t.shadow.container,
     flex: 1,
     width: "100%",
     maxWidth: 430,

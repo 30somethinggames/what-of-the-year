@@ -40,7 +40,6 @@ export function PlayerList({ data, completedUids, playerCount, maxPlayerCount }:
 
 const useStyles = createStyles((t) => ({
   root: {
-    paddingHorizontal: t.spacing.md,
     gap: t.spacing.sm,
   },
   row: {

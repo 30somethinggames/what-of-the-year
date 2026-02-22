@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { FlatList, Pressable, Text, TextInput, View } from "react-native";
 
 import { MAX_NAME_LENGTH, sanitizeName, validateName } from "components/input/sanitize";
@@ -33,7 +33,30 @@ export function Autocomplete({
   const s = useStyles();
   const [error, setError] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
+
+  /**
+   * Holds the pending blur timeout so it can be cancelled.
+   *
+   * React Native fires `onBlur` before `onPress` when tapping a suggestion,
+   * which would unmount the dropdown before the press registers. To work
+   * around this, `onBlur` defers hiding suggestions by a short delay.
+   * If the user taps a suggestion within that window, `clearBlurTimeout`
+   * cancels the pending hide so the selection goes through.
+   *
+   * @see clearBlurTimeout
+   */
   const blurTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  /** Cancel any pending blur-hide and null out the ref. */
+  const clearBlurTimeout = useCallback(() => {
+    if (blurTimeoutRef.current != null) {
+      clearTimeout(blurTimeoutRef.current);
+      blurTimeoutRef.current = null;
+    }
+  }, []);
+
+  /** Clean up on unmount so we never setState after teardown. */
+  useEffect(() => clearBlurTimeout, [clearBlurTimeout]);
 
   const handleChangeText = useCallback(
     (raw: string) => {
@@ -50,8 +73,21 @@ export function Autocomplete({
       ? options.filter((o) => o.name.toLowerCase().includes(query)).slice(0, MAX_RESULTS)
       : [];
 
+  const onFocus = () => {
+    clearBlurTimeout();
+    setShowSuggestions(true);
+  };
+
+  const onBlur = () => {
+    clearBlurTimeout();
+    blurTimeoutRef.current = setTimeout(() => {
+      blurTimeoutRef.current = null;
+      setShowSuggestions(false);
+    }, 150);
+  };
+
   const handleSelect = (option: Option) => {
-    if (blurTimeoutRef.current) clearTimeout(blurTimeoutRef.current);
+    clearBlurTimeout();
     onChangeText(option.name);
     onSelectOption(option);
     setShowSuggestions(false);
@@ -64,13 +100,8 @@ export function Autocomplete({
         style={[s.input, error ? s.inputError : undefined]}
         value={value}
         onChangeText={handleChangeText}
-        onFocus={() => {
-          if (blurTimeoutRef.current) clearTimeout(blurTimeoutRef.current);
-          setShowSuggestions(true);
-        }}
-        onBlur={() => {
-          blurTimeoutRef.current = setTimeout(() => setShowSuggestions(false), 150);
-        }}
+        onFocus={onFocus}
+        onBlur={onBlur}
         placeholder={placeholder}
         placeholderTextColor={s.placeholder.color}
         maxLength={maxLength}
@@ -113,8 +144,7 @@ const useStyles = createStyles((t) => ({
     borderWidth: t.border.size.md,
     borderColor: t.colors.primary,
     borderRadius: t.border.radius.md,
-    paddingHorizontal: t.spacing.md,
-    paddingVertical: t.spacing.sm,
+    padding: t.spacing.sm,
     fontSize: t.text.size.md,
     color: t.colors.primary,
   },
@@ -140,8 +170,7 @@ const useStyles = createStyles((t) => ({
   suggestion: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: t.spacing.md,
-    paddingVertical: t.spacing.sm,
+    padding: t.spacing.sm,
     gap: t.spacing.sm,
   },
   suggestionText: {

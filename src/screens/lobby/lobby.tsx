@@ -81,7 +81,6 @@ const useStyles = createStyles((t) => ({
     flex: 1,
   },
   footer: {
-    padding: t.spacing.lg,
     gap: t.spacing.md,
   },
 }));

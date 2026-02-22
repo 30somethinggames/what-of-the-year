@@ -6,14 +6,16 @@ const black100 = "#000000";
 export const white100 = "#fff";
 export const blue100 = "#7ec8e3";
 const blue200 = "#0a3d6b";
+const yellow100 = "#FFC233";
+const shadow100 = "rgba(0,0,0,0.85)";
 
-const baseSpacing = {
+const spacing = {
   sm: 8,
   md: 16,
   lg: 24,
 };
 
-const baseBorder = {
+const border = {
   size: {
     sm: 1,
     md: 1.5,
@@ -26,7 +28,7 @@ const baseBorder = {
   },
 };
 
-const baseText = {
+const text = {
   size: {
     xs: 12,
     sm: 14,
@@ -56,18 +58,28 @@ const baseColors = {
   white100,
   blue100,
   blue200,
+  yellow100,
 };
 
-const baseCollections = {
-  spacing: baseSpacing,
-  border: baseBorder,
-  text: baseText,
-  shadow: {
-    shadowColor: black100,
+const shadow = {
+  container: {
+    shadowColor: shadow100,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
   },
+  text: {
+    textShadowColor: "rgba(0,0,0,0.85)",
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 3,
+  },
+};
+
+const baseCollections = {
+  spacing,
+  border,
+  text,
+  shadow,
 };
 
 export const gamesTheme: Theme = {

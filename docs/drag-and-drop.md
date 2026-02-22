@@ -7,6 +7,7 @@ Allow users to reorder their picks via drag & drop instead of only editing the t
 ## Recommended Package
 
 **`react-native-draggable-flatlist`** (v4+)
+
 - Built on `react-native-reanimated` + `react-native-gesture-handler` (both already installed)
 - Drop-in replacement for `FlatList`
 - Well maintained, widely used

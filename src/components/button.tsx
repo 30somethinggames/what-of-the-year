@@ -41,8 +41,10 @@ const useStyles = createStyles((t) => ({
     borderColor: t.colors.primary,
     borderRadius: t.border.radius.lg,
     paddingVertical: t.spacing.md,
+    backgroundColor: t.colors.yellow100,
   },
   text: {
+    ...t.shadow.text,
     color: t.colors.white100,
     fontSize: t.text.size.xl,
     fontWeight: t.text.weight.bold,

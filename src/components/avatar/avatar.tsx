@@ -20,7 +20,9 @@ export function Avatar({ source, size = 100 }: Props) {
 const useStyles = createStyles((t) => ({
   root: {
     overflow: "hidden",
-    backgroundColor: t.colors.surface,
+    backgroundColor: t.colors.white100,
+    borderWidth: t.border.size.lg,
+    borderColor: t.colors.black100,
   },
   image: {
     width: "100%",
