@@ -86,7 +86,6 @@ export function Round({ sessionId, topic, year, isVisible, onClose }: Props) {
   };
 
   // 3. drag and drop placement
-  // 4. move modal to screen
   return (
     <>
       <KeyboardAvoidingView style={s.root}>

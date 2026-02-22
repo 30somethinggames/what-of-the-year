@@ -6,12 +6,12 @@
 
 - Figure out [deeplinks](./universal-links.md)
 
-3. refactor expensive query calls
+3. refactor Round modal to screen modal
 
-- flicker on modal in Round
-- user roster not updated on leaving - works on lobby
+- flicker
+- user status
 
-4. games query - how much to fetch
-5. round flow
-6. handle host duties
-7. theme still borked. move to listener
+4. handle host duties
+5. theme still borked. move to listener
+6. what happens on finish?
+7. [Drag and drop](drag-and-drop.md)
