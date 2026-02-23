@@ -54,17 +54,10 @@ export interface Theme {
     };
   };
   shadow: {
-    container: {
-      shadowColor: string;
-      shadowOffset: ShadowOffset;
-      shadowOpacity: number;
-      shadowRadius: number;
-    };
-    text: {
-      textShadowColor: string;
-      textShadowOffset: ShadowOffset;
-      textShadowRadius: number;
-    };
+    shadowColor: string;
+    shadowOffset: ShadowOffset;
+    shadowOpacity: number;
+    shadowRadius: number;
   };
 }
 

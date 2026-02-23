@@ -62,17 +62,10 @@ const baseColors = {
 };
 
 const shadow = {
-  container: {
-    shadowColor: shadow100,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-  },
-  text: {
-    textShadowColor: "rgba(0,0,0,0.85)",
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 3,
-  },
+  shadowColor: shadow100,
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.1,
+  shadowRadius: 8,
 };
 
 const baseCollections = {

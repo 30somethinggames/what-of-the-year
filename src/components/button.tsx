@@ -44,8 +44,7 @@ const useStyles = createStyles((t) => ({
     backgroundColor: t.colors.yellow100,
   },
   text: {
-    ...t.shadow.text,
-    color: t.colors.white100,
+    color: t.colors.black100,
     fontSize: t.text.size.xl,
     fontWeight: t.text.weight.bold,
   },
