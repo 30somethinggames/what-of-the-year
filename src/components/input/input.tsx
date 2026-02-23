@@ -47,7 +47,7 @@ const useStyles = createStyles((t) => ({
   root: {
     width: "100%",
     backgroundColor: t.colors.surface,
-    borderWidth: t.border.size.md,
+    borderWidth: t.border.size.sm,
     borderColor: t.colors.primary,
     borderRadius: t.border.radius.md,
     paddingHorizontal: t.spacing.md,

@@ -21,7 +21,7 @@ const useStyles = createStyles((t) => ({
   root: {
     overflow: "hidden",
     backgroundColor: t.colors.white100,
-    borderWidth: t.border.size.lg,
+    borderWidth: t.border.size.md,
     borderColor: t.colors.black100,
   },
   image: {

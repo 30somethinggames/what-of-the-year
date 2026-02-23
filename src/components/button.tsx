@@ -41,16 +41,18 @@ const useStyles = createStyles((t) => ({
   root: {
     width: "100%",
     alignItems: "center",
-    borderWidth: t.border.size.lg,
-    borderColor: t.colors.primary,
     borderRadius: t.border.radius.lg,
     paddingVertical: t.spacing.md,
-    backgroundColor: t.colors.yellow100,
+    backgroundColor: "#3292c9",
+    // movies 32c992
   },
   text: {
-    color: t.colors.black100,
+    color: "#f1efea",
     fontSize: t.text.size.xl,
     fontWeight: t.text.weight.bold,
+    textShadowColor: "rgba(0, 0, 0, 0.35)",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
   },
   pressed: {
     opacity: 0.7,
