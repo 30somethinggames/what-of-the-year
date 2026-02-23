@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { Text, TextInput, View } from "react-native";
 
-import { MAX_NAME_LENGTH, sanitizeName, validateName } from "components/input/sanitize";
+import { MAX_NAME_LENGTH, sanitizeName, validateName } from "./sanitize";
 import { createStyles } from "utils/theme";
 
 interface Props {

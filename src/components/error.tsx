@@ -1,6 +1,6 @@
 import { Text, View } from "react-native";
 
-import { Avatar } from "./avatar/avatar";
+import { Avatar } from "./avatar";
 import { Button } from "./button";
 import { createStyles } from "utils/theme";
 

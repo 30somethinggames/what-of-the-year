@@ -5,10 +5,8 @@ import { Text, View } from "react-native";
 import { Button } from "components/button";
 import { Container } from "components/container";
 import { Picker } from "components/picker";
-import type { TopicType } from "constants/topics";
-import { topics } from "constants/topics";
-import type { Year } from "constants/years";
-import { years } from "constants/years";
+import { type TopicType, topics } from "constants/topics";
+import { type Year, years } from "constants/years";
 import { createStyles, useTheme } from "utils/theme";
 
 export function Home() {

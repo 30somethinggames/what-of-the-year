@@ -85,7 +85,6 @@ export function Round({ sessionId, topic, year, isVisible, onClose }: Props) {
     setSelectedOption(null);
   };
 
-  // 3. drag and drop placement
   return (
     <>
       <KeyboardAvoidingView style={s.root}>

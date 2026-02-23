@@ -1,7 +1,11 @@
-import type { PressableProps, PressableStateCallbackType } from "react-native";
-import { Pressable, Text } from "react-native";
+import {
+  Pressable,
+  type PressableProps,
+  type PressableStateCallbackType,
+  StyleSheet,
+  Text,
+} from "react-native";
 
-import { flatten } from "utils/styles";
 import { createStyles } from "utils/theme";
 
 interface Props extends PressableProps {
@@ -12,7 +16,7 @@ export function Button({ label, style, disabled, ...props }: Props) {
   const s = useStyles();
   const fStyle = (state: PressableStateCallbackType) => {
     const resolvedStyle = typeof style === "function" ? style(state) : style;
-    return flatten([
+    return StyleSheet.flatten([
       s.root,
       resolvedStyle,
       !disabled && state.pressed && s.pressed,

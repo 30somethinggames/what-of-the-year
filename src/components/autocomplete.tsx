@@ -95,7 +95,7 @@ export function Autocomplete({
   };
 
   return (
-    <View style={s.wrapper}>
+    <View style={s.root}>
       <TextInput
         style={[s.input, error ? s.inputError : undefined]}
         value={value}
@@ -133,7 +133,7 @@ export function Autocomplete({
 }
 
 const useStyles = createStyles((t) => ({
-  wrapper: {
+  root: {
     width: "100%",
     gap: t.spacing.sm / 2,
     zIndex: 1,

@@ -1,7 +1,6 @@
 import * as Haptics from "expo-haptics";
 import { memo, useCallback, useEffect, useRef } from "react";
-import type { FlatList } from "react-native";
-import { Text } from "react-native";
+import { type FlatList, Text } from "react-native";
 import Animated, {
   type SharedValue,
   useAnimatedScrollHandler,
