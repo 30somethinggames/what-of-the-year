@@ -1,4 +1,3 @@
-import type { TOPIC_KEY } from "constants/topics";
 interface ShadowOffset {
   width: number;
   height: number;
@@ -15,7 +14,6 @@ export interface Theme {
     grey100: string;
     red100: string;
     shadow100: string;
-    transparent: "transparent";
     white100: string;
     white200: string;
     yellow100: string;
@@ -48,8 +46,6 @@ export interface Theme {
       sm: number;
       md: number;
       lg: number;
-
-      title: number;
     };
     weight: {
       regular: "400";
@@ -65,5 +61,3 @@ export interface Theme {
     shadowRadius: number;
   };
 }
-
-export type ThemeName = TOPIC_KEY.GAMES | TOPIC_KEY.MOVIES | TOPIC_KEY.BOOKS;

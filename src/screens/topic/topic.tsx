@@ -22,8 +22,8 @@ interface Props {
   existingSessionId?: string;
 }
 export function Topic({ topic, year, existingSessionId }: Props) {
-  const s = useStyles();
   const headerHeight = useHeaderHeight();
+  const s = useStyles({ headerHeight });
   const { isLoading, isError, refetch } = useTopicData({ key: topic.value, year });
   const { avatar, randomizeAvatar } = useRandomAvatar();
   const [name, setName] = useState("");
@@ -86,7 +86,7 @@ export function Topic({ topic, year, existingSessionId }: Props) {
 
   return (
     <KeyboardAvoidingView style={s.root}>
-      <Container style={[s.container, { marginTop: -headerHeight / 2 }]}>
+      <Container style={s.container}>
         <View style={s.avatar}>
           <Avatar source={avatar} size={120} />
           <Button style={s.btn} label="Random" onPress={randomizeAvatar} />
@@ -98,7 +98,7 @@ export function Topic({ topic, year, existingSessionId }: Props) {
   );
 }
 
-const useStyles = createStyles((t) => ({
+const useStyles = createStyles((t, p: { headerHeight: number }) => ({
   root: {
     flex: 1,
   },
@@ -107,6 +107,7 @@ const useStyles = createStyles((t) => ({
     alignItems: "center",
     justifyContent: "center",
     gap: t.spacing.lg,
+    marginTop: -p.headerHeight / 2,
   },
   avatar: {
     width: "100%",

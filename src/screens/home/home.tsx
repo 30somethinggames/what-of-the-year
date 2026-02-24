@@ -7,19 +7,14 @@ import { Container } from "components/container";
 import { Picker } from "components/picker";
 import { type TopicType, topics } from "constants/topics";
 import { type Year, years } from "constants/years";
-import { createStyles, useTheme } from "utils/theme";
+import { createStyles, themes } from "utils/theme";
 
 export function Home() {
   const [topic, setTopic] = useState<TopicType>(topics[0]);
   const [year, setYear] = useState<Year>(years[0]);
-  const { setTheme } = useTheme();
-  const s = useStyles();
+  const s = useStyles({ backgroundColor: themes[topic.value].topic.color });
 
-  const onTopicChange = (v: TopicType) => {
-    setTopic(v);
-    setTheme(v.value);
-  };
-
+  const onTopicChange = (v: TopicType) => setTopic(v);
   const onYearChange = (v: Year) => setYear(v);
 
   return (
@@ -37,13 +32,13 @@ export function Home() {
           params: { topic: topic.value, year: year.value },
         }}
       >
-        <Button label="Start" />
+        <Button label="Start" style={s.btn} />
       </Link>
     </Container>
   );
 }
 
-const useStyles = createStyles((t) => ({
+const useStyles = createStyles((t, p: { backgroundColor: string }) => ({
   root: {
     flex: 1,
     alignItems: "center",
@@ -54,5 +49,8 @@ const useStyles = createStyles((t) => ({
     fontWeight: t.text.weight.bold,
     color: t.colors.black100,
     marginVertical: t.spacing.lg,
+  },
+  btn: {
+    backgroundColor: p.backgroundColor,
   },
 }));

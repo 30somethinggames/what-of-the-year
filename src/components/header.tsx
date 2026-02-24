@@ -15,6 +15,6 @@ const useStyles = createStyles((t) => ({
   root: {
     fontWeight: t.text.weight.bold,
     fontSize: t.text.size.lg,
-    backgroundColor: t.colors.transparent,
+    backgroundColor: "transparent",
   },
 }));

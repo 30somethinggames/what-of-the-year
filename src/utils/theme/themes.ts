@@ -7,7 +7,6 @@ const green100 = "#32c992";
 const grey100 = "#666666";
 const red100 = "#ED4337";
 const shadow100 = "rgba(0,0,0,0.85)";
-const transparent = "transparent" as const;
 const white100 = "#f1efea";
 const white200 = "#fff";
 const yellow100 = "#c9b432";
@@ -24,7 +23,6 @@ export const baseTheme: Theme = {
     blue200,
     red100,
     shadow100,
-    transparent,
     white100,
     white200,
     yellow100,
@@ -57,7 +55,6 @@ export const baseTheme: Theme = {
       sm: 14,
       md: 16,
       lg: 18,
-      title: 72,
     },
     weight: {
       regular: "400" as const,

@@ -9,20 +9,23 @@ interface Props {
 }
 
 export function Avatar({ source, size = 100 }: Props) {
-  const s = useStyles();
+  const s = useStyles({ size });
   return (
-    <View style={[s.root, { width: size, height: size, borderRadius: size / 2 }]}>
+    <View style={s.root}>
       <Image style={s.image} source={{ uri: source }} contentFit="cover" transition={200} />
     </View>
   );
 }
 
-const useStyles = createStyles((t) => ({
+const useStyles = createStyles((t, p: { size: number }) => ({
   root: {
     overflow: "hidden",
-    backgroundColor: t.colors.white200,
+    width: p.size,
+    height: p.size,
+    borderRadius: p.size / 2,
     borderWidth: t.border.size.sm,
     borderColor: t.colors.black100,
+    backgroundColor: t.colors.white200,
   },
   image: {
     width: "100%",

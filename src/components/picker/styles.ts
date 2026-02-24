@@ -24,7 +24,7 @@ export const useStyles = createStyles((t) => ({
     alignItems: "center",
   },
   label: {
-    fontSize: t.text.size.title,
+    fontSize: 72,
     fontWeight: t.text.weight.bold,
     color: t.colors.black100,
   },

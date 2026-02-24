@@ -9,7 +9,13 @@
 - user status
 
 3. handle host duties
+
+- player should be able to do it solo
+
 4. what happens on finish?
+
+- be able to share
+
 5. Figure out [deeplinks](./universal-links.md)
 6. hook clean up
 

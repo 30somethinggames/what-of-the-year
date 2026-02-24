@@ -20,9 +20,7 @@ export interface PlayerRoundSelection extends Selection {
  * @param maxRounds - Total number of rounds in the session.
  */
 export function useAllSelections(sessionId: string | undefined, maxRounds: number) {
-  const [selectionsMap, setSelectionsMap] = useState<Map<number, PlayerRoundSelection[]>>(
-    new Map(),
-  );
+  const [selectionsMap, setSelectionsMap] = useState<Record<number, PlayerRoundSelection[]>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState<Error | null>(null);
 
@@ -45,11 +43,7 @@ export function useAllSelections(sessionId: string | undefined, maxRounds: numbe
             roundNumber: round,
             ...(doc.data() as Selection),
           }));
-          setSelectionsMap((prev) => {
-            const next = new Map(prev);
-            next.set(round, data);
-            return next;
-          });
+          setSelectionsMap((prev) => ({ ...prev, [round]: data }));
           loadedCount++;
           if (loadedCount >= maxRounds) setIsLoading(false);
         },
@@ -66,7 +60,7 @@ export function useAllSelections(sessionId: string | undefined, maxRounds: numbe
     };
   }, [sessionId, maxRounds]);
 
-  const allSelections: PlayerRoundSelection[] = Array.from(selectionsMap.values()).flat();
+  const allSelections: PlayerRoundSelection[] = Object.values(selectionsMap).flat();
 
   return { allSelections, isLoading, isError };
 }
