@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { FlatList, Pressable, Text, TextInput, View } from "react-native";
+import { FlatList, Pressable, Text, View } from "react-native";
 
 import { Input } from "./input";
 import { MAX_NAME_LENGTH, sanitizeName, validateName } from "components/input/sanitize";

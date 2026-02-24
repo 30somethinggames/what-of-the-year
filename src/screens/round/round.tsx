@@ -38,7 +38,7 @@ export function Round({ sessionId, topic, year, isVisible, onClose }: Props) {
     mySelections,
     uid,
     hasPickedThisRound,
-  } = useRoundState({ sessionId });
+  } = useRoundState({ sessionId, topic, year });
 
   const { data: options = [] } = useTopicData({ key: topic, year });
 

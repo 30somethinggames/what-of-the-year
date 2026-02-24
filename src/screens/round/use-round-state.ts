@@ -10,8 +10,10 @@ import { advanceRound } from "db/utils/advance-round";
 
 interface Props {
   sessionId: string;
+  topic: string;
+  year: string;
 }
-export function useRoundState({ sessionId }: Props) {
+export function useRoundState({ sessionId, topic, year }: Props) {
   const { session, isLoading: sessionLoading, isError: sessionError } = useSession(sessionId);
 
   // activeRoundNumber is the source of truth — no URL navigation needed
@@ -71,6 +73,19 @@ export function useRoundState({ sessionId }: Props) {
   ]);
 
   const completedUids = new Set(selections.map((s) => s.uid));
+
+  // Navigate to results when the last round (round 1) is closed.
+  // Check round.number === 1 to avoid acting on stale data from the
+  // previous round that may still be in state during the same render batch.
+  useEffect(() => {
+    if (!session || !round || !activeRound) return;
+    if (activeRound === 1 && round.number === 1 && round.state === "closed") {
+      router.replace({
+        pathname: "/[topic]/[year]/[sessionId]/results",
+        params: { topic, year, sessionId },
+      } as never);
+    }
+  }, [round?.number, round?.state, activeRound, session, sessionId, topic, year]);
 
   const hasPickedThisRound = activeRound
     ? mySelections.some((s) => s.roundNumber === activeRound)

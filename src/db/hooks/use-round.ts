@@ -22,6 +22,12 @@ export function useRound(sessionId: string | undefined, roundNumber: number | un
   useEffect(() => {
     if (!sessionId || !roundNumber) return;
 
+    // Reset state to avoid stale data from the previous round being used
+    // before the new subscription delivers its first snapshot.
+    setRound(null);
+    setIsLoading(true);
+    setIsError(null);
+
     const unsubscribe = onSnapshot(
       roundRef(sessionId, roundNumber),
       (snapshot) => {

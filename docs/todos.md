@@ -9,12 +9,9 @@
 - user status
 
 3. handle host duties
-4. theme still borked. move to listener - remove?
-5. what happens on finish?
-   . Deeplinks
-
-6. Figure out [deeplinks](./universal-links.md)
-7. hook clean up
+4. what happens on finish?
+5. Figure out [deeplinks](./universal-links.md)
+6. hook clean up
 
 ## V2
 
