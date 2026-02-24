@@ -1,15 +1,10 @@
 import { useCallback, useState } from "react";
-import { Text, TextInput, View } from "react-native";
+import { Text, TextInput, type TextInputProps, View } from "react-native";
 
 import { MAX_NAME_LENGTH, sanitizeName, validateName } from "./sanitize";
 import { createStyles } from "utils/theme";
 
-interface Props {
-  value: string;
-  onChangeText?: ((text: string) => void) | undefined;
-  placeholder?: string;
-  maxLength?: number;
-}
+interface Props extends TextInputProps {}
 export function Input({ value, onChangeText, placeholder, maxLength = MAX_NAME_LENGTH }: Props) {
   const s = useStyles();
   const [error, setError] = useState("");

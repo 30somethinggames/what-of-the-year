@@ -16,8 +16,8 @@ export function SettingsButton({ onPress }: Props) {
 
 const useStyles = createStyles((t) => ({
   root: {
-    fontSize: t.text.size.lg,
+    fontSize: 28,
     color: t.colors.black100,
-    paddingHorizontal: t.spacing.md,
+    paddingHorizontal: t.spacing.sm,
   },
 }));

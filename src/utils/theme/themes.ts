@@ -3,12 +3,14 @@ import type { Theme } from "./types";
 const black100 = "#000000";
 const blue100 = "#3292c9";
 const blue200 = "#0a3d6b";
+const green100 = "#32c992";
 const grey100 = "#666666";
 const red100 = "#ED4337";
 const shadow100 = "rgba(0,0,0,0.85)";
 const transparent = "transparent" as const;
 const white100 = "#f1efea";
 const white200 = "#fff";
+const yellow100 = "#c9b432";
 
 export const baseTheme: Theme = {
   topic: {
@@ -17,6 +19,7 @@ export const baseTheme: Theme = {
   colors: {
     black100,
     grey100,
+    green100,
     blue100,
     blue200,
     red100,
@@ -24,6 +27,7 @@ export const baseTheme: Theme = {
     transparent,
     white100,
     white200,
+    yellow100,
   },
   spacing: {
     sm: 8,
@@ -73,14 +77,14 @@ export const baseTheme: Theme = {
 export const moviesTheme: Theme = {
   ...baseTheme,
   topic: {
-    color: "#32c992",
+    color: green100,
   },
 };
 
 export const booksTheme: Theme = {
   ...baseTheme,
   topic: {
-    color: "#32c992",
+    color: yellow100,
   },
 };
 

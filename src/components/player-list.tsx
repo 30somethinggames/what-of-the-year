@@ -1,6 +1,7 @@
 import { FlatList, Text, View } from "react-native";
 
 import { Avatar } from "./avatar";
+import { Row } from "./row";
 import type { Player } from "types/session";
 import { createStyles } from "utils/theme";
 
@@ -21,12 +22,12 @@ export function PlayerList({ data, completedUids, playerCount, maxPlayerCount }:
       renderItem={({ item }) => {
         const hasCompleted = completedUids?.has(item.uid);
         return (
-          <View style={s.row}>
+          <Row>
             <Avatar source={item.avatar} size={40} />
             <Text style={s.playerName}>{item.name}</Text>
             {item.isHost && <Text style={s.hostBadge}>Host</Text>}
             {completedUids && <Text style={s.status}>{hasCompleted ? "✓" : "..."}</Text>}
-          </View>
+          </Row>
         );
       }}
       ListFooterComponent={
@@ -41,14 +42,6 @@ export function PlayerList({ data, completedUids, playerCount, maxPlayerCount }:
 const useStyles = createStyles((t) => ({
   root: {
     gap: t.spacing.sm,
-  },
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: t.colors.white200,
-    padding: t.spacing.sm,
-    borderRadius: t.border.radius.lg,
-    gap: t.spacing.md,
   },
   playerName: {
     flex: 1,

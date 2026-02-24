@@ -9,6 +9,7 @@ import { Container } from "components/container";
 import { Error } from "components/error";
 import { KeyboardAvoidingView } from "components/keyboard-avoiding-view";
 import { Loading } from "components/loading";
+import { Row } from "components/row";
 import type { TOPIC_KEY } from "constants/topics";
 import type { MySelection } from "db/hooks/use-my-selections";
 import { editSelection } from "db/utils/edit-selection";
@@ -95,13 +96,13 @@ export function Round({ sessionId, topic, year, isVisible, onClose }: Props) {
             keyExtractor={(item) => String(item.roundNumber)}
             contentContainerStyle={s.list}
             renderItem={({ item }: { item: MySelection }) => (
-              <View style={s.row}>
+              <Row>
                 <Text style={s.rank}>#{item.roundNumber}</Text>
                 <Text style={s.pick}>{item.pick.name}</Text>
                 <Pressable onPress={() => onEdit(item)} hitSlop={8}>
                   <Text style={s.editButton}>Edit</Text>
                 </Pressable>
-              </View>
+              </Row>
             )}
           />
 
@@ -142,14 +143,6 @@ const useStyles = createStyles((t) => ({
   list: {
     gap: t.spacing.sm,
     flexGrow: 1,
-  },
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: t.colors.white100,
-    padding: t.spacing.sm,
-    borderRadius: t.border.radius.lg,
-    gap: t.spacing.md,
   },
   rank: {
     fontSize: t.text.size.md,

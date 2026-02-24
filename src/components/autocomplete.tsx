@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FlatList, Pressable, Text, TextInput, View } from "react-native";
 
+import { Input } from "./input";
 import { MAX_NAME_LENGTH, sanitizeName, validateName } from "components/input/sanitize";
 import type { Option } from "types/option";
 import { createStyles } from "utils/theme";
@@ -96,7 +97,7 @@ export function Autocomplete({
 
   return (
     <View style={s.root}>
-      <TextInput
+      <Input
         style={[s.input, error ? s.inputError : undefined]}
         value={value}
         onChangeText={handleChangeText}

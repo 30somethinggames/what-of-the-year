@@ -1,8 +1,29 @@
-import { useEffect, useRef } from "react";
+import { memo, useEffect, useRef } from "react";
 import { ScrollView, Text, View, type ViewStyle } from "react-native";
 
 import { useStyles } from "./styles";
-import { ITEM_HEIGHT, type PickerItem, type PickerProps } from "./types";
+import {
+  ITEM_HEIGHT,
+  NUMBER_OF_LINES,
+  type ItemProps,
+  type PickerItem,
+  type PickerProps,
+} from "./types";
+import { getInitialScrollIndex, keyExtractor } from "./utils";
+
+const Item = memo(function Item({ label }: ItemProps) {
+  const s = useStyles();
+  // Each child snaps to the start of the scroll container
+  const animatedStyle = { scrollSnapAlign: "start" } as unknown as ViewStyle;
+
+  return (
+    <View style={[s.item, animatedStyle]}>
+      <Text style={s.label} numberOfLines={NUMBER_OF_LINES}>
+        {label}
+      </Text>
+    </View>
+  );
+});
 
 /**
  * Web picker using a `ScrollView` with CSS `scroll-snap-type` for native-feeling
@@ -17,7 +38,8 @@ export function Picker<T extends PickerItem>({
 }: PickerProps<T>) {
   const s = useStyles();
   const scrollRef = useRef<ScrollView>(null);
-  const activeIndex = useRef(data.findIndex((d) => d.value === value.value));
+  const initialScrollIndex = getInitialScrollIndex(data, value);
+  const activeIndex = useRef(initialScrollIndex);
 
   /** Syncs the scroll position when `value` changes externally. */
   useEffect(() => {
@@ -58,14 +80,7 @@ export function Picker<T extends PickerItem>({
       testID={testID}
       showsVerticalScrollIndicator={false}
       scrollEventThrottle={16}
-      contentOffset={{
-        x: 0,
-        y:
-          Math.max(
-            0,
-            data.findIndex((d) => d.value === value.value),
-          ) * ITEM_HEIGHT,
-      }}
+      contentOffset={{ x: 0, y: initialScrollIndex * ITEM_HEIGHT }}
       style={[
         s.list,
         // CSS scroll-snap for reliable snapping on web
@@ -76,18 +91,7 @@ export function Picker<T extends PickerItem>({
       ]}
     >
       {data.map((item) => (
-        <View
-          key={String(item.value)}
-          style={[
-            s.item,
-            // Each child snaps to the start of the scroll container
-            { scrollSnapAlign: "start" } as unknown as ViewStyle,
-          ]}
-        >
-          <Text style={s.label} numberOfLines={1}>
-            {item.label}
-          </Text>
-        </View>
+        <Item key={keyExtractor(item)} label={item.label} />
       ))}
     </ScrollView>
   );

@@ -2,7 +2,6 @@ import * as Haptics from "expo-haptics";
 import { memo, useCallback, useEffect, useRef } from "react";
 import { type FlatList, Text } from "react-native";
 import Animated, {
-  type SharedValue,
   useAnimatedScrollHandler,
   useAnimatedStyle,
   useSharedValue,
@@ -11,16 +10,14 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { useStyles } from "./styles";
-import { ITEM_HEIGHT, type PickerItem, type PickerProps } from "./types";
-
-interface ItemProps {
-  /** Display text for the row. */
-  label: string;
-  /** Position in the data array, used to calculate scroll-based animations. */
-  index: number;
-  /** Shared scroll offset that drives opacity and scale animations. */
-  scrollOffset: SharedValue<number>;
-}
+import {
+  ITEM_HEIGHT,
+  NUMBER_OF_LINES,
+  type NativeItemProps,
+  type PickerItem,
+  type PickerProps,
+} from "./types";
+import { getInitialScrollIndex, keyExtractor } from "./utils";
 
 /**
  * Returns the layout metadata for a given item index. Defined outside the
@@ -32,14 +29,6 @@ function getItemLayout(_data: unknown, index: number) {
 }
 
 /**
- * Extracts a stable string key for each picker item. Defined outside the
- * component to avoid creating a new function reference on every render.
- */
-function keyExtractor(item: PickerItem) {
-  return String(item.value);
-}
-
-/**
  * A single row in the picker. Fades and scales based on its distance from the
  * currently centered scroll position. The animation runs entirely on the UI
  * thread via `useAnimatedStyle`, so no JS re-renders occur during scroll.
@@ -47,7 +36,7 @@ function keyExtractor(item: PickerItem) {
  * Wrapped in `memo` so that React skips re-rendering rows whose `label` and
  * `index` props haven't changed when the parent `Picker` re-renders.
  */
-const Item = memo(function Item({ label, index, scrollOffset }: ItemProps) {
+const Item = memo(function Item({ label, index, scrollOffset }: NativeItemProps) {
   const s = useStyles();
 
   const animatedStyle = useAnimatedStyle(() => {
@@ -62,7 +51,7 @@ const Item = memo(function Item({ label, index, scrollOffset }: ItemProps) {
 
   return (
     <Animated.View style={[s.item, animatedStyle]}>
-      <Text style={s.label} numberOfLines={1}>
+      <Text style={s.label} numberOfLines={NUMBER_OF_LINES}>
         {label}
       </Text>
     </Animated.View>
@@ -90,7 +79,8 @@ export function Picker<T extends PickerItem>({
   const s = useStyles();
   const flatListRef = useRef<FlatList<T>>(null);
   const scrollOffset = useSharedValue(0);
-  const activeIndex = useRef(data.findIndex((d) => d.value === value.value));
+  const initialScrollIndex = getInitialScrollIndex(data, value);
+  const activeIndex = useRef(initialScrollIndex);
 
   /**
    * Syncs the list scroll position whenever the external `value` prop changes
@@ -139,11 +129,6 @@ export function Picker<T extends PickerItem>({
       <Item label={item.label} index={index} scrollOffset={scrollOffset} />
     ),
     [scrollOffset],
-  );
-
-  const initialScrollIndex = Math.max(
-    0,
-    data.findIndex((d) => d.value === value.value),
   );
 
   return (

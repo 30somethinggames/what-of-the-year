@@ -8,6 +8,10 @@ export const useStyles = createStyles((t) => ({
     flexGrow: 0,
     width: "100%",
     height: ITEM_HEIGHT,
+    borderRadius: t.border.radius.md,
+    borderWidth: t.border.size.sm,
+    backgroundColor: t.colors.white200,
+    overflow: "hidden",
     ...Platform.select({
       web: {
         cursor: "ns-resize",

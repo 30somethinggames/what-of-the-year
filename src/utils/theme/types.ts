@@ -11,12 +11,14 @@ export interface Theme {
     black100: string;
     blue100: string;
     blue200: string;
+    green100: string;
     grey100: string;
     red100: string;
     shadow100: string;
     transparent: "transparent";
     white100: string;
     white200: string;
+    yellow100: string;
   };
   spacing: {
     sm: number;
