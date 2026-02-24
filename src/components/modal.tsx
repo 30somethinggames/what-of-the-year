@@ -30,7 +30,7 @@ const useStyles = createStyles((t) => ({
     margin: 0,
   },
   content: {
-    backgroundColor: t.colors.background,
+    backgroundColor: t.colors.white100,
     borderTopLeftRadius: t.border.radius.lg * 2,
     borderTopRightRadius: t.border.radius.lg * 2,
     maxHeight: "80%",

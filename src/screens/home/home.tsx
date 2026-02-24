@@ -1,7 +1,6 @@
 import { Link } from "expo-router";
 import { useState } from "react";
 import { Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Button } from "components/button";
 import { Container } from "components/container";
@@ -53,7 +52,7 @@ const useStyles = createStyles((t) => ({
   of: {
     fontSize: 52,
     fontWeight: t.text.weight.bold,
-    color: t.colors.primary,
+    color: t.colors.black100,
     marginVertical: t.spacing.lg,
   },
 }));

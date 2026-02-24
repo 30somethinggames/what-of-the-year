@@ -78,13 +78,13 @@ const useStyles = createStyles((t) => ({
     padding: t.spacing.lg,
   },
   title: {
-    fontSize: t.text.size.xl,
+    fontSize: t.text.size.lg,
     fontWeight: t.text.weight.bold,
-    color: t.colors.primary,
+    color: t.colors.black100,
   },
   closeBtn: {
-    fontSize: t.text.size.xxl,
-    color: t.colors.secondary,
+    fontSize: t.text.size.lg,
+    color: t.colors.grey100,
   },
   footer: {
     paddingTop: t.spacing.lg,
@@ -92,9 +92,9 @@ const useStyles = createStyles((t) => ({
     gap: t.spacing.md,
   },
   nextBtn: {
-    backgroundColor: t.colors.primary,
+    backgroundColor: t.colors.black100,
   },
   leaveBtn: {
-    backgroundColor: t.colors.error,
+    backgroundColor: t.colors.red100,
   },
 }));

@@ -134,9 +134,9 @@ const useStyles = createStyles((t) => ({
     flex: 1,
   },
   title: {
-    fontSize: t.text.size.xl,
+    fontSize: t.text.size.lg,
     fontWeight: t.text.weight.bold,
-    color: t.colors.primary,
+    color: t.colors.black100,
     paddingVertical: t.spacing.md,
   },
   list: {
@@ -146,7 +146,7 @@ const useStyles = createStyles((t) => ({
   row: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: t.colors.surface,
+    backgroundColor: t.colors.white100,
     padding: t.spacing.sm,
     borderRadius: t.border.radius.lg,
     gap: t.spacing.md,
@@ -154,18 +154,18 @@ const useStyles = createStyles((t) => ({
   rank: {
     fontSize: t.text.size.md,
     fontWeight: t.text.weight.bold,
-    color: t.colors.primary,
+    color: t.colors.black100,
     minWidth: 28,
   },
   pick: {
     flex: 1,
     fontSize: t.text.size.md,
-    color: t.colors.primary,
+    color: t.colors.black100,
   },
   editButton: {
     fontSize: t.text.size.sm,
     fontWeight: t.text.weight.bold,
-    color: t.colors.secondary,
+    color: t.colors.grey100,
   },
   footer: {
     paddingTop: t.spacing.md,

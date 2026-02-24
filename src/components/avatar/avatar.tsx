@@ -8,7 +8,7 @@ interface Props {
   size?: number;
 }
 
-export function Avatar({ source, size = 100 }: Props) {
+export function Avatar({ source, size = 110 }: Props) {
   const s = useStyles();
   return (
     <View style={[s.root, { width: size, height: size, borderRadius: size / 2 }]}>
@@ -20,8 +20,8 @@ export function Avatar({ source, size = 100 }: Props) {
 const useStyles = createStyles((t) => ({
   root: {
     overflow: "hidden",
-    backgroundColor: t.colors.white100,
-    borderWidth: t.border.size.md,
+    backgroundColor: t.colors.white200,
+    borderWidth: t.border.size.sm,
     borderColor: t.colors.black100,
   },
   image: {

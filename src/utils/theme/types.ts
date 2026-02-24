@@ -4,20 +4,19 @@ interface ShadowOffset {
   height: number;
 }
 export interface Theme {
+  topic: {
+    color: string;
+  };
   colors: {
-    primary: string;
-    secondary: string;
-    background: string;
-    backgroundSecondary: string;
-    surface: string;
-    error: string;
-    success: string;
-    transparent: string;
     black100: string;
-    white100: string;
     blue100: string;
     blue200: string;
-    yellow100: string;
+    grey100: string;
+    red100: string;
+    shadow100: string;
+    transparent: "transparent";
+    white100: string;
+    white200: string;
   };
   spacing: {
     sm: number;
@@ -25,6 +24,7 @@ export interface Theme {
     lg: number;
   };
   border: {
+    color: string;
     size: {
       sm: number;
       md: number;
@@ -37,13 +37,16 @@ export interface Theme {
     };
   };
   text: {
+    shadow: {
+      textShadowColor: string;
+      textShadowOffset: ShadowOffset;
+      textShadowRadius: number;
+    };
     size: {
-      xs: number;
       sm: number;
       md: number;
       lg: number;
-      xl: number;
-      xxl: number;
+
       title: number;
     };
     weight: {

@@ -38,7 +38,7 @@ const useStyles = createStyles((t) => ({
     gap: t.spacing.md,
   },
   message: {
-    color: t.colors.primary,
+    color: t.colors.black100,
     fontSize: t.text.size.lg,
     fontWeight: t.text.weight.medium,
   },

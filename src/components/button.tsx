@@ -43,16 +43,13 @@ const useStyles = createStyles((t) => ({
     alignItems: "center",
     borderRadius: t.border.radius.lg,
     paddingVertical: t.spacing.md,
-    backgroundColor: "#3292c9",
-    // movies 32c992
+    backgroundColor: t.topic.color,
   },
   text: {
-    color: "#f1efea",
-    fontSize: t.text.size.xl,
+    ...t.text.shadow,
+    color: t.colors.white100,
+    fontSize: t.text.size.lg,
     fontWeight: t.text.weight.bold,
-    textShadowColor: "rgba(0, 0, 0, 0.35)",
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 3,
   },
   pressed: {
     opacity: 0.7,

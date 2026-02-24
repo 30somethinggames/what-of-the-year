@@ -1,106 +1,91 @@
-import { tintColor } from "./tintColor";
 import type { Theme } from "./types";
 
-const SECONDARY = "#666666";
 const black100 = "#000000";
-export const white100 = "#fff";
-export const blue100 = "#7ec8e3";
+const blue100 = "#3292c9";
 const blue200 = "#0a3d6b";
-const yellow100 = "#FFC233";
+const grey100 = "#666666";
+const red100 = "#ED4337";
 const shadow100 = "rgba(0,0,0,0.85)";
+const transparent = "transparent" as const;
+const white100 = "#f1efea";
+const white200 = "#fff";
 
-const spacing = {
-  sm: 8,
-  md: 16,
-  lg: 24,
-};
-
-const border = {
-  size: {
-    sm: 1,
-    md: 1.5,
-    lg: 2,
+export const baseTheme: Theme = {
+  topic: {
+    color: blue100,
   },
-  radius: {
-    sm: 4,
-    md: 8,
-    lg: 12,
-  },
-};
-
-const text = {
-  size: {
-    xs: 12,
-    sm: 14,
-    md: 16,
-    lg: 18,
-    xl: 24,
-    xxl: 32,
-    title: 72,
-  },
-  weight: {
-    regular: "400" as const,
-    medium: "500" as const,
-    semibold: "600" as const,
-    bold: "700" as const,
-  },
-};
-
-const baseColors = {
-  secondary: SECONDARY,
-  background: white100,
-  backgroundSecondary: "#F0F0F0",
-  surface: "#F5F5F5",
-  error: "#DC2626",
-  success: "#16A34A",
-  transparent: "transparent",
-  black100,
-  white100,
-  blue100,
-  blue200,
-  yellow100,
-};
-
-const shadow = {
-  shadowColor: shadow100,
-  shadowOffset: { width: 0, height: 2 },
-  shadowOpacity: 0.1,
-  shadowRadius: 8,
-};
-
-const baseCollections = {
-  spacing,
-  border,
-  text,
-  shadow,
-};
-
-export const gamesTheme: Theme = {
-  ...baseCollections,
   colors: {
-    primary: black100,
-    ...baseColors,
+    black100,
+    grey100,
+    blue100,
+    blue200,
+    red100,
+    shadow100,
+    transparent,
+    white100,
+    white200,
+  },
+  spacing: {
+    sm: 8,
+    md: 16,
+    lg: 24,
+  },
+  border: {
+    color: black100,
+    size: {
+      sm: 1,
+      md: 1.5,
+      lg: 2,
+    },
+    radius: {
+      sm: 4,
+      md: 8,
+      lg: 12,
+    },
+  },
+  text: {
+    shadow: {
+      textShadowColor: shadow100,
+      textShadowOffset: { width: 0, height: 1 },
+      textShadowRadius: 3,
+    },
+    size: {
+      sm: 14,
+      md: 16,
+      lg: 18,
+      title: 72,
+    },
+    weight: {
+      regular: "400" as const,
+      medium: "500" as const,
+      semibold: "600" as const,
+      bold: "700" as const,
+    },
+  },
+  shadow: {
+    shadowColor: shadow100,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
   },
 };
 
 export const moviesTheme: Theme = {
-  ...baseCollections,
-  colors: {
-    primary: tintColor(black100, "#3B82F6", 0.3),
-    ...baseColors,
+  ...baseTheme,
+  topic: {
+    color: "#32c992",
   },
 };
 
 export const booksTheme: Theme = {
-  ...baseCollections,
-  colors: {
-    primary: tintColor(black100, "#3bf673", 0.3),
-    ...baseColors,
+  ...baseTheme,
+  topic: {
+    color: "#32c992",
   },
 };
 
 export const themes = {
-  games: gamesTheme,
+  games: baseTheme,
   movies: moviesTheme,
   books: booksTheme,
 };

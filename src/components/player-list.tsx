@@ -45,7 +45,7 @@ const useStyles = createStyles((t) => ({
   row: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: t.colors.surface,
+    backgroundColor: t.colors.white200,
     padding: t.spacing.sm,
     borderRadius: t.border.radius.lg,
     gap: t.spacing.md,
@@ -58,17 +58,17 @@ const useStyles = createStyles((t) => ({
   hostBadge: {
     fontSize: t.text.size.sm,
     fontWeight: t.text.weight.semibold,
-    color: t.colors.primary,
+    color: t.colors.black100,
   },
   status: {
-    fontSize: t.text.size.xl,
-    color: t.colors.primary,
+    fontSize: t.text.size.lg,
+    color: t.colors.black100,
   },
   footer: {
     alignItems: "flex-end",
   },
   count: {
     fontSize: t.text.size.sm,
-    color: t.colors.background,
+    color: t.colors.white100,
   },
 }));

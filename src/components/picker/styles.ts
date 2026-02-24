@@ -22,7 +22,7 @@ export const useStyles = createStyles((t) => ({
   label: {
     fontSize: t.text.size.title,
     fontWeight: t.text.weight.bold,
-    color: t.colors.primary,
+    color: t.colors.black100,
   },
   contentContainerStyle: {
     paddingVertical: 0,

@@ -140,29 +140,29 @@ const useStyles = createStyles((t) => ({
   },
   input: {
     width: "100%",
-    backgroundColor: t.colors.surface,
+    backgroundColor: t.colors.white200,
     borderWidth: t.border.size.md,
-    borderColor: t.colors.primary,
+    borderColor: t.border.color,
     borderRadius: t.border.radius.md,
     padding: t.spacing.sm,
     fontSize: t.text.size.md,
-    color: t.colors.primary,
+    color: t.colors.black100,
   },
   inputError: {
-    borderColor: t.colors.error,
+    borderColor: t.colors.red100,
   },
   placeholder: {
-    color: t.colors.secondary,
+    color: t.colors.grey100,
   },
   error: {
-    color: t.colors.error,
+    color: t.colors.red100,
     fontSize: t.text.size.sm,
     paddingHorizontal: t.spacing.sm,
   },
   dropdown: {
-    backgroundColor: t.colors.surface,
+    backgroundColor: t.colors.white200,
     borderWidth: t.border.size.md,
-    borderColor: t.colors.primary,
+    borderColor: t.colors.black100,
     borderRadius: t.border.radius.md,
     maxHeight: 240,
     overflow: "hidden",
@@ -176,10 +176,10 @@ const useStyles = createStyles((t) => ({
   suggestionText: {
     flex: 1,
     fontSize: t.text.size.md,
-    color: t.colors.primary,
+    color: t.colors.black100,
   },
   suggestionMeta: {
     fontSize: t.text.size.sm,
-    color: t.colors.secondary,
+    color: t.colors.grey100,
   },
 }));

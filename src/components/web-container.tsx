@@ -24,6 +24,6 @@ const useStyles = createStyles((t) => ({
     flex: 1,
     width: "100%",
     maxWidth: 430,
-    backgroundColor: t.colors.background,
+    backgroundColor: t.colors.white100,
   },
 }));
