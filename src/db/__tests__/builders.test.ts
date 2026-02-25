@@ -1,5 +1,7 @@
 import { describe, expect, it } from "bun:test";
 
+import { MAX_PLAYERS, MAX_ROUNDS } from "constants/session";
+
 import {
   buildAllRounds,
   buildPick,
@@ -8,7 +10,6 @@ import {
   buildSession,
   getRoundWeight,
 } from "../builders";
-import { MAX_PLAYERS, MAX_ROUNDS } from "constants/session";
 
 describe("getRoundWeight", () => {
   it("returns inverted weight (round 10 = 1pt, round 1 = 10pt)", () => {

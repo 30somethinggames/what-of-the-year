@@ -1,7 +1,8 @@
 import { describe, expect, it } from "bun:test";
 
-import { filterOptions } from "../filter-options";
 import type { Option } from "types/option";
+
+import { filterOptions } from "../filter-options";
 
 const option = (id: number, name: string): Option => ({
   id,

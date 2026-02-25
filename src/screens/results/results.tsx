@@ -1,12 +1,13 @@
 import { FlatList, Text, View } from "react-native";
 
+import { Container } from "components/container";
+import { Row } from "components/row";
+import { Error } from "components/states/error";
+import { Loading } from "components/states/loading";
+import { createStyles } from "utils/theme";
+
 import type { RankedPick } from "./use-results-state";
 import { useResultsState } from "./use-results-state";
-import { Container } from "components/container";
-import { Error } from "components/error";
-import { Loading } from "components/loading";
-import { Row } from "components/row";
-import { createStyles } from "utils/theme";
 
 interface Props {
   sessionId: string;

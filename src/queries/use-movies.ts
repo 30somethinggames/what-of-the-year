@@ -1,10 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { handleError, getStaleTime } from "./utils";
 import { TOPIC_KEY } from "constants/topics";
 import type { Option } from "types/option";
 import type { QUERY_ARGS } from "types/query-args";
 import { currentYear } from "utils/dates";
+
+import { handleError, getStaleTime } from "./utils";
 
 const TMDB_API_URL = process.env.EXPO_PUBLIC_TMDB_TMDB_API_URL;
 const TMDB_API_KEY = process.env.EXPO_PUBLIC_TMDB_API_KEY;

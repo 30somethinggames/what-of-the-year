@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FlatList, Pressable, Text, View } from "react-native";
 
-import { Input } from "../input";
-import { filterOptions } from "./filter-options";
 import type { Option } from "types/option";
 import { createStyles } from "utils/theme";
+
+import { Input } from "../input";
+import { filterOptions } from "./filter-options";
 
 interface Props {
   value: string;

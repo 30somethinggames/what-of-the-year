@@ -2,17 +2,18 @@ import * as Linking from "expo-linking";
 import { router } from "expo-router";
 import { Share, View } from "react-native";
 
-import type { LobbyProps } from "./types";
-import { useLobbyState } from "./use-lobby-state";
 import { Button } from "components/button";
 import { Container } from "components/container";
-import { Error } from "components/error";
-import { Loading } from "components/loading";
 import { PlayerList } from "components/player-list";
+import { Error } from "components/states/error";
+import { Loading } from "components/states/loading";
 import { MAX_ROUNDS } from "constants/session";
 import { leaveSession } from "db/utils/leave-session";
 import { startSession } from "db/utils/start-session";
 import { createStyles } from "utils/theme";
+
+import type { LobbyProps } from "./types";
+import { useLobbyState } from "./use-lobby-state";
 
 export function Lobby({ topic, year, sessionId }: LobbyProps) {
   const s = useStyles();

@@ -1,9 +1,10 @@
 import { onSnapshot } from "firebase/firestore";
 import { useEffect, useState } from "react";
 
-import { auth } from "../config";
 import { selectionRef } from "db/collections";
 import type { Selection } from "types/session";
+
+import { auth } from "../config";
 
 export interface MySelection extends Selection {
   roundNumber: number;

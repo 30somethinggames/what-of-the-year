@@ -1,9 +1,10 @@
 import { FlatList, Text, View } from "react-native";
 
-import { Avatar } from "./avatar";
-import { Row } from "./row";
 import type { Player } from "types/session";
 import { createStyles } from "utils/theme";
+
+import { Avatar } from "./avatar";
+import { Row } from "./row";
 
 interface Props {
   data: Player[];

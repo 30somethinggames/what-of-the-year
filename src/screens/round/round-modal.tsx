@@ -1,13 +1,14 @@
 import { router } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 
-import { PlayerList } from "../../components/player-list";
 import { Button } from "components/button";
-import { Loading } from "components/loading";
 import { Modal } from "components/modal";
+import { Loading } from "components/states/loading";
 import { usePlayers } from "db/hooks/use-players";
 import { advanceRound } from "db/utils/advance-round";
 import { createStyles } from "utils/theme";
+
+import { PlayerList } from "../../components/player-list";
 
 interface Props {
   isVisible: boolean;

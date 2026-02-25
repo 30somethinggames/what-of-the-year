@@ -1,7 +1,8 @@
 import { Platform, type ViewStyle } from "react-native";
 
-import { ITEM_HEIGHT } from "./types";
 import { createStyles } from "utils/theme";
+
+import { ITEM_HEIGHT } from "./types";
 
 export const useStyles = createStyles((t) => ({
   list: {

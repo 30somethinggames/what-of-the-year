@@ -1,9 +1,10 @@
 import { onSnapshot, orderBy, query } from "firebase/firestore";
 import { useEffect, useState } from "react";
 
-import { auth } from "../config";
 import { playersRef } from "db/collections";
 import type { Player } from "types/session";
+
+import { auth } from "../config";
 
 /**
  * Subscribes to the players collection for a given session in real time.

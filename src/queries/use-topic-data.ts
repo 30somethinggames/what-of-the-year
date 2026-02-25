@@ -1,7 +1,8 @@
+import type { QUERY_ARGS } from "types/query-args";
+
 import { useBooks } from "./use-books";
 import { useGames } from "./use-games";
 import { useMovies } from "./use-movies";
-import type { QUERY_ARGS } from "types/query-args";
 
 export function useTopicData(args: QUERY_ARGS) {
   const games = useGames(args);

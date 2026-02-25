@@ -1,11 +1,12 @@
 import { router } from "expo-router";
 import { useEffect } from "react";
 
-import type { LobbyProps } from "./types";
 import { MAX_ROUNDS } from "constants/session";
 import { usePlayers } from "db/hooks/use-players";
 import { useSession } from "db/hooks/use-session";
 import { isDev } from "utils/dev/isDev";
+
+import type { LobbyProps } from "./types";
 
 /**
  * Composite hook for managing lobby state.

@@ -1,8 +1,9 @@
 import { Text, View } from "react-native";
 
-import { Avatar } from "./avatar";
-import { Button } from "./button";
 import { createStyles } from "utils/theme";
+
+import { Avatar } from "../avatar";
+import { Button } from "../button";
 
 const SAD_ROBOT = "https://api.dicebear.com/7.x/bottts/svg?seed=sad";
 

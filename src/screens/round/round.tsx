@@ -1,15 +1,13 @@
 import { useState } from "react";
 import { FlatList, Pressable, Text, View } from "react-native";
 
-import { RoundModal } from "./round-modal";
-import { useRoundState } from "./use-round-state";
 import { Autocomplete } from "components/autocomplete";
 import { Button } from "components/button";
 import { Container } from "components/container";
-import { Error } from "components/error";
 import { KeyboardAvoidingView } from "components/keyboard-avoiding-view";
-import { Loading } from "components/loading";
 import { Row } from "components/row";
+import { Error } from "components/states/error";
+import { Loading } from "components/states/loading";
 import type { TOPIC_KEY } from "constants/topics";
 import type { MySelection } from "db/hooks/use-my-selections";
 import { editSelection } from "db/utils/edit-selection";
@@ -17,6 +15,9 @@ import { saveSelection } from "db/utils/save-selection";
 import { useTopicData } from "queries/use-topic-data";
 import type { Option } from "types/option";
 import { createStyles } from "utils/theme";
+
+import { RoundModal } from "./round-modal";
+import { useRoundState } from "./use-round-state";
 
 interface Props {
   sessionId: string;
