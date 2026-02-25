@@ -42,16 +42,17 @@ export interface Theme {
       textShadowOffset: ShadowOffset;
       textShadowRadius: number;
     };
+    font: {
+      regular: string;
+      medium: string;
+      semibold: string;
+      bold: string;
+    };
     size: {
       sm: number;
       md: number;
       lg: number;
-    };
-    weight: {
-      regular: "400";
-      medium: "500";
-      semibold: "600";
-      bold: "700";
+      xl: number;
     };
   };
   shadow: {

@@ -133,6 +133,7 @@ const useStyles = createStyles((t, p: { headerHeight: number }) => ({
   },
   error: {
     color: t.colors.red100,
+    fontFamily: t.text.font.regular,
     fontSize: t.text.size.sm,
     paddingHorizontal: t.spacing.sm,
   },

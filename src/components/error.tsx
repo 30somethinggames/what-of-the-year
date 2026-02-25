@@ -39,7 +39,7 @@ const useStyles = createStyles((t) => ({
   },
   message: {
     color: t.colors.black100,
+    fontFamily: t.text.font.medium,
     fontSize: t.text.size.lg,
-    fontWeight: t.text.weight.medium,
   },
 }));

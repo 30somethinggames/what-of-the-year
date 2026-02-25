@@ -126,6 +126,7 @@ const useStyles = createStyles((t) => ({
     borderColor: t.border.color,
     borderRadius: t.border.radius.md,
     padding: t.spacing.sm,
+    fontFamily: t.text.font.regular,
     fontSize: t.text.size.md,
     color: t.colors.black100,
   },
@@ -145,10 +146,12 @@ const useStyles = createStyles((t) => ({
   },
   suggestionText: {
     flex: 1,
+    fontFamily: t.text.font.regular,
     fontSize: t.text.size.md,
     color: t.colors.black100,
   },
   suggestionMeta: {
+    fontFamily: t.text.font.regular,
     fontSize: t.text.size.sm,
     color: t.colors.grey100,
   },

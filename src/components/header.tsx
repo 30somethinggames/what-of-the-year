@@ -13,7 +13,7 @@ export function Header({ title }: Props) {
 
 const useStyles = createStyles((t) => ({
   root: {
-    fontWeight: t.text.weight.bold,
+    fontFamily: t.text.font.semibold,
     fontSize: t.text.size.lg,
     backgroundColor: "transparent",
   },

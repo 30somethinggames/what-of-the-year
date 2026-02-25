@@ -78,8 +78,8 @@ const useStyles = createStyles((t) => ({
     padding: t.spacing.lg,
   },
   title: {
+    fontFamily: t.text.font.semibold,
     fontSize: t.text.size.lg,
-    fontWeight: t.text.weight.bold,
     color: t.colors.black100,
   },
   closeBtn: {

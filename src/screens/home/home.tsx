@@ -45,8 +45,8 @@ const useStyles = createStyles((t, p: { backgroundColor: string }) => ({
     justifyContent: "center",
   },
   of: {
+    fontFamily: t.text.font.semibold,
     fontSize: 52,
-    fontWeight: t.text.weight.bold,
     color: t.colors.black100,
     marginVertical: t.spacing.lg,
   },

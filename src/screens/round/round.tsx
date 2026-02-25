@@ -135,8 +135,8 @@ const useStyles = createStyles((t) => ({
     flex: 1,
   },
   title: {
+    fontFamily: t.text.font.semibold,
     fontSize: t.text.size.lg,
-    fontWeight: t.text.weight.bold,
     color: t.colors.black100,
     paddingVertical: t.spacing.md,
   },
@@ -145,19 +145,20 @@ const useStyles = createStyles((t) => ({
     flexGrow: 1,
   },
   rank: {
+    fontFamily: t.text.font.bold,
     fontSize: t.text.size.md,
-    fontWeight: t.text.weight.bold,
     color: t.colors.black100,
     minWidth: 28,
   },
   pick: {
     flex: 1,
+    fontFamily: t.text.font.regular,
     fontSize: t.text.size.md,
     color: t.colors.black100,
   },
   editButton: {
+    fontFamily: t.text.font.bold,
     fontSize: t.text.size.sm,
-    fontWeight: t.text.weight.bold,
     color: t.colors.grey100,
   },
   footer: {

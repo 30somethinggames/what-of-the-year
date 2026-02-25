@@ -18,3 +18,4 @@
 ## V2
 
 1. [drag and drop](drag-and-drop.md)
+2. Embed fonts via `expo-font` config plugin in app.json instead of runtime `useFonts`

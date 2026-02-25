@@ -45,12 +45,12 @@ const useStyles = createStyles((t) => ({
   },
   playerName: {
     flex: 1,
+    fontFamily: t.text.font.medium,
     fontSize: t.text.size.lg,
-    fontWeight: t.text.weight.medium,
   },
   hostBadge: {
+    fontFamily: t.text.font.semibold,
     fontSize: t.text.size.sm,
-    fontWeight: t.text.weight.semibold,
     color: t.colors.black100,
   },
   status: {

@@ -46,6 +46,7 @@ const useStyles = createStyles((t) => ({
     borderRadius: t.border.radius.md,
     paddingHorizontal: t.spacing.md,
     paddingVertical: t.spacing.sm,
+    fontFamily: t.text.font.regular,
     fontSize: t.text.size.md,
     color: t.colors.black100,
   },

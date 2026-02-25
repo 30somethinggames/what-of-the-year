@@ -49,8 +49,8 @@ const useStyles = createStyles((t) => ({
     flexGrow: 1,
   },
   rank: {
+    fontFamily: t.text.font.bold,
     fontSize: t.text.size.md,
-    fontWeight: t.text.weight.bold,
     color: t.colors.black100,
     minWidth: 28,
   },
@@ -59,17 +59,18 @@ const useStyles = createStyles((t) => ({
     gap: 2,
   },
   pickName: {
+    fontFamily: t.text.font.semibold,
     fontSize: t.text.size.md,
-    fontWeight: t.text.weight.semibold,
     color: t.colors.black100,
   },
   voters: {
+    fontFamily: t.text.font.regular,
     fontSize: t.text.size.sm,
     color: t.colors.grey100,
   },
   totalPoints: {
+    fontFamily: t.text.font.bold,
     fontSize: t.text.size.md,
-    fontWeight: t.text.weight.bold,
     color: t.colors.black100,
   },
 }));

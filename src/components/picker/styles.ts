@@ -24,8 +24,8 @@ export const useStyles = createStyles((t) => ({
     alignItems: "center",
   },
   label: {
+    fontFamily: t.text.font.semibold,
     fontSize: 72,
-    fontWeight: t.text.weight.bold,
     color: t.colors.black100,
   },
   contentContainerStyle: {

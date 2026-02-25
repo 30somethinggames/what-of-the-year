@@ -7,7 +7,7 @@ const green100 = "#32c992";
 const grey100 = "#666666";
 const red100 = "#ED4337";
 const shadow100 = "rgba(0,0,0,0.85)";
-const white100 = "#f1efea";
+export const white100 = "#f1efea";
 const white200 = "#fff";
 const yellow100 = "#c9b432";
 
@@ -51,16 +51,17 @@ export const baseTheme: Theme = {
       textShadowOffset: { width: 0, height: 1 },
       textShadowRadius: 3,
     },
+    font: {
+      regular: "Inter_400Regular",
+      medium: "Inter_500Medium",
+      semibold: "Inter_600SemiBold", // - LIKE
+      bold: "Inter_700Bold",
+    },
     size: {
       sm: 14,
       md: 16,
       lg: 18,
-    },
-    weight: {
-      regular: "400" as const,
-      medium: "500" as const,
-      semibold: "600" as const,
-      bold: "700" as const,
+      xl: 24,
     },
   },
   shadow: {
