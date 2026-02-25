@@ -6,7 +6,7 @@ if [ -n "$STAGED_FILES" ]; then
 
 # Format and lint staged files
 
-bunx oxfmt $STAGED_FILES
+bunx oxfmt --no-error-on-unmatched-pattern $STAGED_FILES
 bunx oxlint --fix $STAGED_FILES
 
 # Re-add formatted files
