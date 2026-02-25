@@ -1,20 +1,17 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FlatList, Pressable, Text, View } from "react-native";
 
-import { Input } from "./input";
-import { MAX_NAME_LENGTH, sanitizeName, validateName } from "components/input/sanitize";
+import { Input } from "../input";
+import { filterOptions } from "./filter-options";
 import type { Option } from "types/option";
 import { createStyles } from "utils/theme";
-
-const MAX_RESULTS = 8;
 
 interface Props {
   value: string;
   onChangeText: (text: string) => void;
   onSelectOption: (option: Option) => void;
   options: Option[];
-  placeholder?: string;
-  maxLength?: number;
+  placeholder: string;
 }
 
 /**
@@ -23,16 +20,8 @@ interface Props {
  * As the user types, matching options are shown in a dropdown.
  * Selecting an option calls `onSelectOption` with the full Option object.
  */
-export function Autocomplete({
-  value,
-  onChangeText,
-  onSelectOption,
-  options,
-  placeholder,
-  maxLength = MAX_NAME_LENGTH,
-}: Props) {
+export function Autocomplete({ value, placeholder, onChangeText, onSelectOption, options }: Props) {
   const s = useStyles();
-  const [error, setError] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
 
   /**
@@ -60,19 +49,14 @@ export function Autocomplete({
   useEffect(() => clearBlurTimeout, [clearBlurTimeout]);
 
   const handleChangeText = useCallback(
-    (raw: string) => {
-      setError(validateName(raw) ?? "");
-      onChangeText(sanitizeName(raw));
+    (text: string) => {
+      onChangeText(text);
       setShowSuggestions(true);
     },
     [onChangeText],
   );
 
-  const query = value.trim().toLowerCase();
-  const filtered =
-    showSuggestions && query.length >= 2
-      ? options.filter((o) => o.name.toLowerCase().includes(query)).slice(0, MAX_RESULTS)
-      : [];
+  const filtered = showSuggestions ? filterOptions(options, value) : [];
 
   const onFocus = () => {
     clearBlurTimeout();
@@ -92,25 +76,21 @@ export function Autocomplete({
     onChangeText(option.name);
     onSelectOption(option);
     setShowSuggestions(false);
-    setError("");
   };
 
   return (
     <View style={s.root}>
       <Input
-        style={[s.input, error ? s.inputError : undefined]}
+        style={s.input}
         value={value}
         onChangeText={handleChangeText}
         onFocus={onFocus}
         onBlur={onBlur}
-        placeholder={placeholder}
-        placeholderTextColor={s.placeholder.color}
-        maxLength={maxLength}
         autoCorrect={false}
         autoCapitalize="words"
+        placeholder={placeholder}
       />
-      {error ? <Text style={s.error}>{error}</Text> : null}
-      {filtered.length > 0 && (
+      {filtered?.length > 0 && (
         <View style={s.dropdown}>
           <FlatList
             data={filtered}
@@ -148,17 +128,6 @@ const useStyles = createStyles((t) => ({
     padding: t.spacing.sm,
     fontSize: t.text.size.md,
     color: t.colors.black100,
-  },
-  inputError: {
-    borderColor: t.colors.red100,
-  },
-  placeholder: {
-    color: t.colors.grey100,
-  },
-  error: {
-    color: t.colors.red100,
-    fontSize: t.text.size.sm,
-    paddingHorizontal: t.spacing.sm,
   },
   dropdown: {
     backgroundColor: t.colors.white200,

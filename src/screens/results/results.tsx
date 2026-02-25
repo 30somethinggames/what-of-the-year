@@ -21,7 +21,6 @@ export function Results({ sessionId }: Props) {
 
   return (
     <Container style={s.root}>
-      <Text style={s.title}>Results</Text>
       <FlatList
         data={results}
         keyExtractor={(item) => item.pick.id}
@@ -44,12 +43,6 @@ export function Results({ sessionId }: Props) {
 const useStyles = createStyles((t) => ({
   root: {
     flex: 1,
-  },
-  title: {
-    fontSize: t.text.size.lg,
-    fontWeight: t.text.weight.bold,
-    color: t.colors.black100,
-    paddingBottom: t.spacing.md,
   },
   list: {
     gap: t.spacing.sm,

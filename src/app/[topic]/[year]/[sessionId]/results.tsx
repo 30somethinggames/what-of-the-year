@@ -15,7 +15,13 @@ export default function ResultsIndex() {
 
   return (
     <>
-      <Stack.Screen options={{ headerTitle: () => <Header title={title} /> }} />
+      <Stack.Screen
+        options={{
+          headerTitle: () => <Header title={title} />,
+          headerBackTitle: "Done",
+          gestureEnabled: false,
+        }}
+      />
       <Results sessionId={sessionId} />
     </>
   );

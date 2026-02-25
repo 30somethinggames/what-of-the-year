@@ -1,13 +1,14 @@
 import { useHeaderHeight } from "@react-navigation/elements";
 import { router } from "expo-router";
 import { useState } from "react";
-import { View } from "react-native";
+import { Text, View } from "react-native";
 
 import { Avatar, useRandomAvatar } from "components/avatar";
 import { Button } from "components/button";
 import { Container } from "components/container";
 import { Error } from "components/error";
 import { Input } from "components/input";
+import { MAX_NAME_LENGTH, validateName } from "components/input/sanitize";
 import { KeyboardAvoidingView } from "components/keyboard-avoiding-view";
 import type { TopicType } from "constants/topics";
 import { useAuth } from "db/hooks/use-auth";
@@ -26,14 +27,13 @@ export function Topic({ topic, year, existingSessionId }: Props) {
   const s = useStyles({ headerHeight });
   const { isLoading, isError, refetch } = useTopicData({ key: topic.value, year });
   const { avatar, randomizeAvatar } = useRandomAvatar();
-  const [name, setName] = useState("");
   const { mutateAsync: signIn, isPending } = useAuth();
+  const [name, setName] = useState("");
 
+  const nameError = validateName(name);
   const isJoining = !!existingSessionId;
-  const disabled = isLoading || isPending || name.length < 1;
+  const disabled = isLoading || isPending || name.length < 1 || nameError != null;
   const label = isPending ? "Loading..." : isJoining ? "Join" : "Create";
-
-  const onChangeText = (text: string) => setName(text);
 
   const onSubmit = async () => {
     try {
@@ -91,7 +91,16 @@ export function Topic({ topic, year, existingSessionId }: Props) {
           <Avatar source={avatar} size={120} />
           <Button style={s.btn} label="Random" onPress={randomizeAvatar} />
         </View>
-        <Input placeholder="User name" value={name} onChangeText={onChangeText} />
+        <View style={s.input}>
+          <Input
+            placeholder="User name"
+            value={name}
+            onChangeText={setName}
+            error={nameError ?? undefined}
+            maxLength={MAX_NAME_LENGTH}
+          />
+          {nameError ? <Text style={s.error}>{nameError}</Text> : null}
+        </View>
         <Button label={label} disabled={disabled} onPress={onSubmit} />
       </Container>
     </KeyboardAvoidingView>
@@ -117,5 +126,14 @@ const useStyles = createStyles((t, p: { headerHeight: number }) => ({
   },
   btn: {
     width: 120,
+  },
+  input: {
+    width: "100%",
+    gap: t.spacing.sm,
+  },
+  error: {
+    color: t.colors.red100,
+    fontSize: t.text.size.sm,
+    paddingHorizontal: t.spacing.sm,
   },
 }));

@@ -1,35 +1,34 @@
-import { useCallback, useState } from "react";
-import { Text, TextInput, type TextInputProps, View } from "react-native";
+import { TextInput, type TextInputProps, View } from "react-native";
 
-import { MAX_NAME_LENGTH, sanitizeName, validateName } from "./sanitize";
 import { createStyles } from "utils/theme";
 
-interface Props extends TextInputProps {}
-export function Input({ value, onChangeText, placeholder, maxLength = MAX_NAME_LENGTH }: Props) {
+interface Props extends TextInputProps {
+  error?: string;
+}
+export function Input({
+  value,
+  onChangeText,
+  placeholder,
+  maxLength,
+  error,
+  style,
+  ...rest
+}: Props) {
   const s = useStyles();
-  const [error, setError] = useState("");
-
-  const handleChangeText = useCallback(
-    (raw: string) => {
-      setError(validateName(raw) ?? "");
-      onChangeText?.(sanitizeName(raw));
-    },
-    [onChangeText],
-  );
 
   return (
     <View style={s.wrapper}>
       <TextInput
-        style={[s.root, error ? s.rootError : undefined]}
+        style={[s.root, error ? s.rootError : undefined, style]}
         value={value}
-        onChangeText={handleChangeText}
+        onChangeText={onChangeText}
         placeholder={placeholder}
         placeholderTextColor={s.placeholder.color}
         maxLength={maxLength}
         autoCorrect={false}
         autoCapitalize="words"
+        {...rest}
       />
-      {error ? <Text style={s.error}>{error}</Text> : null}
     </View>
   );
 }
@@ -55,10 +54,5 @@ const useStyles = createStyles((t) => ({
   },
   placeholder: {
     color: t.colors.grey100,
-  },
-  error: {
-    color: t.colors.red100,
-    fontSize: t.text.size.sm,
-    paddingHorizontal: t.spacing.sm,
   },
 }));

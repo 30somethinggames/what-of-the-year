@@ -1,6 +1,7 @@
 import { Redirect, Stack } from "expo-router";
 import { useState } from "react";
 
+import { Header } from "components/header";
 import { SettingsButton } from "components/settings-button";
 import { useParams } from "hooks/use-params";
 import { Round } from "screens/round";
@@ -23,7 +24,7 @@ export default function RoundIndex() {
       <Stack.Screen
         options={{
           headerLeft: () => <SettingsButton onPress={onPress} />,
-          title,
+          headerTitle: () => <Header title={title} />,
         }}
       />
       <Round

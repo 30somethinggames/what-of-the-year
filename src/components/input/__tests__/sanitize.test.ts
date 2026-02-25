@@ -1,57 +1,6 @@
 import { describe, expect, it } from "bun:test";
 
-import { MAX_NAME_LENGTH, sanitizeName, validateName } from "../sanitize";
-
-describe("sanitizeName", () => {
-  it("allows alphanumeric characters and spaces", () => {
-    expect(sanitizeName("Ryan 123")).toBe("Ryan 123");
-  });
-
-  it("allows apostrophes, hyphens, and periods", () => {
-    expect(sanitizeName("O'Brien-Jr.")).toBe("O'Brien-Jr.");
-  });
-
-  it("strips HTML tags", () => {
-    expect(sanitizeName("<script>alert('xss')</script>")).toBe("scriptalert'xss'scri");
-  });
-
-  it("strips control characters", () => {
-    expect(sanitizeName("Ryan\u0000\u001F\u200B")).toBe("Ryan");
-  });
-
-  it("strips zero-width and format characters", () => {
-    expect(sanitizeName("R\u200By\uFEFFa\u2028n")).toBe("Ryan");
-  });
-
-  it("collapses consecutive spaces", () => {
-    expect(sanitizeName("Ryan   Seery")).toBe("Ryan Seery");
-  });
-
-  it("trims leading whitespace", () => {
-    expect(sanitizeName("  Ryan")).toBe("Ryan");
-  });
-
-  it("enforces max length", () => {
-    const long = "A".repeat(30);
-    expect(sanitizeName(long)).toHaveLength(MAX_NAME_LENGTH);
-  });
-
-  it("strips emoji and special unicode", () => {
-    expect(sanitizeName("Ryan 🎮")).toBe("Ryan ");
-  });
-
-  it("handles empty string", () => {
-    expect(sanitizeName("")).toBe("");
-  });
-
-  it("handles string of only disallowed characters", () => {
-    expect(sanitizeName("!!!@@@###$$$")).toBe("");
-  });
-
-  it("preserves valid name after stripping", () => {
-    expect(sanitizeName("  <b>John</b>  ")).toBe("bJohnb ");
-  });
-});
+import { MAX_NAME_LENGTH, validateName } from "../sanitize";
 
 describe("validateName", () => {
   it("returns null for valid names", () => {
