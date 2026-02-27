@@ -1,6 +1,6 @@
 import { type SharedValue } from "react-native-reanimated";
 /** Height in pixels for each picker row. Used for snap intervals and layout calculations. */
-export const ITEM_HEIGHT = 88;
+export const ITEM_HEIGHT = 90;
 
 export const NUMBER_OF_LINES = 1;
 

@@ -1,21 +1,17 @@
+1. serverless functions for api calls
+1. android picker issues
 1. E2E Multiplayer Testing Strategy
-
-- screen testing by screenshot - available in maestro
-- Figure out [doc](./testing-strat.md)
-
-2. refactor Round modal to screen modal
-
-- flicker
-- user status
-
-3. handle host duties
-
-- player should be able to do it solo
-
-4. Figure out [deeplinks](./universal-links.md)
-5. hook clean up
+   - screen testing by screenshot - available in maestro
+   - Figure out [doc](./testing-strat.md)
+1. refactor Round modal to screen modal\
+   - flicker
+   - user status
+1. handle host duties
+   - player should be able to do it solo
+1. Figure out [deeplinks](./universal-links.md)
+1. hook clean up
 
 ## V2
 
 1. [drag and drop](drag-and-drop.md)
-2. Embed fonts via `expo-font` config plugin in app.json instead of runtime `useFonts`
+1. Embed fonts via `expo-font` config plugin in app.json instead of runtime `useFonts`

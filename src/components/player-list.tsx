@@ -52,7 +52,7 @@ const useStyles = createStyles((t) => ({
   hostBadge: {
     fontFamily: t.text.font.semibold,
     fontSize: t.text.size.sm,
-    color: t.colors.black100,
+    color: t.colors.grey100,
   },
   status: {
     fontSize: t.text.size.lg,
