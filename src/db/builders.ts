@@ -50,8 +50,15 @@ export const buildPick = (name: string): Pick => ({
 export const buildPickFromOption = (option: Option): Pick => ({
   id: String(option.id),
   name: option.name,
-  cover: option.cover,
+  cover: normalizeCover(option.cover),
   rating: option.rating,
   first_release_date: option.first_release_date,
   summary: option.summary,
 });
+
+/** Normalize cover URL coming from IGDB which can be protocol-relative (e.g. `//images...`) */
+function normalizeCover(url?: string) {
+  if (!url) return undefined;
+  if (url.startsWith("//")) return `https:${url}`;
+  return url;
+}

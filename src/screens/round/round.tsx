@@ -1,3 +1,4 @@
+import { Image } from "expo-image";
 import { useState } from "react";
 import { FlatList, Pressable, Text, View } from "react-native";
 
@@ -17,7 +18,8 @@ import type { Option } from "types/option";
 import { createStyles } from "utils/theme";
 
 import { RoundModal } from "./round-modal";
-import { useRoundState } from "./use-round-state";
+import { useAvailableOptions } from "./utils/use-available-options";
+import { useRoundState } from "./utils/use-round-state";
 
 interface Props {
   sessionId: string;
@@ -46,6 +48,8 @@ export function Round({ sessionId, topic, year, isVisible, onClose }: Props) {
   const [inputValue, setInputValue] = useState("");
   const [editingRound, setEditingRound] = useState<number | null>(null);
   const [selectedOption, setSelectedOption] = useState<Option | null>(null);
+
+  const availableOptions = useAvailableOptions(options, mySelections, editingRound);
 
   if (isLoading) return <Loading />;
   if (isError || !session || !round || !activeRound) return <Error />;
@@ -99,6 +103,9 @@ export function Round({ sessionId, topic, year, isVisible, onClose }: Props) {
             renderItem={({ item }: { item: MySelection }) => (
               <Row>
                 <Text style={s.rank}>#{item.roundNumber}</Text>
+                {item.pick.cover ? (
+                  <Image source={{ uri: item.pick.cover }} style={s.cover} />
+                ) : null}
                 <Text style={s.pick}>{item.pick.name}</Text>
                 <Pressable onPress={() => onEdit(item)} hitSlop={8}>
                   <Text style={s.editButton}>Edit</Text>
@@ -112,7 +119,7 @@ export function Round({ sessionId, topic, year, isVisible, onClose }: Props) {
               value={inputValue}
               onChangeText={setInputValue}
               onSelectOption={onSelectOption}
-              options={options}
+              options={availableOptions}
               placeholder={isEditing ? "Edit your pick" : "Enter your pick"}
             />
             <Button label={isEditing ? "Save" : "Enter"} onPress={onEnter} disabled={isDisabled} />
@@ -156,6 +163,14 @@ const useStyles = createStyles((t) => ({
     fontFamily: t.text.font.regular,
     fontSize: t.text.size.md,
     color: t.colors.black100,
+  },
+  cover: {
+    width: 40,
+    height: 56,
+    borderRadius: t.border.radius.sm,
+    borderWidth: t.border.size.sm,
+    borderColor: t.border.color,
+    backgroundColor: "transparent",
   },
   editButton: {
     fontFamily: t.text.font.bold,

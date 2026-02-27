@@ -40,7 +40,10 @@ export interface Round {
 export interface Pick {
   id: string;
   name: string;
-  [key: string]: unknown;
+  cover?: string;
+  rating?: number;
+  first_release_date?: number;
+  summary?: string;
 }
 
 export interface Selection {

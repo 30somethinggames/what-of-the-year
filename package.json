@@ -7,9 +7,9 @@
   "scripts": {
     "start": "expo start",
     "format": "oxfmt .",
-    "format:check": "oxfmt --check .",
-    "lint": "oxlint .",
-    "lint:styles": "bun run scripts/check-unused-styles.ts",
+    "check:format": "oxfmt --check .",
+    "check:lint": "oxlint .",
+    "check:styles": "bun run scripts/check-unused-styles.ts",
     "check:types": "bunx tsc --noEmit",
     "test": "bun test",
     "test:watch": "bun test --watch",
