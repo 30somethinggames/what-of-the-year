@@ -15,7 +15,7 @@ git add $STAGED_FILES
 fi
 
 # Check for unused styles
-bun run lint:styles
+bun run check:styles
 
 # Check TypeScript types
 bun run check:types
