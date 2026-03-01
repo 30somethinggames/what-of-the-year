@@ -3,14 +3,14 @@ import { Platform, type ViewStyle } from "react-native";
 import { createStyles } from "utils/theme";
 
 /** Height in pixels for each picker row. Used for snap intervals and layout calculations. */
-export const ITEM_HEIGHT = 90;
+export const ITEM_HEIGHT = Platform.OS === "android" ? 100 : 90;
 export const NUMBER_OF_LINES = 1;
 
 export const useStyles = createStyles((t) => ({
   list: {
     flexGrow: 0,
     width: "100%",
-    height: ITEM_HEIGHT,
+    height: ITEM_HEIGHT + t.border.size.md * 2,
     borderRadius: t.border.radius.md,
     borderWidth: t.border.size.sm,
     backgroundColor: t.colors.white200,
