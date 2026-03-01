@@ -2,7 +2,9 @@ import { Platform, type ViewStyle } from "react-native";
 
 import { createStyles } from "utils/theme";
 
-import { ITEM_HEIGHT } from "./types";
+/** Height in pixels for each picker row. Used for snap intervals and layout calculations. */
+export const ITEM_HEIGHT = 90;
+export const NUMBER_OF_LINES = 1;
 
 export const useStyles = createStyles((t) => ({
   list: {

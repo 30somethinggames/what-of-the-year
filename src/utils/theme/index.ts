@@ -1,2 +1,2 @@
 export { createStyles } from "./create-styles";
-export { themes } from "./themes";
+export { palette, themes } from "./themes";

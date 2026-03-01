@@ -1,14 +1,8 @@
 import { memo, useEffect, useRef } from "react";
 import { ScrollView, Text, View, type ViewStyle } from "react-native";
 
-import { useStyles } from "./styles";
-import {
-  ITEM_HEIGHT,
-  NUMBER_OF_LINES,
-  type ItemProps,
-  type PickerItem,
-  type PickerProps,
-} from "./types";
+import { ITEM_HEIGHT, NUMBER_OF_LINES, useStyles } from "./styles";
+import { type ItemProps, type PickerItem, type PickerProps } from "./types";
 import { getInitialScrollIndex, keyExtractor } from "./utils";
 
 const Item = memo(function Item({ label }: ItemProps) {

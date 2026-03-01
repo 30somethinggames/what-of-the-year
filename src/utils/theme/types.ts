@@ -13,7 +13,6 @@ export interface Theme {
     green100: string;
     grey100: string;
     red100: string;
-    shadow100: string;
     white100: string;
     white200: string;
     yellow100: string;

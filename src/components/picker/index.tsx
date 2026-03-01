@@ -9,14 +9,8 @@ import Animated, {
   Extrapolation,
 } from "react-native-reanimated";
 
-import { useStyles } from "./styles";
-import {
-  ITEM_HEIGHT,
-  NUMBER_OF_LINES,
-  type NativeItemProps,
-  type PickerItem,
-  type PickerProps,
-} from "./types";
+import { ITEM_HEIGHT, NUMBER_OF_LINES, useStyles } from "./styles";
+import { type NativeItemProps, type PickerItem, type PickerProps } from "./types";
 import { getInitialScrollIndex, keyExtractor } from "./utils";
 
 /**

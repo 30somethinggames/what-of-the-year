@@ -13,7 +13,7 @@ import { useEffect } from "react";
 
 import { WebContainer } from "components/web-container";
 import { DEFAULT_STALE_TIME } from "queries/utils";
-import { white100 } from "utils/theme/themes";
+import { palette } from "utils/theme";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -51,7 +51,7 @@ export default function Root() {
           screenOptions={{
             headerBackButtonDisplayMode: "minimal",
             headerShadowVisible: false,
-            headerStyle: { backgroundColor: white100 },
+            headerStyle: { backgroundColor: palette.white100 },
           }}
         />
       </WebContainer>

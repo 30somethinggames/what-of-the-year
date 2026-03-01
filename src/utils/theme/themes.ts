@@ -1,31 +1,21 @@
 import type { Theme } from "./types";
 
-const black100 = "#000000";
-const blue100 = "#3292c9";
-const blue200 = "#0a3d6b";
-const green100 = "#32c992";
-const grey100 = "#666666";
-const red100 = "#ED4337";
-const shadow100 = "rgba(0,0,0,0.85)";
-export const white100 = "#f1efea";
-const white200 = "#fff";
-const yellow100 = "#c9b432";
+export const palette = {
+  black100: "#222222",
+  blue100: "#3292c9",
+  blue200: "#0a3d6b",
+  green100: "#32c992",
+  grey100: "#666666",
+  red100: "#ED4337",
+  white100: "#f1efea",
+  white200: "#fff",
+  yellow100: "#d1c432",
+} as const;
 
 export const baseTheme: Theme = {
-  topic: {
-    color: blue100,
-  },
+  topic: { color: palette.blue100 },
   colors: {
-    black100,
-    grey100,
-    green100,
-    blue100,
-    blue200,
-    red100,
-    shadow100,
-    white100,
-    white200,
-    yellow100,
+    ...palette,
   },
   spacing: {
     sm: 8,
@@ -33,7 +23,7 @@ export const baseTheme: Theme = {
     lg: 24,
   },
   border: {
-    color: black100,
+    color: palette.black100,
     size: {
       sm: 1,
       md: 1.5,
@@ -47,9 +37,9 @@ export const baseTheme: Theme = {
   },
   text: {
     shadow: {
-      textShadowColor: shadow100,
-      textShadowOffset: { width: 0, height: 1 },
-      textShadowRadius: 3,
+      textShadowColor: palette.black100,
+      textShadowOffset: { width: 0, height: 0 },
+      textShadowRadius: 1,
     },
     font: {
       regular: "Inter_400Regular",
@@ -65,29 +55,22 @@ export const baseTheme: Theme = {
     },
   },
   shadow: {
-    shadowColor: shadow100,
+    shadowColor: palette.black100,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
   },
 };
 
-export const moviesTheme: Theme = {
-  ...baseTheme,
-  topic: {
-    color: green100,
-  },
-};
+function makeTheme(topicColor: string): Theme {
+  return {
+    ...baseTheme,
+    topic: { color: topicColor },
+  };
+}
 
-export const booksTheme: Theme = {
-  ...baseTheme,
-  topic: {
-    color: yellow100,
-  },
-};
-
-export const themes = {
-  games: baseTheme,
-  movies: moviesTheme,
-  books: booksTheme,
+export const themes: Record<"games" | "movies" | "books", Theme> = {
+  games: makeTheme(palette.blue100),
+  movies: makeTheme(palette.green100),
+  books: makeTheme(palette.yellow100),
 };
