@@ -5,28 +5,16 @@ import { createStyles } from "utils/theme";
 interface Props extends TextInputProps {
   error?: string;
 }
-export function Input({
-  value,
-  onChangeText,
-  placeholder,
-  maxLength,
-  error,
-  style,
-  ...rest
-}: Props) {
+export function Input({ error, style, ...rest }: Props) {
   const s = useStyles();
 
   return (
     <View style={s.wrapper}>
       <TextInput
-        style={[s.root, error ? s.rootError : undefined, style]}
-        value={value}
-        onChangeText={onChangeText}
-        placeholder={placeholder}
-        placeholderTextColor={s.placeholder.color}
-        maxLength={maxLength}
         autoCorrect={false}
         autoCapitalize="words"
+        placeholderTextColor={s.placeholder.color}
+        style={[s.root, error ? s.rootError : undefined, style]}
         {...rest}
       />
     </View>
