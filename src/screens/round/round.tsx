@@ -11,6 +11,7 @@ import { Error } from "components/states/error";
 import { Loading } from "components/states/loading";
 import type { TOPIC_KEY } from "constants/topics";
 import type { MySelection } from "db/hooks/use-my-selections";
+import type { SessionID } from "db/types";
 import { editSelection } from "db/utils/edit-selection";
 import { saveSelection } from "db/utils/save-selection";
 import { useTopicData } from "queries/use-topic-data";
@@ -22,7 +23,7 @@ import { useAvailableOptions } from "./utils/use-available-options";
 import { useRoundState } from "./utils/use-round-state";
 
 interface Props {
-  sessionId: string;
+  sessionId: SessionID;
   topic: TOPIC_KEY;
   year: string;
   isVisible: boolean;

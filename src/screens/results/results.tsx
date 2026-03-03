@@ -4,13 +4,14 @@ import { Container } from "components/container";
 import { Row } from "components/row";
 import { Error } from "components/states/error";
 import { Loading } from "components/states/loading";
+import type { SessionID } from "db/types";
 import { createStyles } from "utils/theme";
 
 import type { RankedPick } from "./use-results-state";
 import { useResultsState } from "./use-results-state";
 
 interface Props {
-  sessionId: string;
+  sessionId: SessionID;
 }
 
 export function Results({ sessionId }: Props) {

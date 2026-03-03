@@ -6,10 +6,11 @@ import { usePlayers } from "db/hooks/use-players";
 import { useRound } from "db/hooks/use-round";
 import { useSelections } from "db/hooks/use-selections";
 import { useSession } from "db/hooks/use-sessions";
+import type { SessionID } from "db/types";
 import { advanceRound } from "db/utils/advance-round";
 
 interface Props {
-  sessionId: string;
+  sessionId: SessionID;
   topic: string;
   year: string;
 }

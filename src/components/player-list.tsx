@@ -1,6 +1,6 @@
 import { FlatList, Text, View } from "react-native";
 
-import type { Player } from "types/session";
+import type { Player } from "db/types";
 import { createStyles } from "utils/theme";
 
 import { Avatar } from "./avatar";

@@ -1,5 +1,5 @@
 {
-  "ignorePatterns": [".github/**", "README.md"],
+  "ignorePatterns": [".github/**", "README.md", "convex/**"],
   "experimentalSortImports": {
     "groups": [["builtin"], ["external"], ["internal"], ["parent", "sibling", "index"]],
     "newlinesBetween": true,

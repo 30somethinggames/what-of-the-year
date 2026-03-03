@@ -1,7 +1,16 @@
 import { v } from "convex/values";
 
 import { mutation, query } from "./_generated/server";
-import { MAX_PLAYERS, MAX_ROUNDS } from "./constants";
+
+const MAX_ROUNDS = 10;
+const MAX_PLAYERS = 10;
+
+export const getSession = query({
+  args: { sessionId: v.id("sessions") },
+  handler: async (ctx, { sessionId }) => {
+    return await ctx.db.get(sessionId);
+  },
+});
 
 export const createSession = mutation({
   args: {
@@ -53,46 +62,40 @@ export const createSession = mutation({
   },
 });
 
-export const joinSession = mutation({
+export const startSession = mutation({
   args: {
     sessionId: v.id("sessions"),
-    name: v.string(),
-    avatar: v.string(),
   },
-  handler: async (ctx, { sessionId, name, avatar }) => {
+  handler: async (ctx, { sessionId }) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Unauthenticated");
-    const uid = identity.subject;
 
     const session = await ctx.db.get(sessionId);
     if (!session) throw new Error("Session not found");
-    if (!session.isOpen) throw new Error("Session is closed");
-    if (session.playerCount >= session.maxPlayers) throw new Error("Session is full");
 
-    // Check if already joined
-    const existing = await ctx.db
+    const host = await ctx.db
       .query("players")
-      .withIndex("by_session_uid", (q) => q.eq("sessionId", sessionId).eq("uid", uid))
+      .withIndex("by_session_uid", (q) => q.eq("sessionId", sessionId).eq("uid", identity.subject))
       .unique();
-    if (existing) throw new Error("Already joined this session");
 
-    await ctx.db.insert("players", {
-      sessionId,
-      uid,
-      name,
-      avatar,
-      isHost: false,
-    });
+    if (!host?.isHost) throw new Error("Only the host can start the session");
+
+    const round = await ctx.db
+      .query("rounds")
+      .withIndex("by_session", (q) => q.eq("sessionId", sessionId))
+      .filter((q) => q.eq(q.field("number"), MAX_ROUNDS))
+      .unique();
+
+    if (!round) throw new Error("Round not found");
 
     await ctx.db.patch(sessionId, {
-      playerCount: session.playerCount + 1,
+      isOpen: false,
+      activeRoundNumber: MAX_ROUNDS,
     });
-  },
-});
 
-export const getSession = query({
-  args: { sessionId: v.id("sessions") },
-  handler: async (ctx, { sessionId }) => {
-    return await ctx.db.get(sessionId);
+    await ctx.db.patch(round._id, {
+      state: "active",
+      startedAt: Date.now(),
+    });
   },
 });

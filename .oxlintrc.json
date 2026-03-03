@@ -21,10 +21,6 @@
           {
             "group": ["screens/*/*"],
             "message": "Screen internals are private. Move shared functionality to a top-level dir (hooks/, utils/, db/, etc.)."
-          },
-          {
-            "group": ["db/*"],
-            "message": "Only db/hooks/* and db/utils/* are public. Move shared functionality to top-level dir"
           }
         ]
       }
@@ -35,12 +31,6 @@
       "files": ["src/app/**/*.tsx"],
       "rules": {
         "import/no-default-export": "off"
-      }
-    },
-    {
-      "files": ["src/db/**/*.ts"],
-      "rules": {
-        "no-restricted-imports": "off"
       }
     }
   ]

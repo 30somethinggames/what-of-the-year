@@ -1,6 +1,7 @@
 import { Redirect, Stack } from "expo-router";
 
 import { Header } from "components/header";
+import type { SessionID } from "db/types";
 import { useParams } from "hooks/use-params";
 import { Results } from "screens/results";
 
@@ -22,7 +23,7 @@ export default function ResultsIndex() {
           gestureEnabled: false,
         }}
       />
-      <Results sessionId={sessionId} />
+      <Results sessionId={sessionId as SessionID} />
     </>
   );
 }

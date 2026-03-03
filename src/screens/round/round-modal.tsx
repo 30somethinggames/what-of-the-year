@@ -5,6 +5,7 @@ import { Button } from "components/button";
 import { Modal } from "components/modal";
 import { Loading } from "components/states/loading";
 import { usePlayers } from "db/hooks/use-players";
+import type { SessionID } from "db/types";
 import { advanceRound } from "db/utils/advance-round";
 import { createStyles } from "utils/theme";
 
@@ -14,13 +15,13 @@ interface Props {
   isVisible: boolean;
   onClose: () => void;
   completedUids: Set<string>;
-  sessionId: string;
+  sessionId: SessionID;
   roundNumber: number;
 }
 
 export function RoundModal({ isVisible, onClose, completedUids, sessionId, roundNumber }: Props) {
   const s = useStyles();
-  const { players, isHost, isLoading, isError } = usePlayers(sessionId);
+  const { players, isHost, isLoading } = usePlayers(sessionId);
 
   const onNextRound = async () => {
     await advanceRound({

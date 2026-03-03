@@ -15,7 +15,6 @@ import { MAX_NAME_LENGTH, validateName } from "components/input/sanitize";
 import { KeyboardAvoidingView } from "components/keyboard-avoiding-view";
 import { Error } from "components/states/error";
 import type { TopicType } from "constants/topics";
-import { useAuth } from "db/hooks/use-auth";
 import { useTopicData } from "queries/use-topic-data";
 import { createStyles } from "utils/theme";
 
@@ -25,16 +24,16 @@ interface Props {
   existingSessionId?: string;
 }
 export function Topic({ topic, year, existingSessionId }: Props) {
-  const mutateJoin = useMutation(api.sessions.joinSession);
-  const mutateCreate = useMutation(api.sessions.createSession);
   const headerHeight = useHeaderHeight();
   const s = useStyles({ headerHeight });
   const { isLoading, isError, refetch } = useTopicData({ key: topic.value, year });
+  const { isAuthenticated, isLoading: isPending } = useConvexAuth();
+  const mutateJoin = useMutation(api.players.joinSession);
+  const mutateCreate = useMutation(api.sessions.createSession);
   const { avatar, randomizeAvatar } = useRandomAvatar();
-  const { mutateAsync: signIn, isPending } = useAuth();
-  const { signIn: signInConvex } = useAuthActions();
+  // const { mutateAsync: signIn, isPending } = useAuth();
+  const { signIn } = useAuthActions();
   const [name, setName] = useState("");
-  const { isAuthenticated } = useConvexAuth();
 
   const nameError = validateName(name);
   const isJoining = !!existingSessionId;
@@ -43,11 +42,11 @@ export function Topic({ topic, year, existingSessionId }: Props) {
 
   const onSubmit = async () => {
     try {
-      if (!isAuthenticated) await signInConvex("anonymous");
+      if (!isAuthenticated) await signIn("anonymous");
 
       let sessionId: string;
 
-      if (isJoining && existingSessionId) {
+      if (isJoining) {
         try {
           await mutateJoin({
             sessionId: existingSessionId as Id<"sessions">,
@@ -55,8 +54,8 @@ export function Topic({ topic, year, existingSessionId }: Props) {
             avatar,
           });
         } catch (e: unknown) {
-          const error = e as Error;
-          if (error.message !== "Already joined this session") throw e;
+          // oxlint-disable-next-line no-console
+          console.error("Failed to join:", e);
         }
         sessionId = existingSessionId;
       } else {

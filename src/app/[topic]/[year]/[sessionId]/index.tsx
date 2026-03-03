@@ -1,6 +1,7 @@
 import { Redirect, Stack } from "expo-router";
 
 import { Header } from "components/header";
+import type { SessionID } from "db/types";
 import { useParams } from "hooks/use-params";
 import { Lobby } from "screens/lobby";
 
@@ -16,7 +17,7 @@ export default function LobbyIndex() {
   return (
     <>
       <Stack.Screen options={{ headerTitle: () => <Header title={title} /> }} />
-      <Lobby topic={topic} year={year} sessionId={sessionId} />
+      <Lobby topic={topic} year={year} sessionId={sessionId as SessionID} />
     </>
   );
 }

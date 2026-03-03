@@ -4,7 +4,6 @@ import { useEffect } from "react";
 import { MAX_ROUNDS } from "constants/session";
 import { usePlayers } from "db/hooks/use-players";
 import { useSession } from "db/hooks/use-sessions";
-import { isDev } from "utils/dev/isDev";
 
 import type { LobbyProps } from "./types";
 
@@ -20,7 +19,6 @@ export function useLobbyState({ sessionId, topic, year }: LobbyProps) {
     isLoading: playersLoading,
     isError: playersError,
     players,
-    currentUser,
     isHost,
   } = usePlayers(sessionId);
 
@@ -29,7 +27,6 @@ export function useLobbyState({ sessionId, topic, year }: LobbyProps) {
 
   const playerCount = players.length;
   const maxPlayerCount = session?.maxPlayers;
-  const isDisabled = isDev ? false : playerCount < 2;
 
   // Auto-navigate non-host players when game starts
   useEffect(() => {
@@ -45,11 +42,9 @@ export function useLobbyState({ sessionId, topic, year }: LobbyProps) {
     isLoading,
     isError,
     session,
-    currentUser,
     players,
     isHost,
     playerCount,
     maxPlayerCount,
-    isDisabled,
   };
 }

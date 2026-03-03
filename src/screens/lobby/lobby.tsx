@@ -1,3 +1,5 @@
+import { api } from "convex/_generated/api";
+import { useMutation } from "convex/react";
 import * as Linking from "expo-linking";
 import { router } from "expo-router";
 import { Share, View } from "react-native";
@@ -8,8 +10,6 @@ import { PlayerList } from "components/player-list";
 import { Error } from "components/states/error";
 import { Loading } from "components/states/loading";
 import { MAX_ROUNDS } from "constants/session";
-import { leaveSession } from "db/utils/leave-session";
-import { startSession } from "db/utils/start-session";
 import { createStyles } from "utils/theme";
 
 import type { LobbyProps } from "./types";
@@ -17,21 +17,15 @@ import { useLobbyState } from "./use-lobby-state";
 
 export function Lobby({ topic, year, sessionId }: LobbyProps) {
   const s = useStyles();
-  const {
-    isLoading,
-    isError,
-    session,
-    players,
-    isHost,
-    playerCount,
-    maxPlayerCount,
-    isDisabled,
-    currentUser,
-  } = useLobbyState({
-    topic,
-    year,
-    sessionId,
-  });
+  const { isLoading, isError, session, players, isHost, playerCount, maxPlayerCount } =
+    useLobbyState({
+      topic,
+      year,
+      sessionId,
+    });
+
+  const leaveSession = useMutation(api.players.leaveSession);
+  const startSession = useMutation(api.sessions.startSession);
 
   if (isLoading) return <Loading />;
   if (isError || !session) return <Error />;
@@ -55,7 +49,7 @@ export function Lobby({ topic, year, sessionId }: LobbyProps) {
   };
 
   const onLeave = async () => {
-    await leaveSession({ sessionId, uid: currentUser?.uid });
+    await leaveSession({ sessionId });
     router.replace("/");
   };
 
@@ -67,7 +61,7 @@ export function Lobby({ topic, year, sessionId }: LobbyProps) {
         {isHost ? (
           <>
             <Button label="Invite" onPress={onShare} />
-            <Button label="Start" onPress={onStart} disabled={isDisabled} />
+            <Button label="Start" onPress={onStart} />
           </>
         ) : (
           <Button label="Leave" onPress={onLeave} />

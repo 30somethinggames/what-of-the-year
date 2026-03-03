@@ -1,29 +1,5 @@
 import type { Timestamp } from "firebase/firestore";
 
-import type { TOPIC_KEY } from "constants/topics";
-
-// --- sessions/{sessionId} ---
-export interface Session {
-  _id: string;
-  _creationTime: number;
-  topic: string;
-  year: number;
-  maxRounds: number;
-  maxPlayers: number;
-  isOpen: boolean;
-  playerCount: number;
-  activeRoundNumber: number;
-}
-
-// --- sessions/{sessionId}/players/{uid} ---
-export interface Player {
-  uid: string;
-  name: string;
-  avatar: string;
-  joinedAt: Timestamp;
-  isHost: boolean;
-}
-
 // --- sessions/{sessionId}/rounds/{roundNumber} ---
 export type RoundState = "pending" | "open" | "closed";
 

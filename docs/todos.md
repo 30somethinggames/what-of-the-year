@@ -1,4 +1,6 @@
 1. refactor from firebase to convex
+   - error
+   - move logic up
 1. serverless functions for api calls
 1. app version
    - main screen

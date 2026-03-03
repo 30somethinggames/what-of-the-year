@@ -3,6 +3,7 @@ import { useState } from "react";
 
 import { Header } from "components/header";
 import { SettingsButton } from "components/settings-button";
+import type { SessionID } from "db/types";
 import { useParams } from "hooks/use-params";
 import { Round } from "screens/round";
 
@@ -28,7 +29,7 @@ export default function RoundIndex() {
         }}
       />
       <Round
-        sessionId={sessionId}
+        sessionId={sessionId as SessionID}
         topic={topic.value}
         year={year}
         isVisible={isVisible}
