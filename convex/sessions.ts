@@ -94,7 +94,7 @@ export const startSession = mutation({
     });
 
     await ctx.db.patch(round._id, {
-      state: "active",
+      state: "open",
       startedAt: Date.now(),
     });
   },

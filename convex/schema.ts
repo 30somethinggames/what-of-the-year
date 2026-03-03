@@ -25,7 +25,7 @@ export default defineSchema({
   rounds: defineTable({
     sessionId: v.id("sessions"),
     number: v.number(),
-    state: v.union(v.literal("pending"), v.literal("active"), v.literal("closed")),
+    state: v.union(v.literal("pending"), v.literal("open"), v.literal("closed")),
     weight: v.number(),
     selectionsComplete: v.number(),
     startedAt: v.union(v.number(), v.null()),
@@ -44,5 +44,7 @@ export default defineSchema({
       first_release_date: v.optional(v.number()),
       summary: v.optional(v.string()),
     }),
+    points: v.number(),
+    savedAt: v.number(),
   }).index("by_round_uid", ["roundId", "uid"]),
 });
