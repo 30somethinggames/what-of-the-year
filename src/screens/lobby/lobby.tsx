@@ -1,4 +1,5 @@
 import { api } from "convex/_generated/api";
+import { MAX_ROUNDS } from "convex/constants";
 import { useMutation } from "convex/react";
 import * as Linking from "expo-linking";
 import { router } from "expo-router";
@@ -9,7 +10,6 @@ import { Container } from "components/container";
 import { PlayerList } from "components/player-list";
 import { Error } from "components/states/error";
 import { Loading } from "components/states/loading";
-import { MAX_ROUNDS } from "constants/session";
 import { createStyles } from "utils/theme";
 
 import type { LobbyProps } from "./types";
@@ -17,18 +17,18 @@ import { useLobbyState } from "./use-lobby-state";
 
 export function Lobby({ topic, year, sessionId }: LobbyProps) {
   const s = useStyles();
-  const { isLoading, isError, session, players, isHost, playerCount, maxPlayerCount } =
-    useLobbyState({
-      topic,
-      year,
-      sessionId,
-    });
+  const { isLoading, session, players, isHost, playerCount, maxPlayerCount } = useLobbyState({
+    topic,
+    year,
+    sessionId,
+  });
 
   const leaveSession = useMutation(api.players.leaveSession);
   const startSession = useMutation(api.sessions.startSession);
 
   if (isLoading) return <Loading />;
-  if (isError || !session) return <Error />;
+  // TODO figure out
+  if (!session) return <Error />;
 
   const onShare = async () => {
     const url = Linking.createURL(`/${topic.value}/${year}`, {

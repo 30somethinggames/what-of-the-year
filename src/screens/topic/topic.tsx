@@ -1,7 +1,6 @@
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { api } from "convex/_generated/api";
-import type { Id } from "convex/_generated/dataModel";
 import { useConvexAuth, useMutation } from "convex/react";
 import { router } from "expo-router";
 import { useState } from "react";
@@ -11,16 +10,18 @@ import { Avatar, useRandomAvatar } from "components/avatar";
 import { Button } from "components/button";
 import { Container } from "components/container";
 import { Input } from "components/input";
-import { MAX_NAME_LENGTH, validateName } from "components/input/sanitize";
 import { KeyboardAvoidingView } from "components/keyboard-avoiding-view";
 import type { TopicType } from "constants/topics";
+import type { SessionID } from "db/types";
 import { useTopicData } from "hooks/queries/use-topic-data";
 import { createStyles } from "utils/theme";
+
+import { MAX_NAME_LENGTH, validateName } from "./utils/validate";
 
 interface Props {
   topic: TopicType;
   year: string;
-  existingSessionId?: string;
+  existingSessionId?: SessionID;
 }
 export function Topic({ topic, year, existingSessionId }: Props) {
   const headerHeight = useHeaderHeight();
@@ -47,7 +48,7 @@ export function Topic({ topic, year, existingSessionId }: Props) {
       if (isJoining) {
         try {
           await mutateJoin({
-            sessionId: existingSessionId as Id<"sessions">,
+            sessionId: existingSessionId,
             name,
             avatar,
           });

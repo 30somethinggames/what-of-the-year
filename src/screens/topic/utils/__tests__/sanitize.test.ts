@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test";
 
-import { MAX_NAME_LENGTH, validateName } from "../sanitize";
+import { MAX_NAME_LENGTH, validateName } from "../validate";
 
 describe("validateName", () => {
   it("returns null for valid names", () => {

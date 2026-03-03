@@ -1,15 +1,8 @@
 import { describe, expect, it } from "bun:test";
 
-import { MAX_PLAYERS, MAX_ROUNDS } from "constants/session";
+import { MAX_ROUNDS } from "convex/constants";
 
-import {
-  buildAllRounds,
-  buildPick,
-  buildPlayer,
-  buildRound,
-  buildSession,
-  getRoundWeight,
-} from "../builders";
+import { buildAllRounds, buildPick, buildPlayer, buildRound, getRoundWeight } from "../builders";
 
 describe("getRoundWeight", () => {
   it("returns inverted weight (round 10 = 1pt, round 1 = 10pt)", () => {
@@ -19,43 +12,12 @@ describe("getRoundWeight", () => {
   });
 });
 
-describe("buildSession", () => {
-  it("creates a session with correct defaults", () => {
-    const session = buildSession("games", 2025);
-
-    expect(session).toEqual({
-      topic: "games",
-      year: 2025,
-      maxRounds: MAX_ROUNDS,
-      maxPlayers: MAX_PLAYERS,
-      isOpen: true,
-      playerCount: 1,
-      activeRoundNumber: 1,
-    });
-  });
-
-  it("sets playerCount to 1 (host)", () => {
-    const session = buildSession("movies", 2024);
-    expect(session.playerCount).toBe(1);
-  });
-
-  it("starts on round 1", () => {
-    const session = buildSession("books", 2023);
-    expect(session.activeRoundNumber).toBe(1);
-  });
-
-  it("defaults to open", () => {
-    const session = buildSession("games", 2025);
-    expect(session.isOpen).toBe(true);
-  });
-});
-
 describe("buildPlayer", () => {
   it("creates a host player", () => {
-    const player = buildPlayer("Ryan", "avatar-seed", true);
+    const player = buildPlayer("Snake", "avatar-seed", true);
 
     expect(player).toEqual({
-      name: "Ryan",
+      name: "Snake",
       avatar: "avatar-seed",
       isHost: true,
     });

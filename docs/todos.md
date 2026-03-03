@@ -1,6 +1,6 @@
 1. refactor from firebase to convex
    - error
-   - move logic up
+   - start script that opens 2 terminals split to run convex and app
 1. serverless functions for api calls
 1. app version
    - main screen

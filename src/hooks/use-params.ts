@@ -2,6 +2,7 @@ import { useLocalSearchParams } from "expo-router";
 
 import type { TOPIC_KEY } from "constants/topics";
 import { getTopic } from "constants/topics";
+import type { SessionID } from "db/types";
 
 export type Params = {
   /** The topic key (e.g., 'movies', 'games', 'books') */
@@ -15,29 +16,14 @@ export type Params = {
 };
 
 /**
- * Custom hook that extracts and validates route parameters from the current URL.
- *
- * This hook wraps expo-router's `useLocalSearchParams` and provides additional
- * validation by converting the raw topic parameter into a validated Topic object
- * using `getTopic()`.
- *
- * @returns An object containing the validated topic object and other route parameters
- *
- * @example
- * ```tsx
- * function MyScreen() {
- *   const { topic, year, session, round } = useParams();
- *   // topic is a validated Topic object with name, icon, etc.
- *   // year, session, and round are strings (if present in URL)
- * }
- * ```
+ * Wraps `useLocalSearchParams` and converts the raw topic param
+ * into a validated Topic object via `getTopic()`.
  */
 export function useParams() {
-  const params = useLocalSearchParams<Params>();
-  const { topic: paramsTopic, ...rest } = params;
-  const topic = getTopic(paramsTopic);
+  const { topic, sessionId, ...rest } = useLocalSearchParams<Params>();
   return {
     ...rest,
-    topic,
+    sessionId: sessionId as SessionID,
+    topic: getTopic(topic),
   };
 }

@@ -21,8 +21,8 @@ export interface RankedPick {
 }
 
 export function useResultsState({ sessionId }: Props) {
-  const { session, isLoading: sessionLoading, isError: sessionError } = useSession(sessionId);
-  const { players, isLoading: playersLoading, isError: playersError } = usePlayers(sessionId);
+  const { session, isLoading: sessionLoading } = useSession(sessionId);
+  const { players, isLoading: playersLoading } = usePlayers(sessionId);
   const {
     allSelections,
     isLoading: selectionsLoading,
@@ -30,7 +30,7 @@ export function useResultsState({ sessionId }: Props) {
   } = useAllSelections(sessionId, session?.maxRounds ?? 0);
 
   const isLoading = sessionLoading || playersLoading || selectionsLoading;
-  const isError = sessionError || playersError || selectionsError;
+  const isError = selectionsError;
 
   // Build a lookup for player info
   const playerMap = new Map(players.map((p) => [p.uid, p]));

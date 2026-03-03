@@ -8,9 +8,10 @@ export function usePlayers(sessionId: SessionID | undefined) {
   const currentUser = useQuery(api.auth.getViewer);
   const isHost = players?.some((p) => p.uid === currentUser?.subject && p.isHost) ?? false;
 
+  const isLoading = players === undefined || currentUser === undefined;
+
   return {
-    isLoading: players === undefined || currentUser === undefined,
-    isError: null,
+    isLoading,
     isHost,
     currentUser,
     players: players ?? [],

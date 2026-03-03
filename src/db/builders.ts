@@ -1,4 +1,5 @@
-import { MAX_PLAYERS, MAX_ROUNDS } from "constants/session";
+import { MAX_ROUNDS } from "convex/constants";
+
 import type { Option } from "types/option";
 import type { Pick } from "types/session";
 
@@ -7,17 +8,6 @@ export const SESSION_TTL_MS = 24 * 60 * 60 * 1000;
 
 /** Deterministic round weights: round 10 = 1pt, round 1 = 10pts (lower pick = higher value) */
 export const getRoundWeight = (roundNumber: number) => MAX_ROUNDS + 1 - roundNumber;
-
-/** Build the session document data */
-export const buildSession = (topic: string, year: number) => ({
-  topic,
-  year,
-  maxRounds: MAX_ROUNDS,
-  maxPlayers: MAX_PLAYERS,
-  isOpen: true,
-  playerCount: 1,
-  activeRoundNumber: 1,
-});
 
 /** Build the host player document data */
 export const buildPlayer = (name: string, avatar: string, isHost: boolean) => ({

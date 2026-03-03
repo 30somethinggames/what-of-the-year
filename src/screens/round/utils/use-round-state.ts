@@ -15,10 +15,7 @@ interface Props {
   year: string;
 }
 export function useRoundState({ sessionId, topic, year }: Props) {
-  const { session, isLoading: sessionLoading, isError: sessionError } = useSession(sessionId);
-
-  // activeRoundNumber is the source of truth — no URL navigation needed
-  const activeRound = session?.activeRoundNumber;
+  const { isLoading: sessionLoading, session, activeRound } = useSession(sessionId);
 
   // Keep URL param in sync for deep linking (no navigation transition)
   useEffect(() => {
@@ -42,7 +39,7 @@ export function useRoundState({ sessionId, topic, year }: Props) {
   const { isHost } = usePlayers(sessionId);
 
   const isLoading = sessionLoading || roundLoading || selectionsLoading || mySelectionsLoading;
-  const isError = sessionError || roundError || selectionsError || mySelectionsError;
+  const isError = roundError || selectionsError || mySelectionsError;
 
   // Auto-advance when all players have submitted their selection.
   // Only the host's client triggers this to avoid duplicate writes.

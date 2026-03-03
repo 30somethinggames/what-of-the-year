@@ -5,7 +5,6 @@ import { Error } from "components/states/error";
 import { useParams } from "hooks/use-params";
 import { Topic } from "screens/topic";
 
-// Route-level error boundary
 export function ErrorBoundary({ retry }: ErrorBoundaryProps) {
   return <Error onRetry={retry} />;
 }
