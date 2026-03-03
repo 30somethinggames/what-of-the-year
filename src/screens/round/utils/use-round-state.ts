@@ -5,7 +5,7 @@ import { useMySelections } from "db/hooks/use-my-selections";
 import { usePlayers } from "db/hooks/use-players";
 import { useRound } from "db/hooks/use-round";
 import { useSelections } from "db/hooks/use-selections";
-import { useSession } from "db/hooks/use-session";
+import { useSession } from "db/hooks/use-sessions";
 import { advanceRound } from "db/utils/advance-round";
 
 interface Props {

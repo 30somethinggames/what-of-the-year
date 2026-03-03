@@ -1,4 +1,8 @@
+import { useAuthActions } from "@convex-dev/auth/react";
 import { useHeaderHeight } from "@react-navigation/elements";
+import { api } from "convex/_generated/api";
+import type { Id } from "convex/_generated/dataModel";
+import { useConvexAuth, useMutation } from "convex/react";
 import { router } from "expo-router";
 import { useState } from "react";
 import { Text, View } from "react-native";
@@ -12,8 +16,6 @@ import { KeyboardAvoidingView } from "components/keyboard-avoiding-view";
 import { Error } from "components/states/error";
 import type { TopicType } from "constants/topics";
 import { useAuth } from "db/hooks/use-auth";
-import { createSession } from "db/utils/create-session";
-import { joinSession } from "db/utils/join-session";
 import { useTopicData } from "queries/use-topic-data";
 import { createStyles } from "utils/theme";
 
@@ -23,12 +25,16 @@ interface Props {
   existingSessionId?: string;
 }
 export function Topic({ topic, year, existingSessionId }: Props) {
+  const mutateJoin = useMutation(api.sessions.joinSession);
+  const mutateCreate = useMutation(api.sessions.createSession);
   const headerHeight = useHeaderHeight();
   const s = useStyles({ headerHeight });
   const { isLoading, isError, refetch } = useTopicData({ key: topic.value, year });
   const { avatar, randomizeAvatar } = useRandomAvatar();
   const { mutateAsync: signIn, isPending } = useAuth();
+  const { signIn: signInConvex } = useAuthActions();
   const [name, setName] = useState("");
+  const { isAuthenticated } = useConvexAuth();
 
   const nameError = validateName(name);
   const isJoining = !!existingSessionId;
@@ -37,15 +43,14 @@ export function Topic({ topic, year, existingSessionId }: Props) {
 
   const onSubmit = async () => {
     try {
-      const user = await signIn();
+      if (!isAuthenticated) await signInConvex("anonymous");
 
       let sessionId: string;
 
       if (isJoining && existingSessionId) {
         try {
-          await joinSession({
-            sessionId: existingSessionId,
-            uid: user.uid,
+          await mutateJoin({
+            sessionId: existingSessionId as Id<"sessions">,
             name,
             avatar,
           });
@@ -55,23 +60,15 @@ export function Topic({ topic, year, existingSessionId }: Props) {
         }
         sessionId = existingSessionId;
       } else {
-        const result = await createSession({
+        const result = await mutateCreate({
           topic: topic.value,
           year: Number(year),
-          uid: user.uid,
           name,
           avatar,
         });
         sessionId = result.sessionId;
       }
 
-      /**
-       * Use router.replace instead of router.push to prevent users from navigating
-       * back to the topic/join screen after entering a session. Once a user has
-       * joined or created a session, they should not be able to return to this
-       * screen using the back button, as it would create a confusing UX and
-       * potentially allow duplicate session creation.
-       */
       router.replace({
         pathname: "/[topic]/[year]/[sessionId]",
         params: { topic: topic.value, year, sessionId, round: "1" },

@@ -3,7 +3,7 @@ import { useEffect } from "react";
 
 import { MAX_ROUNDS } from "constants/session";
 import { usePlayers } from "db/hooks/use-players";
-import { useSession } from "db/hooks/use-session";
+import { useSession } from "db/hooks/use-sessions";
 import { isDev } from "utils/dev/isDev";
 
 import type { LobbyProps } from "./types";

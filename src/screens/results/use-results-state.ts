@@ -1,6 +1,6 @@
 import { useAllSelections } from "db/hooks/use-all-selections";
 import { usePlayers } from "db/hooks/use-players";
-import { useSession } from "db/hooks/use-session";
+import { useSession } from "db/hooks/use-sessions";
 import type { Pick } from "types/session";
 
 interface Props {

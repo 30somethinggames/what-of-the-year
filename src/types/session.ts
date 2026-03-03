@@ -4,15 +4,15 @@ import type { TOPIC_KEY } from "constants/topics";
 
 // --- sessions/{sessionId} ---
 export interface Session {
-  topic: TOPIC_KEY;
+  _id: string;
+  _creationTime: number;
+  topic: string;
   year: number;
   maxRounds: number;
   maxPlayers: number;
   isOpen: boolean;
   playerCount: number;
   activeRoundNumber: number;
-  createdAt: Timestamp;
-  expiresAt: Timestamp;
 }
 
 // --- sessions/{sessionId}/players/{uid} ---

@@ -1,3 +1,4 @@
+import { ConvexAuthProvider } from "@convex-dev/auth/react";
 import { useReactQueryDevTools } from "@dev-plugins/react-query";
 import {
   Inter_400Regular,
@@ -5,7 +6,9 @@ import {
   Inter_600SemiBold,
   Inter_700Bold,
 } from "@expo-google-fonts/inter";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ConvexProvider, ConvexReactClient } from "convex/react";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -14,6 +17,8 @@ import { useEffect } from "react";
 import { WebContainer } from "components/web-container";
 import { DEFAULT_STALE_TIME } from "queries/utils";
 import { palette } from "utils/theme";
+
+const convex = new ConvexReactClient(process.env.EXPO_PUBLIC_CONVEX_URL!);
 
 SplashScreen.preventAutoHideAsync();
 
@@ -45,16 +50,18 @@ export default function Root() {
   if (!fontsLoaded) return null;
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <WebContainer>
-        <Stack
-          screenOptions={{
-            headerBackButtonDisplayMode: "minimal",
-            headerShadowVisible: false,
-            headerStyle: { backgroundColor: palette.white100 },
-          }}
-        />
-      </WebContainer>
-    </QueryClientProvider>
+    <ConvexAuthProvider client={convex} storage={AsyncStorage}>
+      <QueryClientProvider client={queryClient}>
+        <WebContainer>
+          <Stack
+            screenOptions={{
+              headerBackButtonDisplayMode: "minimal",
+              headerShadowVisible: false,
+              headerStyle: { backgroundColor: palette.white100 },
+            }}
+          />
+        </WebContainer>
+      </QueryClientProvider>
+    </ConvexAuthProvider>
   );
 }
