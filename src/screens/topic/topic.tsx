@@ -13,9 +13,8 @@ import { Container } from "components/container";
 import { Input } from "components/input";
 import { MAX_NAME_LENGTH, validateName } from "components/input/sanitize";
 import { KeyboardAvoidingView } from "components/keyboard-avoiding-view";
-import { Error } from "components/states/error";
 import type { TopicType } from "constants/topics";
-import { useTopicData } from "queries/use-topic-data";
+import { useTopicData } from "hooks/queries/use-topic-data";
 import { createStyles } from "utils/theme";
 
 interface Props {
@@ -26,13 +25,12 @@ interface Props {
 export function Topic({ topic, year, existingSessionId }: Props) {
   const headerHeight = useHeaderHeight();
   const s = useStyles({ headerHeight });
-  const { isLoading, isError, refetch } = useTopicData({ key: topic.value, year });
+  const { isLoading } = useTopicData({ key: topic.value, year });
   const { isAuthenticated, isLoading: isPending } = useConvexAuth();
+  const { signIn } = useAuthActions();
   const mutateJoin = useMutation(api.players.joinSession);
   const mutateCreate = useMutation(api.sessions.createSession);
   const { avatar, randomizeAvatar } = useRandomAvatar();
-  // const { mutateAsync: signIn, isPending } = useAuth();
-  const { signIn } = useAuthActions();
   const [name, setName] = useState("");
 
   const nameError = validateName(name);
@@ -77,8 +75,6 @@ export function Topic({ topic, year, existingSessionId }: Props) {
       console.error("Failed to submit:", e);
     }
   };
-
-  if (isError) return <Error onRetry={refetch} />;
 
   return (
     <KeyboardAvoidingView style={s.root}>

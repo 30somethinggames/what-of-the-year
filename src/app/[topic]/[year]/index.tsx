@@ -1,8 +1,14 @@
-import { Redirect, Stack } from "expo-router";
+import { type ErrorBoundaryProps, Redirect, Stack } from "expo-router";
 
 import { Header } from "components/header";
+import { Error } from "components/states/error";
 import { useParams } from "hooks/use-params";
 import { Topic } from "screens/topic";
+
+// Route-level error boundary
+export function ErrorBoundary({ retry }: ErrorBoundaryProps) {
+  return <Error onRetry={retry} />;
+}
 
 export default function TopicIndex() {
   const { topic, year, sessionId } = useParams();

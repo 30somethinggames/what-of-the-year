@@ -1,5 +1,4 @@
-import type { QUERY_ARGS } from "types/query-args";
-
+import type { QUERY_ARGS } from "./types";
 import { useBooks } from "./use-books";
 import { useGames } from "./use-games";
 import { useMovies } from "./use-movies";

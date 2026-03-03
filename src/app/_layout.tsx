@@ -15,7 +15,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 
 import { WebContainer } from "components/web-container";
-import { DEFAULT_STALE_TIME } from "queries/utils";
+import { DEFAULT_STALE_TIME } from "hooks/queries/utils";
 import { palette } from "utils/theme";
 
 const convex = new ConvexReactClient(process.env.EXPO_PUBLIC_CONVEX_URL!);

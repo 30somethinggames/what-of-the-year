@@ -2,10 +2,10 @@ import { useQuery } from "@tanstack/react-query";
 
 import { TOPIC_KEY } from "constants/topics";
 import type { Option } from "types/option";
-import type { QUERY_ARGS } from "types/query-args";
 import { currentYear } from "utils/dates";
 
-import { handleError, getStaleTime } from "./utils";
+import type { QUERY_ARGS } from "./types";
+import { handleError, DEFAULT_STALE_TIME } from "./utils";
 
 const GOOGLE_BOOKS_API_URL = process.env.EXPO_PUBLIC_GOOGLE_BOOKS_API_URL;
 const GOOGLE_BOOKS_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_BOOKS_API_KEY;
@@ -92,7 +92,7 @@ export function useBooks({ key, year }: QUERY_ARGS) {
     queryKey: [BOOK_QUERY_KEY, year],
     queryFn: () => getBooksForYear(year),
     select: formBookOptions,
-    staleTime: getStaleTime(year),
+    staleTime: DEFAULT_STALE_TIME,
     enabled,
   });
 }

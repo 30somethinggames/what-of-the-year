@@ -14,7 +14,7 @@ import type { MySelection } from "db/hooks/use-my-selections";
 import type { SessionID } from "db/types";
 import { editSelection } from "db/utils/edit-selection";
 import { saveSelection } from "db/utils/save-selection";
-import { useTopicData } from "queries/use-topic-data";
+import { useTopicData } from "hooks/queries/use-topic-data";
 import type { Option } from "types/option";
 import { createStyles } from "utils/theme";
 

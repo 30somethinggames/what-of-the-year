@@ -12,9 +12,11 @@ import type * as auth from "../auth.js";
 import type * as constants from "../constants.js";
 import type * as crons from "../crons.js";
 import type * as http from "../http.js";
+import type * as igdb from "../igdb.js";
 import type * as players from "../players.js";
 import type * as reset from "../reset.js";
 import type * as sessions from "../sessions.js";
+import type * as utils_dates from "../utils/dates.js";
 
 import type {
   ApiFromModules,
@@ -27,9 +29,11 @@ declare const fullApi: ApiFromModules<{
   constants: typeof constants;
   crons: typeof crons;
   http: typeof http;
+  igdb: typeof igdb;
   players: typeof players;
   reset: typeof reset;
   sessions: typeof sessions;
+  "utils/dates": typeof utils_dates;
 }>;
 
 /**
