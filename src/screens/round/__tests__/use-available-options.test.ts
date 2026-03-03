@@ -2,7 +2,7 @@ import { describe, expect, it } from "bun:test";
 
 import type { Timestamp } from "firebase/firestore";
 
-import type { MySelection } from "db/hooks/use-my-selections";
+import type { MySelection } from "db/types";
 import type { Option } from "types/option";
 
 import { computeAvailableOptions } from "../utils/use-available-options";
@@ -31,7 +31,12 @@ describe("computeAvailableOptions", () => {
 
   it("filters out picks already selected by the user", () => {
     const mySelections: MySelection[] = [
-      { roundNumber: 1, pick: { id: "2", name: "Two" }, points: 1, savedAt: fakeTimestamp },
+      {
+        roundNumber: 1,
+        pick: { id: "2", name: "Two" },
+        points: 1,
+        savedAt: fakeTimestamp.toMillis(),
+      } as MySelection,
     ];
 
     const avail = computeAvailableOptions(options, mySelections, null);
@@ -40,7 +45,12 @@ describe("computeAvailableOptions", () => {
 
   it("keeps the pick for the round being edited", () => {
     const mySelections: MySelection[] = [
-      { roundNumber: 2, pick: { id: "2", name: "Two" }, points: 1, savedAt: fakeTimestamp },
+      {
+        roundNumber: 2,
+        pick: { id: "2", name: "Two" },
+        points: 1,
+        savedAt: fakeTimestamp.toMillis(),
+      } as MySelection,
     ];
 
     const avail = computeAvailableOptions(options, mySelections, 2);

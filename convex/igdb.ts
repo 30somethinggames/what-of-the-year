@@ -1,5 +1,6 @@
-import { action } from "./_generated/server";
 import { v } from "convex/values";
+
+import { action } from "./_generated/server";
 import { currentYear } from "./utils/dates";
 
 export const getGames = action({
@@ -7,7 +8,7 @@ export const getGames = action({
   handler: async (_, { year }) => {
     const { startDate, endDate } = currentYear(year);
 
-    const response = await fetch('https://api.igdb.com/v4/games', {
+    const response = await fetch("https://api.igdb.com/v4/games", {
       method: "POST",
       headers: {
         "Client-ID": process.env.IGDB_CLIENT_ID!,

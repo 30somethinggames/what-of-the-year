@@ -1,8 +1,7 @@
-import { onSnapshot } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { api } from "convex/_generated/api";
+import { useQuery } from "convex/react";
 
-import { roundRef } from "db/collections";
-import type { Round } from "types/session";
+import type { SessionID } from "db/types";
 
 /**
  * Subscribes to a single round document in real time.
@@ -12,40 +11,16 @@ import type { Round } from "types/session";
  *
  * @param sessionId - The session ID. Pass `undefined` to skip subscribing.
  * @param roundNumber - The round number. Pass `undefined` to skip subscribing.
- * @returns An object containing the `round` data, an `isLoading` flag, and any `error`.
+ * @returns An object containing the `round` data, an `isLoading` flag.
  */
-export function useRound(sessionId: string | undefined, roundNumber: number | undefined) {
-  const [round, setRound] = useState<Round | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState<Error | null>(null);
+export function useRound(sessionId: SessionID | undefined, roundNumber: number | undefined) {
+  const round = useQuery(
+    api.rounds.getRound,
+    sessionId && roundNumber ? { sessionId, number: roundNumber } : "skip",
+  );
 
-  useEffect(() => {
-    if (!sessionId || !roundNumber) return;
-
-    // Reset state to avoid stale data from the previous round being used
-    // before the new subscription delivers its first snapshot.
-    setRound(null);
-    setIsLoading(true);
-    setIsError(null);
-
-    const unsubscribe = onSnapshot(
-      roundRef(sessionId, roundNumber),
-      (snapshot) => {
-        if (snapshot.exists()) {
-          setRound(snapshot.data() as Round);
-        } else {
-          setIsError(new Error("Round not found"));
-        }
-        setIsLoading(false);
-      },
-      (err) => {
-        setIsError(err);
-        setIsLoading(false);
-      },
-    );
-
-    return unsubscribe;
-  }, [sessionId, roundNumber]);
-
-  return { round, isLoading, isError };
+  return {
+    round: round ?? null,
+    isLoading: round === undefined,
+  };
 }

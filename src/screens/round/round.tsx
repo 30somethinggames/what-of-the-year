@@ -10,8 +10,7 @@ import { Row } from "components/row";
 import { Error } from "components/states/error";
 import { Loading } from "components/states/loading";
 import type { TOPIC_KEY } from "constants/topics";
-import type { MySelection } from "db/hooks/use-my-selections";
-import type { SessionID } from "db/types";
+import type { MySelection, SessionID } from "db/types";
 import { editSelection } from "db/utils/edit-selection";
 import { saveSelection } from "db/utils/save-selection";
 import { useTopicData } from "hooks/queries/use-topic-data";
@@ -34,7 +33,6 @@ export function Round({ sessionId, topic, year, isVisible, onClose }: Props) {
   const s = useStyles();
   const {
     isLoading,
-    isError,
     session,
     round,
     activeRound,
@@ -53,7 +51,7 @@ export function Round({ sessionId, topic, year, isVisible, onClose }: Props) {
   const availableOptions = useAvailableOptions(options, mySelections, editingRound);
 
   if (isLoading) return <Loading />;
-  if (isError || !session || !round || !activeRound) return <Error />;
+  if (!session || !round || !activeRound) return <Error />;
 
   const isEditing = editingRound !== null;
   const isDisabled = !inputValue.trim() || !uid || (!isEditing && hasPickedThisRound);

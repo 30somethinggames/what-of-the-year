@@ -2,7 +2,7 @@ import { onSnapshot } from "firebase/firestore";
 import { useEffect, useState } from "react";
 
 import { selectionsRef } from "db/collections";
-import type { Selection } from "types/session";
+import type { Selection } from "db/types";
 
 export interface PlayerRoundSelection extends Selection {
   uid: string;
@@ -39,7 +39,7 @@ export function useAllSelections(sessionId: string | undefined, maxRounds: numbe
         ref,
         (snapshot) => {
           const data: PlayerRoundSelection[] = snapshot.docs.map((doc) => ({
-            uid: doc.id,
+            // uid: doc.id,
             roundNumber: round,
             ...(doc.data() as Selection),
           }));

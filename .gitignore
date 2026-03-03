@@ -40,4 +40,5 @@ yarn-error.*
 # generated 
 /ios
 /android
-/convex/_generated
+
+/convex/_generated/

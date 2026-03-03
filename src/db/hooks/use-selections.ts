@@ -1,12 +1,7 @@
-import { onSnapshot } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { api } from "convex/_generated/api";
+import { useQuery } from "convex/react";
 
-import { selectionsRef } from "db/collections";
-import type { Selection } from "types/session";
-
-export interface SelectionWithUid extends Selection {
-  uid: string;
-}
+import type { SessionID } from "db/types";
 
 /**
  * Subscribes to all selections for a given round in real time.
@@ -16,34 +11,16 @@ export interface SelectionWithUid extends Selection {
  *
  * @param sessionId - The session ID. Pass `undefined` to skip subscribing.
  * @param roundNumber - The round number. Pass `undefined` to skip subscribing.
- * @returns An object containing the `selections` array, an `isLoading` flag, and any `error`.
+ * @returns An object containing the `selections` array, an `isLoading` flag.
  */
-export function useSelections(sessionId: string | undefined, roundNumber: number | undefined) {
-  const [selections, setSelections] = useState<SelectionWithUid[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState<Error | null>(null);
+export function useSelections(sessionId: SessionID | undefined, roundNumber: number | undefined) {
+  const selections = useQuery(
+    api.selections.getSelections,
+    sessionId && roundNumber ? { sessionId, number: roundNumber } : "skip",
+  );
 
-  useEffect(() => {
-    if (!sessionId || !roundNumber) return;
-
-    const unsubscribe = onSnapshot(
-      selectionsRef(sessionId, roundNumber),
-      (snapshot) => {
-        const data = snapshot.docs.map((doc) => ({
-          uid: doc.id,
-          ...(doc.data() as Selection),
-        }));
-        setSelections(data);
-        setIsLoading(false);
-      },
-      (err) => {
-        setIsError(err);
-        setIsLoading(false);
-      },
-    );
-
-    return unsubscribe;
-  }, [sessionId, roundNumber]);
-
-  return { selections, isLoading, isError };
+  return {
+    selections: selections ?? [],
+    isLoading: selections === undefined,
+  };
 }

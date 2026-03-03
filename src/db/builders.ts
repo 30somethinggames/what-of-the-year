@@ -1,7 +1,15 @@
 import { MAX_ROUNDS } from "convex/constants";
 
 import type { Option } from "types/option";
-import type { Pick } from "types/session";
+
+interface Pick {
+  id: string;
+  name: string;
+  cover?: string;
+  rating?: number;
+  first_release_date?: number;
+  summary?: string;
+}
 
 /** Session TTL in milliseconds (24 hours) */
 export const SESSION_TTL_MS = 24 * 60 * 60 * 1000;

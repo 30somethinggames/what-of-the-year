@@ -16,6 +16,10 @@ interface Props {
 }
 export function useRoundState({ sessionId, topic, year }: Props) {
   const { isLoading: sessionLoading, session, activeRound } = useSession(sessionId);
+  const { isLoading: roundLoading, round } = useRound(sessionId, activeRound);
+  const { isLoading: selectionsLoading, selections } = useSelections(sessionId, activeRound);
+  const { isLoading: mySelectionsLoading, mySelections, uid } = useMySelections(sessionId);
+  const { isLoading: playersLoading, isHost } = usePlayers(sessionId);
 
   // Keep URL param in sync for deep linking (no navigation transition)
   useEffect(() => {
@@ -24,23 +28,8 @@ export function useRoundState({ sessionId, topic, year }: Props) {
     }
   }, [activeRound]);
 
-  const { round, isLoading: roundLoading, isError: roundError } = useRound(sessionId, activeRound);
-  const {
-    selections,
-    isLoading: selectionsLoading,
-    isError: selectionsError,
-  } = useSelections(sessionId, activeRound);
-  const {
-    mySelections,
-    uid,
-    isLoading: mySelectionsLoading,
-    isError: mySelectionsError,
-  } = useMySelections(sessionId, session?.maxRounds ?? 0);
-  const { isHost } = usePlayers(sessionId);
-
-  const isLoading = sessionLoading || roundLoading || selectionsLoading || mySelectionsLoading;
-  const isError = roundError || selectionsError || mySelectionsError;
-
+  const isLoading =
+    sessionLoading || roundLoading || selectionsLoading || mySelectionsLoading || playersLoading;
   // Auto-advance when all players have submitted their selection.
   // Only the host's client triggers this to avoid duplicate writes.
   const hasAdvancedRef = useRef(false);
@@ -91,7 +80,6 @@ export function useRoundState({ sessionId, topic, year }: Props) {
 
   return {
     isLoading,
-    isError,
     session,
     round,
     activeRound,
