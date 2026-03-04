@@ -45,6 +45,9 @@ export default defineSchema({
       summary: v.optional(v.string()),
     }),
     points: v.number(),
+    roundNumber: v.number(),
     savedAt: v.number(),
-  }).index("by_round_uid", ["roundId", "uid"]),
+  })
+    .index("by_round_uid", ["roundId", "uid"])
+    .index("by_session", ["sessionId"]),
 });

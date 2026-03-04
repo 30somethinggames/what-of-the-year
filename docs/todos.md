@@ -1,8 +1,5 @@
 1. refactor from firebase to convex
    - error
-   - start script that opens 2 terminals split to run convex and app
-   - git ignore
-   - useRoundState
 1. serverless functions for api calls
 1. app version
    - main screen

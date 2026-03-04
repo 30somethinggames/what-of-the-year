@@ -38,7 +38,7 @@ export function formGameOptions(games: Game[]): Option[] {
   }));
 }
 
-const GAMES_QUERY_KEY = TOPIC_KEY.MOVIES;
+const GAMES_QUERY_KEY = TOPIC_KEY.GAMES;
 
 export function useGames({ key, year }: QUERY_ARGS) {
   const enabled = key === GAMES_QUERY_KEY && !!year;

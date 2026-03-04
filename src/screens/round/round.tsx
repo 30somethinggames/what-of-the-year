@@ -1,3 +1,5 @@
+import { api } from "convex/_generated/api";
+import { useMutation } from "convex/react";
 import { Image } from "expo-image";
 import { useState } from "react";
 import { FlatList, Pressable, Text, View } from "react-native";
@@ -10,9 +12,7 @@ import { Row } from "components/row";
 import { Error } from "components/states/error";
 import { Loading } from "components/states/loading";
 import type { TOPIC_KEY } from "constants/topics";
-import type { MySelection, SessionID } from "db/types";
-import { editSelection } from "db/utils/edit-selection";
-import { saveSelection } from "db/utils/save-selection";
+import type { SessionID } from "db/types";
 import { useTopicData } from "hooks/queries/use-topic-data";
 import type { Option } from "types/option";
 import { createStyles } from "utils/theme";
@@ -38,11 +38,15 @@ export function Round({ sessionId, topic, year, isVisible, onClose }: Props) {
     activeRound,
     completedUids,
     mySelections,
-    uid,
     hasPickedThisRound,
   } = useRoundState({ sessionId, topic, year });
 
+  const saveSelection = useMutation(api.selections.saveSelection);
+  const editSelection = useMutation(api.selections.editSelection);
+
   const { data: options = [] } = useTopicData({ key: topic, year });
+
+  console.log("data: ", options);
 
   const [inputValue, setInputValue] = useState("");
   const [editingRound, setEditingRound] = useState<number | null>(null);
@@ -54,31 +58,29 @@ export function Round({ sessionId, topic, year, isVisible, onClose }: Props) {
   if (!session || !round || !activeRound) return <Error />;
 
   const isEditing = editingRound !== null;
-  const isDisabled = !inputValue.trim() || !uid || (!isEditing && hasPickedThisRound);
+  const isDisabled = !inputValue.trim() || (!isEditing && hasPickedThisRound);
 
   const onEnter = async () => {
-    if (isDisabled || !uid) return;
+    if (isDisabled) return;
     const name = inputValue.trim();
     const option = selectedOption?.name === name ? selectedOption : undefined;
     try {
       if (isEditing) {
-        await editSelection({ sessionId, roundNumber: editingRound, uid, name, option });
+        await editSelection({ sessionId, roundNumber: editingRound, name, option });
         setEditingRound(null);
       } else {
-        await saveSelection({ sessionId, roundNumber: activeRound, uid, name, option });
+        await saveSelection({ sessionId, roundNumber: activeRound, name, option });
       }
     } catch {
-      // Write failed — ignored since the real-time listener will reflect the current state
+      // Write failed — real-time listener will reflect current state
     }
     setInputValue("");
     setSelectedOption(null);
   };
 
-  const onSelectOption = (option: Option) => {
-    setSelectedOption(option);
-  };
+  const onSelectOption = (option: Option) => setSelectedOption(option);
 
-  const onEdit = (item: MySelection) => {
+  const onEdit = (item: (typeof mySelections)[number]) => {
     setEditingRound(item.roundNumber);
     setInputValue(item.pick.name);
     setSelectedOption(null);
@@ -99,7 +101,7 @@ export function Round({ sessionId, topic, year, isVisible, onClose }: Props) {
             data={mySelections}
             keyExtractor={(item) => String(item.roundNumber)}
             contentContainerStyle={s.list}
-            renderItem={({ item }: { item: MySelection }) => (
+            renderItem={({ item }) => (
               <Row>
                 <Text style={s.rank}>#{item.roundNumber}</Text>
                 {item.pick.cover ? (
@@ -112,7 +114,6 @@ export function Round({ sessionId, topic, year, isVisible, onClose }: Props) {
               </Row>
             )}
           />
-
           <View style={s.footer}>
             <Autocomplete
               value={inputValue}
@@ -138,19 +139,14 @@ export function Round({ sessionId, topic, year, isVisible, onClose }: Props) {
 }
 
 const useStyles = createStyles((t) => ({
-  root: {
-    flex: 1,
-  },
+  root: { flex: 1 },
   title: {
     fontFamily: t.text.font.semibold,
     fontSize: t.text.size.lg,
     color: t.colors.black100,
     paddingVertical: t.spacing.md,
   },
-  list: {
-    gap: t.spacing.sm,
-    flexGrow: 1,
-  },
+  list: { gap: t.spacing.sm, flexGrow: 1 },
   rank: {
     fontFamily: t.text.font.bold,
     fontSize: t.text.size.md,

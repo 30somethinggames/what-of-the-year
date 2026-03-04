@@ -1,14 +1,16 @@
+import type { api } from "convex/_generated/api";
+import type { FunctionReturnType } from "convex/server";
 import { FlatList, Text, View } from "react-native";
 
 import { Container } from "components/container";
 import { Row } from "components/row";
-import { Error } from "components/states/error";
 import { Loading } from "components/states/loading";
 import type { SessionID } from "db/types";
 import { createStyles } from "utils/theme";
 
-import type { RankedPick } from "./use-results-state";
 import { useResultsState } from "./use-results-state";
+
+type RankedPick = FunctionReturnType<typeof api.selections.getResults>[number];
 
 interface Props {
   sessionId: SessionID;
@@ -16,10 +18,9 @@ interface Props {
 
 export function Results({ sessionId }: Props) {
   const s = useStyles();
-  const { isLoading, isError, results } = useResultsState({ sessionId });
+  const { isLoading, results } = useResultsState({ sessionId });
 
   if (isLoading) return <Loading />;
-  if (isError) return <Error />;
 
   return (
     <Container style={s.root}>

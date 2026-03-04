@@ -3,7 +3,7 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import { api } from "convex/_generated/api";
 import { useConvexAuth, useMutation } from "convex/react";
 import { router } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
 
 import { Avatar, useRandomAvatar } from "components/avatar";
@@ -23,6 +23,7 @@ interface Props {
   year: string;
   existingSessionId?: SessionID;
 }
+
 export function Topic({ topic, year, existingSessionId }: Props) {
   const headerHeight = useHeaderHeight();
   const s = useStyles({ headerHeight });
@@ -34,6 +35,10 @@ export function Topic({ topic, year, existingSessionId }: Props) {
   const { avatar, randomizeAvatar } = useRandomAvatar();
   const [name, setName] = useState("");
 
+  useEffect(() => {
+    if (!isAuthenticated && !isPending) signIn("anonymous");
+  }, [isAuthenticated, isPending]);
+
   const nameError = validateName(name);
   const isJoining = !!existingSessionId;
   const disabled = isLoading || isPending || name.length < 1 || nameError != null;
@@ -41,8 +46,6 @@ export function Topic({ topic, year, existingSessionId }: Props) {
 
   const onSubmit = async () => {
     try {
-      if (!isAuthenticated) await signIn("anonymous");
-
       let sessionId: string;
 
       if (isJoining) {
@@ -53,8 +56,8 @@ export function Topic({ topic, year, existingSessionId }: Props) {
             avatar,
           });
         } catch (e: unknown) {
-          // oxlint-disable-next-line no-console
-          console.error("Failed to join:", e);
+          const error = e as Error;
+          if (error.message !== "Already joined this session") throw e;
         }
         sessionId = existingSessionId;
       } else {
@@ -101,9 +104,7 @@ export function Topic({ topic, year, existingSessionId }: Props) {
 }
 
 const useStyles = createStyles((t, p: { headerHeight: number }) => ({
-  root: {
-    flex: 1,
-  },
+  root: { flex: 1 },
   container: {
     flex: 1,
     alignItems: "center",
@@ -117,13 +118,8 @@ const useStyles = createStyles((t, p: { headerHeight: number }) => ({
     justifyContent: "space-between",
     alignItems: "center",
   },
-  btn: {
-    width: 120,
-  },
-  input: {
-    width: "100%",
-    gap: t.spacing.sm,
-  },
+  btn: { width: 120 },
+  input: { width: "100%", gap: t.spacing.sm },
   error: {
     color: t.colors.red100,
     fontFamily: t.text.font.regular,
