@@ -6,8 +6,8 @@ import { Pressable, Text, View } from "react-native";
 import { Button } from "components/button";
 import { Modal } from "components/modal";
 import { Loading } from "components/states/loading";
-import { usePlayers } from "db/hooks/use-players";
 import type { SessionID } from "db/types";
+import { usePlayers } from "db/use-players";
 import { createStyles } from "utils/theme";
 
 import { PlayerList } from "../../components/player-list";

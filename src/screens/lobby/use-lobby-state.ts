@@ -1,8 +1,8 @@
 import { router } from "expo-router";
 import { useEffect } from "react";
 
-import { usePlayers } from "db/hooks/use-players";
-import { useSession } from "db/hooks/use-sessions";
+import { usePlayers } from "db/use-players";
+import { useSession } from "db/use-sessions";
 
 import type { LobbyProps } from "./types";
 

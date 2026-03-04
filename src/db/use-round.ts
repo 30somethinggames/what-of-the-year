@@ -6,12 +6,11 @@ import type { SessionID } from "db/types";
 /**
  * Subscribes to a single round document in real time.
  *
- * The subscription is automatically cleaned up when the component unmounts or
- * parameters change. If the document does not exist, `error` is set.
+ * Automatically skips subscribing if `sessionId` or `roundNumber` is undefined.
  *
  * @param sessionId - The session ID. Pass `undefined` to skip subscribing.
  * @param roundNumber - The round number. Pass `undefined` to skip subscribing.
- * @returns An object containing the `round` data, an `isLoading` flag.
+ * @returns An object containing the `round` data and an `isLoading` flag.
  */
 export function useRound(sessionId: SessionID | undefined, roundNumber: number | undefined) {
   const round = useQuery(
@@ -20,7 +19,7 @@ export function useRound(sessionId: SessionID | undefined, roundNumber: number |
   );
 
   return {
-    round: round ?? null,
     isLoading: round === undefined,
+    round: round ?? null,
   };
 }

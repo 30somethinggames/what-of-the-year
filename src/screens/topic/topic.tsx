@@ -13,7 +13,7 @@ import { Input } from "components/input";
 import { KeyboardAvoidingView } from "components/keyboard-avoiding-view";
 import type { TopicType } from "constants/topics";
 import type { SessionID } from "db/types";
-import { useTopicData } from "hooks/queries/use-topic-data";
+import { useTopicData } from "queries/use-topic-data";
 import { createStyles } from "utils/theme";
 
 import { MAX_NAME_LENGTH, validateName } from "./utils/validate";

@@ -75,3 +75,16 @@ export const getPlayers = query({
       .collect();
   },
 });
+
+export const getMyPlayer = query({
+  args: { sessionId: v.id("sessions") },
+  handler: async (ctx, { sessionId }) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return null;
+
+    return await ctx.db
+      .query("players")
+      .withIndex("by_session_uid", (q) => q.eq("sessionId", sessionId).eq("uid", identity.subject))
+      .unique();
+  },
+});

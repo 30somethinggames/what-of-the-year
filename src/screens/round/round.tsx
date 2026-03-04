@@ -13,7 +13,7 @@ import { Error } from "components/states/error";
 import { Loading } from "components/states/loading";
 import type { TOPIC_KEY } from "constants/topics";
 import type { SessionID } from "db/types";
-import { useTopicData } from "hooks/queries/use-topic-data";
+import { useTopicData } from "queries/use-topic-data";
 import type { Option } from "types/option";
 import { createStyles } from "utils/theme";
 
@@ -45,8 +45,6 @@ export function Round({ sessionId, topic, year, isVisible, onClose }: Props) {
   const editSelection = useMutation(api.selections.editSelection);
 
   const { data: options = [] } = useTopicData({ key: topic, year });
-
-  console.log("data: ", options);
 
   const [inputValue, setInputValue] = useState("");
   const [editingRound, setEditingRound] = useState<number | null>(null);

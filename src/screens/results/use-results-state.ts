@@ -2,8 +2,8 @@ import { api } from "convex/_generated/api";
 import type { Id } from "convex/_generated/dataModel";
 import { useQuery } from "convex/react";
 
-import { useSession } from "db/hooks/use-sessions";
 import type { SessionID } from "db/types";
+import { useSession } from "db/use-sessions";
 
 export function useResultsState({ sessionId }: { sessionId: SessionID }) {
   const { session, isLoading: sessionLoading } = useSession(sessionId);

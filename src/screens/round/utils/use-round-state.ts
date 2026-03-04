@@ -1,11 +1,11 @@
 import { router } from "expo-router";
 import { useEffect } from "react";
 
-import { useMySelections } from "db/hooks/use-my-selections";
-import { useRound } from "db/hooks/use-round";
-import { useSelections } from "db/hooks/use-selections";
-import { useSession } from "db/hooks/use-sessions";
 import type { SessionID } from "db/types";
+import { useMySelections } from "db/use-my-selections";
+import { useRound } from "db/use-round";
+import { useSelections } from "db/use-selections";
+import { useSession } from "db/use-sessions";
 
 interface Props {
   sessionId: SessionID;
@@ -17,7 +17,7 @@ export function useRoundState({ sessionId, topic, year }: Props) {
   const { isLoading: sessionLoading, session, activeRound } = useSession(sessionId);
   const { isLoading: roundLoading, round } = useRound(sessionId, activeRound);
   const { isLoading: selectionsLoading, selections } = useSelections(sessionId, activeRound);
-  const { isLoading: mySelectionsLoading, mySelections, uid } = useMySelections(sessionId);
+  const { isLoading: mySelectionsLoading, mySelections } = useMySelections(sessionId);
 
   const isLoading = sessionLoading || roundLoading || selectionsLoading || mySelectionsLoading;
 
@@ -49,7 +49,6 @@ export function useRoundState({ sessionId, topic, year }: Props) {
     activeRound,
     completedUids,
     mySelections,
-    uid,
     hasPickedThisRound,
   };
 }
