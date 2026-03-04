@@ -1,4 +1,5 @@
 1. delete firebase accounts
+1. bad-words
 1. app version
    - main screen
 1. refactor Round modal to screen modal\
