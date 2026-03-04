@@ -13,9 +13,9 @@ Figure out how to test multi-device interactions in a multiplayer game.
 
 #### Option A: Mock Multiple Clients (Recommended for MVP)
 
-- Spin up multiple Firebase instances in test
+- Spin up multiple Convex instances in test
 - Simulate host + 2-3 player clients
-- Test state propagation through Firestore
+- Test state propagation through Convex
 - **Pros:** No external dependencies, fast, reliable
 - **Cons:** Not testing real multi-device scenarios
 
@@ -26,14 +26,6 @@ Figure out how to test multi-device interactions in a multiplayer game.
 - Coordinate actions across sessions
 - **Pros:** Real multi-device testing
 - **Cons:** Slow, complex setup, flaky
-
-#### Option C: Firestore Emulator + Test Bots (Best Balance)
-
-- Run tests against Firebase emulator
-- Create test "bot" utilities that simulate player actions
-- Verify state changes propagate correctly
-- **Pros:** Fast, reliable, good balance of real + testable
-- **Cons:** Requires emulator setup
 
 **Decision:** Start with **Option A or C** - fastest/most reliable for initial coverage. Add Option B for critical flows only if needed.
 

@@ -5,7 +5,6 @@
     "baseUrl": ".",
     "types": ["bun-types"],
     "paths": {
-      "@firebase/auth": ["./node_modules/@firebase/auth/dist/index.rn.d.ts"],
       "app/*": ["src/app/*"],
       "components/*": ["src/components/*"],
       "constants/*": ["src/constants/*"],

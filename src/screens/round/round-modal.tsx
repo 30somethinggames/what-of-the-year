@@ -1,3 +1,5 @@
+import { api } from "convex/_generated/api";
+import { useMutation } from "convex/react";
 import { router } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 
@@ -6,7 +8,6 @@ import { Modal } from "components/modal";
 import { Loading } from "components/states/loading";
 import { usePlayers } from "db/hooks/use-players";
 import type { SessionID } from "db/types";
-import { advanceRound } from "db/utils/advance-round";
 import { createStyles } from "utils/theme";
 
 import { PlayerList } from "../../components/player-list";
@@ -22,6 +23,7 @@ interface Props {
 export function RoundModal({ isVisible, onClose, completedUids, sessionId, roundNumber }: Props) {
   const s = useStyles();
   const { players, isHost, isLoading } = usePlayers(sessionId);
+  const advanceRound = useMutation(api.rounds.advanceRound);
 
   const onNextRound = async () => {
     await advanceRound({

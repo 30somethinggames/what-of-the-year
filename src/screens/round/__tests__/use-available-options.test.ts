@@ -1,19 +1,9 @@
 import { describe, expect, it } from "bun:test";
 
-import type { Timestamp } from "firebase/firestore";
-
 import type { MySelection } from "db/types";
 import type { Option } from "types/option";
 
 import { computeAvailableOptions } from "../utils/use-available-options";
-
-// Minimal fake Timestamp to satisfy the TypeScript shape in tests.
-const fakeTimestamp: Timestamp = {
-  seconds: 0,
-  nanoseconds: 0,
-  toDate: () => new Date(0),
-  toMillis: () => 0,
-} as unknown as Timestamp;
 
 describe("computeAvailableOptions", () => {
   const options: Option[] = [
@@ -35,7 +25,7 @@ describe("computeAvailableOptions", () => {
         roundNumber: 1,
         pick: { id: "2", name: "Two" },
         points: 1,
-        savedAt: fakeTimestamp.toMillis(),
+        savedAt: Date.now(),
       } as MySelection,
     ];
 
@@ -49,7 +39,7 @@ describe("computeAvailableOptions", () => {
         roundNumber: 2,
         pick: { id: "2", name: "Two" },
         points: 1,
-        savedAt: fakeTimestamp.toMillis(),
+        savedAt: Date.now(),
       } as MySelection,
     ];
 
