@@ -1,10 +1,6 @@
 1. delete firebase accounts
-1. serverless functions for api calls
-   - movies
-   - books
 1. app version
    - main screen
-1. make avatar always random
 1. refactor Round modal to screen modal\
    - flicker
    - user status

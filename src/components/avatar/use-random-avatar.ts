@@ -1,14 +1,16 @@
 import { useState } from "react";
 
+const randomSeed = () => Math.random().toString(36).substring(7);
+
 export function useRandomAvatar() {
-  const [avatarSeed, setAvatarSeed] = useState("default");
+  const [avatarSeed, setAvatarSeed] = useState(randomSeed);
 
-  const source = `https://api.dicebear.com/7.x/bottts/svg?seed=${avatarSeed}`;
+  const avatar = `https://api.dicebear.com/7.x/bottts/svg?seed=${avatarSeed}`;
 
-  const randomizeAvatar = () => setAvatarSeed(Math.random().toString(36).substring(7));
+  const randomizeAvatar = () => setAvatarSeed(randomSeed());
 
   return {
-    avatar: source,
+    avatar,
     randomizeAvatar,
   };
 }

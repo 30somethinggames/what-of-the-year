@@ -5,8 +5,8 @@ import { useAction } from "convex/react";
 import { TOPIC_KEY } from "constants/topics";
 import type { Option } from "types/option";
 
+import { DEFAULT_STALE_TIME } from "./constants";
 import type { QUERY_ARGS } from "./types";
-import { DEFAULT_STALE_TIME } from "./utils";
 
 interface Game {
   id: number;
