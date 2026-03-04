@@ -1,11 +1,17 @@
+import type { ErrorBoundaryProps } from "expo-router";
 import { Redirect, Stack } from "expo-router";
 import { useState } from "react";
 
 import { Header } from "components/header";
 import { SettingsButton } from "components/settings-button";
+import { Error } from "components/states/error";
 import type { SessionID } from "db/types";
 import { useParams } from "hooks/use-params";
 import { Round } from "screens/round";
+
+export function ErrorBoundary({ retry }: ErrorBoundaryProps) {
+  return <Error onRetry={retry} />;
+}
 
 export default function RoundIndex() {
   const { topic, year, sessionId, round } = useParams();
