@@ -1,6 +1,7 @@
-1. refactor from firebase to convex
-   - error
+1. delete firebase accounts
 1. serverless functions for api calls
+   - movies
+   - books
 1. app version
    - main screen
 1. make avatar always random

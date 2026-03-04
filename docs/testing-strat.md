@@ -33,4 +33,4 @@ Figure out how to test multi-device interactions in a multiplayer game.
 
 - Draft testing utilities for simulating multiple clients
 - Identify 3-5 critical multiplayer flows to cover
-- Decide on tooling (Jest + mocked Firestore vs Emulator)
+- Decide on tooling (Jest + mocked convex vs Emulator)

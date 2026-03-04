@@ -21,7 +21,7 @@ Allow users to reorder their picks via drag & drop instead of only editing the t
 - Add a drag handle (e.g. `≡` icon) to each row using `ScaleDecorator` + `renderItem`'s `drag` callback
 - `GestureHandlerRootView` may need to wrap the screen (check if Expo's layout already provides it)
 
-### 2. Create `swapSelections` Firestore Util
+### 2. Create `swapSelections` convex Util
 
 When a user drags pick A from round X to round Y's position, we need to swap the `pick` data on both selection docs atomically.
 
@@ -53,7 +53,7 @@ const onDragEnd = ({ data }: { data: MySelection[] }) => {
 };
 ```
 
-### 4. Firestore Rules
+### 4. Convex Rules
 
 Current rules allow `update` on selections by the owner — no changes needed.
 
@@ -61,8 +61,8 @@ Current rules allow `update` on selections by the owner — no changes needed.
 
 - **Only swap completed rounds** — can't reorder a pick that doesn't exist yet
 - **Active round pick** — allow reordering only after it's submitted
-- **Optimistic UI** — `DraggableFlatList` handles visual reorder immediately; if Firestore write fails, the real-time listener will revert
-- **Multi-item shift** — dragging from position 5 to position 2 means a shift, not a simple swap. Would need to update picks for rounds 2, 3, 4, and 5. Consider batching all affected writes in a single Firestore batch.
+- **Optimistic UI** — `DraggableFlatList` handles visual reorder immediately; if Convex write fails, the real-time listener will revert
+- **Multi-item shift** — dragging from position 5 to position 2 means a shift, not a simple swap. Would need to update picks for rounds 2, 3, 4, and 5. Consider batching all affected writes in a single Convex batch.
 
 ## Complexity Notes
 

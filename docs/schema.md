@@ -48,7 +48,7 @@ erDiagram
 
 User clicks Start, let up to ~10 ephemeral players join, store one pick per player per round with deterministic weighted points, and delete the entire session tree after round 10.
 
-**Path hierarchy** (Firestore subcollections):
+**Path hierarchy** (Convex subcollections):
 
 - `sessions/{sessionId}`
 - `sessions/{sessionId}/players/{uid}`
@@ -81,9 +81,9 @@ rounds: (state, number)                // query active round
 selections: (savedAt)                  // leaderboard ordering
 ```
 
-## Moving Forward: Firestore
+## Moving Forward: Convex
 
-Going with Firestore because it solves the hard parts out of the box:
+Going with Convex because it solves the hard parts out of the box:
 
 1. **Real-time sync** - players see picks instantly, no polling
 2. **Hierarchical cleanup** - delete session root, everything cascades
