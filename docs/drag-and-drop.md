@@ -2,71 +2,74 @@
 
 ## Overview
 
-Allow users to reorder their picks via drag & drop instead of only editing the text. This lets a user move their #3 pick to #1 without re-entering everything.
+Allow users to reorder their picks via drag & drop. Moving a pick to a new position reassigns `points` for all affected selections based on their new position — `roundNumber` is unchanged (historical record only).
 
-## Recommended Package
+## Package
 
-**`react-native-draggable-flatlist`** (v4+)
+**`react-native-draggable-flatlist`** — built on Reanimated + Gesture Handler (both already installed).
 
-- Built on `react-native-reanimated` + `react-native-gesture-handler` (both already installed)
-- Drop-in replacement for `FlatList`
-- Well maintained, widely used
+```bash
+bun add react-native-draggable-flatlist
+```
 
 ## Implementation Plan
 
-### 1. Install & Wire Up the List
+### 1. Convex mutation: `reorderSelections`
 
-- `bun add react-native-draggable-flatlist`
-- Replace `FlatList` in `round.tsx` with `DraggableFlatList`
-- Add a drag handle (e.g. `≡` icon) to each row using `ScaleDecorator` + `renderItem`'s `drag` callback
-- `GestureHandlerRootView` may need to wrap the screen (check if Expo's layout already provides it)
-
-### 2. Create `swapSelections` convex Util
-
-When a user drags pick A from round X to round Y's position, we need to swap the `pick` data on both selection docs atomically.
+Takes the new ordered array of selection IDs and patches `points` based on position:
 
 ```ts
-// db/utils/swap-selections.ts
-interface SwapSelectionsArgs {
-  sessionId: string;
-  uid: string;
-  fromRound: number;
-  toRound: number;
-}
+// convex/selections.ts
+export const reorderSelections = mutation({
+  args: {
+    sessionId: v.id("sessions"),
+    orderedIds: v.array(v.id("selections")),
+  },
+  handler: async (ctx, { sessionId, orderedIds }) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthenticated");
 
-export async function swapSelections({ sessionId, uid, fromRound, toRound }: SwapSelectionsArgs) {
-  // Use a transaction to:
-  // 1. Read both selection docs
-  // 2. Swap their `pick` fields
-  // 3. Update `savedAt` on both
-  // Points stay the same (tied to round number, not pick)
-}
+    for (let i = 0; i < orderedIds.length; i++) {
+      await ctx.db.patch(orderedIds[i], {
+        points: MAX_ROUNDS - i,
+      });
+    }
+  },
+});
 ```
 
-### 3. Handle `onDragEnd`
+Position 0 = most points (`MAX_ROUNDS`), position N = least. Simple, no swapping needed.
+
+### 2. Update `round.tsx`
+
+- Replace `FlatList` with `DraggableFlatList`
+- Add drag handle to each row via `ScaleDecorator` + `drag` callback
+- Add `useMutation(api.selections.reorderSelections)`
+- Implement `onDragEnd`:
 
 ```ts
-const onDragEnd = ({ data }: { data: MySelection[] }) => {
-  // Compare old order vs new order
-  // Find which two rounds were swapped
-  // Call swapSelections()
+const reorderSelections = useMutation(api.selections.reorderSelections);
+
+const onDragEnd = ({ data }: { data: typeof mySelections }) => {
+  reorderSelections({
+    sessionId,
+    orderedIds: data.map((s) => s._id),
+  });
 };
 ```
 
-### 4. Convex Rules
+Convex real-time will reflect the updated points immediately. If the write fails, the listener reverts.
 
-Current rules allow `update` on selections by the owner — no changes needed.
+### 3. GestureHandlerRootView
 
-### 5. Edge Cases
+Check if Expo Router's root layout already wraps with `GestureHandlerRootView`. If not, add it to `_layout.tsx`.
 
-- **Only swap completed rounds** — can't reorder a pick that doesn't exist yet
-- **Active round pick** — allow reordering only after it's submitted
-- **Optimistic UI** — `DraggableFlatList` handles visual reorder immediately; if Convex write fails, the real-time listener will revert
-- **Multi-item shift** — dragging from position 5 to position 2 means a shift, not a simple swap. Would need to update picks for rounds 2, 3, 4, and 5. Consider batching all affected writes in a single Convex batch.
+## Edge Cases
 
-## Complexity Notes
+- **Only reorder submitted picks** — disable drag on the current active round's row until submitted
+- **Optimistic UI** — `DraggableFlatList` handles the visual reorder immediately, Convex reverts on failure
+- **Results** — `getResults` query already uses `points` not `roundNumber` so scoring is automatically correct after reorder
 
-- The shift (vs swap) logic is the hardest part — moving one item shifts all items between the old and new positions
-- Each shift updates N selection docs where N = distance moved
-- Batch writes handle up to 500 ops so this is fine for 10 rounds
-- Consider whether the UX should be swap-only (simpler) or full reorder (more natural but more writes)
+## Complexity
+
+Low-medium. The mutation is simple — no swapping, no shift logic, just reassign points by position. The library handles all the gesture complexity.

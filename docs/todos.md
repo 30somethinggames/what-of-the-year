@@ -16,8 +16,8 @@
    - screen testing by screenshot - available in maestro
    - Figure out [doc](./testing-strat.md)
 1. EAS
+   - Embed fonts via `expo-font` config plugin in app.json instead of runtime `useFonts`
 
 ## V2
 
 1. [drag and drop](drag-and-drop.md)
-1. Embed fonts via `expo-font` config plugin in app.json instead of runtime `useFonts` - need EAS
