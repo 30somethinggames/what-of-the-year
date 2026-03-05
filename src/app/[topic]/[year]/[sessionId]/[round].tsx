@@ -1,6 +1,5 @@
 import type { ErrorBoundaryProps } from "expo-router";
-import { Redirect, Stack } from "expo-router";
-import { useState } from "react";
+import { Link, Redirect, Stack } from "expo-router";
 
 import { Header } from "components/header";
 import { SettingsButton } from "components/settings-button";
@@ -15,14 +14,10 @@ export function ErrorBoundary({ retry }: ErrorBoundaryProps) {
 
 export default function RoundIndex() {
   const { topic, year, sessionId, round } = useParams();
-  const [isVisible, setIsVisible] = useState(false);
 
   if (!topic || !year || !sessionId || !round) {
     return <Redirect href="/" />;
   }
-
-  const onPress = () => setIsVisible(true);
-  const onClose = () => setIsVisible(false);
 
   const title = `${topic.label} of ${year}`;
 
@@ -30,17 +25,21 @@ export default function RoundIndex() {
     <>
       <Stack.Screen
         options={{
-          headerLeft: () => <SettingsButton onPress={onPress} />,
+          headerLeft: () => (
+            <Link
+              href={{
+                pathname: "/[topic]/[year]/[sessionId]/settings",
+                params: { topic: topic.value, year, sessionId, round },
+              }}
+              asChild
+            >
+              <SettingsButton onPress={() => {}} />
+            </Link>
+          ),
           headerTitle: () => <Header title={title} />,
         }}
       />
-      <Round
-        sessionId={sessionId as SessionID}
-        topic={topic.value}
-        year={year}
-        isVisible={isVisible}
-        onClose={onClose}
-      />
+      <Round sessionId={sessionId as SessionID} topic={topic.value} year={year} />
     </>
   );
 }

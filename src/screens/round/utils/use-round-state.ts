@@ -4,7 +4,6 @@ import { useEffect } from "react";
 import type { SessionID } from "db/types";
 import { useMySelections } from "db/use-my-selections";
 import { useRound } from "db/use-round";
-import { useSelections } from "db/use-selections";
 import { useSession } from "db/use-sessions";
 
 interface Props {
@@ -16,10 +15,9 @@ interface Props {
 export function useRoundState({ sessionId, topic, year }: Props) {
   const { isLoading: sessionLoading, session, activeRound } = useSession(sessionId);
   const { isLoading: roundLoading, round } = useRound(sessionId, activeRound);
-  const { isLoading: selectionsLoading, selections } = useSelections(sessionId, activeRound);
   const { isLoading: mySelectionsLoading, mySelections } = useMySelections(sessionId);
 
-  const isLoading = sessionLoading || roundLoading || selectionsLoading || mySelectionsLoading;
+  const isLoading = sessionLoading || roundLoading || mySelectionsLoading;
 
   // Keep URL param in sync for deep linking
   useEffect(() => {
@@ -37,7 +35,6 @@ export function useRoundState({ sessionId, topic, year }: Props) {
     }
   }, [round?.number, round?.state, activeRound, sessionId, topic, year]);
 
-  const completedUids = new Set(selections.map((s) => s.uid));
   const hasPickedThisRound = activeRound
     ? mySelections.some((s) => s.roundNumber === activeRound)
     : false;
@@ -47,7 +44,6 @@ export function useRoundState({ sessionId, topic, year }: Props) {
     session,
     round,
     activeRound,
-    completedUids,
     mySelections,
     hasPickedThisRound,
   };

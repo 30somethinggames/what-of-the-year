@@ -20,10 +20,11 @@ export type Params = {
  * into a validated Topic object via `getTopic()`.
  */
 export function useParams() {
-  const { topic, sessionId, ...rest } = useLocalSearchParams<Params>();
+  const { topic, year, sessionId, round } = useLocalSearchParams<Params>();
   return {
-    ...rest,
     sessionId: sessionId as SessionID,
+    year,
     topic: getTopic(topic),
+    round: Number(round),
   };
 }

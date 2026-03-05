@@ -18,7 +18,6 @@ export function useLobbyState({ sessionId, topic, year }: LobbyProps) {
 
   const isLoading = sessionLoading || playersLoading;
 
-  const playerCount = players.length;
   const maxPlayerCount = session?.maxPlayers;
 
   // Auto-navigate non-host players when game starts
@@ -36,7 +35,6 @@ export function useLobbyState({ sessionId, topic, year }: LobbyProps) {
     session,
     players,
     isHost,
-    playerCount,
     maxPlayerCount,
   };
 }

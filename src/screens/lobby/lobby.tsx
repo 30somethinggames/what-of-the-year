@@ -17,7 +17,7 @@ import { useLobbyState } from "./use-lobby-state";
 
 export function Lobby({ topic, year, sessionId }: LobbyProps) {
   const s = useStyles();
-  const { isLoading, session, players, isHost, playerCount, maxPlayerCount } = useLobbyState({
+  const { isLoading, session, players, isHost, maxPlayerCount } = useLobbyState({
     topic,
     year,
     sessionId,
@@ -55,7 +55,7 @@ export function Lobby({ topic, year, sessionId }: LobbyProps) {
 
   return (
     <Container style={s.root}>
-      <PlayerList data={players} playerCount={playerCount} maxPlayerCount={maxPlayerCount} />
+      <PlayerList data={players} maxPlayerCount={maxPlayerCount} />
 
       <View style={s.footer}>
         {isHost ? (

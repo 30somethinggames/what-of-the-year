@@ -1,15 +1,12 @@
 import { useEffect } from "react";
 import { Dimensions } from "react-native";
 import {
-  interpolateColor,
   useAnimatedStyle,
   useSharedValue,
   withDelay,
   withSpring,
   withTiming,
 } from "react-native-reanimated";
-
-import { palette } from "utils/theme";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 

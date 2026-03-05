@@ -1,5 +1,4 @@
 1. db
-   - rounds. should we create all at once?
    - general look through / clean up
 1. delete firebase accounts
 1. bad-words
@@ -8,6 +7,7 @@
 1. refactor Round modal to screen modal\
    - flicker
    - user status
+   - need everything to have \_layout
 1. android picker issues
    - vertical alignment
 1. handle host duties

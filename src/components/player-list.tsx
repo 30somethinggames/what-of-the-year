@@ -9,11 +9,12 @@ import { Row } from "./row";
 interface Props {
   data: Player[];
   completedUids?: Set<string>;
-  playerCount: number;
   maxPlayerCount?: number;
 }
-export function PlayerList({ data, completedUids, playerCount, maxPlayerCount }: Props) {
+export function PlayerList({ data, completedUids, maxPlayerCount }: Props) {
   const s = useStyles();
+
+  const playerCount = data.length;
 
   return (
     <FlatList

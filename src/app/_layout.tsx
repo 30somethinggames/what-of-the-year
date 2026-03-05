@@ -59,7 +59,12 @@ export default function Root() {
               headerShadowVisible: false,
               headerStyle: { backgroundColor: palette.white100 },
             }}
-          />
+          >
+            <Stack.Screen
+              name="[topic]/[year]/[sessionId]/settings"
+              options={{ presentation: "modal", headerShown: false }}
+            />
+          </Stack>
         </WebContainer>
       </QueryClientProvider>
     </ConvexAuthProvider>

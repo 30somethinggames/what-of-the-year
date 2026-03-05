@@ -17,7 +17,6 @@ import { useTopicData } from "queries/use-topic-data";
 import type { Option } from "types/option";
 import { createStyles } from "utils/theme";
 
-import { RoundModal } from "./round-modal";
 import { useAvailableOptions } from "./utils/use-available-options";
 import { useRoundState } from "./utils/use-round-state";
 
@@ -25,21 +24,12 @@ interface Props {
   sessionId: SessionID;
   topic: TOPIC_KEY;
   year: string;
-  isVisible: boolean;
-  onClose: () => void;
 }
 
-export function Round({ sessionId, topic, year, isVisible, onClose }: Props) {
+export function Round({ sessionId, topic, year }: Props) {
   const s = useStyles();
-  const {
-    isLoading,
-    session,
-    round,
-    activeRound,
-    completedUids,
-    mySelections,
-    hasPickedThisRound,
-  } = useRoundState({ sessionId, topic, year });
+  const { isLoading, session, round, activeRound, mySelections, hasPickedThisRound } =
+    useRoundState({ sessionId, topic, year });
 
   const saveSelection = useMutation(api.selections.saveSelection);
   const editSelection = useMutation(api.selections.editSelection);
@@ -125,13 +115,6 @@ export function Round({ sessionId, topic, year, isVisible, onClose }: Props) {
           </View>
         </Container>
       </KeyboardAvoidingView>
-      <RoundModal
-        isVisible={isVisible}
-        onClose={onClose}
-        completedUids={completedUids}
-        sessionId={sessionId}
-        roundNumber={activeRound}
-      />
     </>
   );
 }
