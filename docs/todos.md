@@ -1,3 +1,6 @@
+1. db
+   - rounds. should we create all at once?
+   - general look through / clean up
 1. delete firebase accounts
 1. bad-words
 1. app version
