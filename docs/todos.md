@@ -4,10 +4,6 @@
 1. bad-words
 1. app version
    - main screen
-1. refactor Round modal to screen modal\
-   - flicker
-   - user status
-   - need everything to have \_layout
 1. android picker issues
    - vertical alignment
 1. handle host duties
