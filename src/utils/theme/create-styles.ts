@@ -4,7 +4,7 @@ import type { ImageStyle, TextStyle, ViewStyle } from "react-native";
 import { baseTheme, themes } from "./themes";
 import type { Theme } from "./types";
 
-type Style = ViewStyle | TextStyle | ImageStyle | Record<string, unknown>;
+type Style = ViewStyle | TextStyle | ImageStyle;
 type NamedStyles<T> = { [K in keyof T]: Style };
 type TopicKey = keyof typeof themes;
 
@@ -40,6 +40,6 @@ export function createStyles<T extends NamedStyles<T>, P = void>(
   return (...args: P extends void ? [] : [P]) => {
     const { topic } = useLocalSearchParams<{ topic?: string }>();
     const theme = (topic && themes[topic as TopicKey]) || baseTheme;
-    return stylesFn(theme, args[0] as P) as T;
+    return stylesFn(theme, args[0] as P);
   };
 }

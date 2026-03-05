@@ -22,7 +22,7 @@ export const Container = ({ children, style }: Props) => {
 const useStyles = createStyles((t) => ({
   root: {
     flex: 1,
-    padding: t.spacing.md,
-    backgroundColor: "#f1efea",
+    paddingHorizontal: t.spacing.md,
+    backgroundColor: t.colors.white100,
   },
 }));

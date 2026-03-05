@@ -128,20 +128,22 @@ export function Picker<T extends PickerItem>({
   return (
     <Animated.FlatList
       ref={flatListRef}
-      testID={testID}
-      data={data}
-      keyExtractor={keyExtractor}
-      renderItem={renderItem}
-      showsVerticalScrollIndicator={false}
-      snapToInterval={ITEM_HEIGHT}
-      decelerationRate="fast"
-      onScroll={handleScroll}
-      onMomentumScrollEnd={handleMomentumScrollEnd}
-      scrollEventThrottle={16}
       contentContainerStyle={s.contentContainerStyle}
-      style={s.list}
+      data={data}
+      decelerationRate="fast"
       getItemLayout={getItemLayout}
       initialScrollIndex={initialScrollIndex}
+      keyExtractor={keyExtractor}
+      // Android
+      overScrollMode="never"
+      renderItem={renderItem}
+      scrollEventThrottle={16}
+      showsVerticalScrollIndicator={false}
+      snapToInterval={ITEM_HEIGHT}
+      style={s.list}
+      testID={testID}
+      onMomentumScrollEnd={handleMomentumScrollEnd}
+      onScroll={handleScroll}
     />
   );
 }

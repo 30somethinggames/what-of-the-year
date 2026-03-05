@@ -3,6 +3,7 @@ import { useState } from "react";
 import { View } from "react-native";
 import Animated from "react-native-reanimated";
 
+import { AppVersion } from "components/app-version";
 import { Button } from "components/button";
 import { Container } from "components/container";
 import { Picker } from "components/picker";
@@ -19,9 +20,9 @@ export function Home() {
   const { topicStyle, yearStyle, ofStyle, btnStyle } = useHomeAnimation();
 
   return (
-    <Animated.View style={s.bg}>
+    <Animated.View style={s.root}>
       <Container>
-        <View style={s.root}>
+        <View style={s.content}>
           <Animated.View style={[s.pickerWrapper, topicStyle]}>
             <Picker testID="topic-picker" data={topics} value={topic} onValueChange={setTopic} />
           </Animated.View>
@@ -33,13 +34,14 @@ export function Home() {
           </Animated.View>
         </View>
 
-        <Animated.View style={btnStyle}>
+        <Animated.View style={[btnStyle, s.footer]}>
           <Link
             asChild
             href={{ pathname: "/[topic]/[year]", params: { topic: topic.value, year: year.value } }}
           >
             <Button label="Start" style={s.btn} />
           </Link>
+          <AppVersion />
         </Animated.View>
       </Container>
     </Animated.View>
@@ -47,8 +49,8 @@ export function Home() {
 }
 
 const useStyles = createStyles((t, p: { backgroundColor: string }) => ({
-  bg: { flex: 1 },
-  root: {
+  root: { flex: 1 },
+  content: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
@@ -60,5 +62,6 @@ const useStyles = createStyles((t, p: { backgroundColor: string }) => ({
     color: t.colors.black100,
     marginVertical: t.spacing.lg,
   },
+  footer: { gap: t.spacing.md },
   btn: { backgroundColor: p.backgroundColor },
 }));

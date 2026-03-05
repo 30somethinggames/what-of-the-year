@@ -3,6 +3,7 @@ import { useMutation } from "convex/react";
 import { router } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 
+import { AppVersion } from "components/app-version";
 import { Button } from "components/button";
 import { Container } from "components/container";
 import { PlayerList } from "components/player-list";
@@ -54,6 +55,7 @@ export function Settings({ sessionId, round }: Props) {
       <View style={s.footer}>
         {isHost && <Button label={round > 1 ? "Next Round" : "End Game"} onPress={onNextRound} />}
         <Button label="Leave Game" onPress={onLeaveGame} style={s.leaveBtn} />
+        <AppVersion />
       </View>
     </Container>
   );

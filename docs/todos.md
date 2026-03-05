@@ -2,8 +2,6 @@
    - general look through / clean up
 1. delete firebase accounts
 1. bad-words
-1. app version
-   - main screen
 1. android picker issues
    - vertical alignment
 1. handle host duties
