@@ -4,7 +4,6 @@ import { Link, Redirect, Stack } from "expo-router";
 import { Header } from "components/header";
 import { SettingsButton } from "components/settings-button";
 import { Error } from "components/states/error";
-import type { SessionID } from "db/types";
 import { useParams } from "hooks/use-params";
 import { Round } from "screens/round";
 

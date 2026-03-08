@@ -3,7 +3,7 @@ import { MAX_ROUNDS } from "convex/constants";
 import { useMutation } from "convex/react";
 import * as Linking from "expo-linking";
 import { router } from "expo-router";
-import { Share, Text, View } from "react-native";
+import { Share, View } from "react-native";
 
 import { Button } from "components/button";
 import { Container } from "components/container";

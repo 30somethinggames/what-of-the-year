@@ -3,7 +3,6 @@ import { Redirect, Stack } from "expo-router";
 
 import { Header } from "components/header";
 import { Error } from "components/states/error";
-import type { SessionID } from "db/types";
 import { useParams } from "hooks/use-params";
 import { Results } from "screens/results";
 
