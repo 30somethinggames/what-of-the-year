@@ -1,0 +1,4 @@
+appId: host.exp.Exponent
+
+env:
+  CONVEX_SITE_URL: https://rosy-anteater-532.convex.site

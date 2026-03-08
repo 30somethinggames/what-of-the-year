@@ -3,7 +3,7 @@ import { MAX_ROUNDS } from "convex/constants";
 import { useMutation } from "convex/react";
 import * as Linking from "expo-linking";
 import { router } from "expo-router";
-import { Share, View } from "react-native";
+import { Share, Text, View } from "react-native";
 
 import { Button } from "components/button";
 import { Container } from "components/container";
@@ -55,6 +55,9 @@ export function Lobby({ topic, year, sessionId }: LobbyProps) {
 
   return (
     <Container style={s.root}>
+      <Text testID="session-id" style={s.hidden}>
+        {sessionId}
+      </Text>
       <PlayerList data={players} maxPlayerCount={maxPlayerCount} />
 
       <View style={s.footer}>
@@ -74,6 +77,11 @@ export function Lobby({ topic, year, sessionId }: LobbyProps) {
 const useStyles = createStyles((t) => ({
   root: {
     flex: 1,
+  },
+  hidden: {
+    position: "absolute" as const,
+    opacity: 0,
+    height: 0,
   },
   footer: {
     gap: t.spacing.md,

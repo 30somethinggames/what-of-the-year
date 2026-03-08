@@ -1,0 +1,82 @@
+appId: host.exp.Exponent
+name: Multiplayer Results
+tags:
+  - e2e
+  - multiplayer
+---
+# Clean up any leftover test data
+- runScript: scripts/cleanup.js
+
+- launchApp
+- tapOn: what-of-the-year
+
+# Home → Setup → Lobby
+- tapOn: "Start"
+- waitForAnimationToEnd
+
+- tapOn: "User name"
+- inputText: "Host Player"
+
+- tapOn: "Start"
+- waitForAnimationToEnd
+
+# Extract sessionId
+- copyTextFrom:
+    id: session-id
+- evalScript: ${output.sessionId = maestro.copiedText}
+
+# Add two simulated players
+- evalScript: ${output.playerName = 'Alice'}
+- evalScript: ${output.playerAvatar = '👩'}
+- runScript: scripts/add-player.js
+- evalScript: ${output.aliceUid = output.lastPlayerUid}
+
+- evalScript: ${output.playerName = 'Bob'}
+- evalScript: ${output.playerAvatar = '👨'}
+- runScript: scripts/add-player.js
+- evalScript: ${output.bobUid = output.lastPlayerUid}
+
+- assertVisible: "3 of 10"
+
+# Start session
+- tapOn: "Start"
+- waitForAnimationToEnd
+- assertVisible: "Round 10"
+
+# Host selects "Elden Ring"
+- tapOn: "Enter your pick"
+- inputText: "Elden Ring"
+- tapOn: "Enter"
+
+# Alice picks "Elden Ring"
+- evalScript: ${output.playerUid = output.aliceUid}
+- evalScript: ${output.roundNumber = '10'}
+- evalScript: ${output.pickName = 'Elden Ring'}
+- runScript: scripts/make-selection.js
+
+# Bob picks "Elden Ring" — should trigger auto-advance
+- evalScript: ${output.playerUid = output.bobUid}
+- evalScript: ${output.pickName = 'Elden Ring'}
+- runScript: scripts/make-selection.js
+
+# Round auto-advances to 9
+- assertVisible: "Round 9"
+
+# Host picks "Zelda"
+- tapOn: "Enter your pick"
+- inputText: "Zelda"
+- tapOn: "Enter"
+
+# Alice picks "Zelda"
+- evalScript: ${output.playerUid = output.aliceUid}
+- evalScript: ${output.roundNumber = '9'}
+- evalScript: ${output.pickName = 'Zelda'}
+- runScript: scripts/make-selection.js
+
+# Bob picks "Mario"
+- evalScript: ${output.playerUid = output.bobUid}
+- evalScript: ${output.pickName = 'Mario'}
+- runScript: scripts/make-selection.js
+
+# Round auto-advances to 8
+- assertVisible: "Round 8"

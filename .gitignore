@@ -37,8 +37,10 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
-# generated 
+# generated
 /ios
 /android
 
 /convex/_generated/
+
+.claude/**

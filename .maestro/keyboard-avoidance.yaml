@@ -1,0 +1,37 @@
+appId: host.exp.Exponent
+name: Keyboard Avoidance
+tags:
+  - e2e
+  - platform
+---
+- runScript: scripts/cleanup.js
+
+- launchApp
+- tapOn: what-of-the-year
+
+# Navigate to round screen
+- tapOn: "Start"
+- waitForAnimationToEnd
+
+- tapOn: "User name"
+- inputText: "KB Tester"
+
+- tapOn: "Start"
+- waitForAnimationToEnd
+
+- tapOn: "Start"
+- waitForAnimationToEnd
+
+- assertVisible: "Round 10"
+
+# Tap the autocomplete input — keyboard should appear
+- tapOn: "Enter your pick"
+
+# The "Enter" button should still be visible with keyboard open
+- assertVisible: "Enter"
+
+# Type something
+- inputText: "Test Game"
+
+# Button should remain accessible
+- assertVisible: "Enter"

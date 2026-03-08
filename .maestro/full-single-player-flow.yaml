@@ -1,0 +1,40 @@
+appId: host.exp.Exponent
+name: Full Single Player Flow
+tags:
+  - e2e
+  - single-player
+---
+# Clean up any leftover test data
+- runScript: scripts/cleanup.js
+
+- launchApp
+- tapOn: what-of-the-year
+
+# Home screen — default topic and year
+- assertVisible: "Start"
+- tapOn: "Start"
+- waitForAnimationToEnd
+
+# Topic/setup screen — enter name and create session
+- assertVisible: "Random"
+- assertVisible: "User name"
+
+- tapOn: "User name"
+- inputText: "E2E Tester"
+
+- tapOn: "Start"
+- waitForAnimationToEnd
+
+# Lobby — verify we landed as host
+- assertVisible: "E2E Tester"
+- assertVisible: "Host"
+- assertVisible: "Invite"
+- assertVisible: "Start"
+- assertVisible: "1 of 10"
+
+# Start the session
+- tapOn: "Start"
+- waitForAnimationToEnd
+
+# Round screen — verify round 10 is active (rounds count down from 10)
+- assertVisible: "Round 10"
