@@ -75,7 +75,6 @@ const useStyles = createStyles((t) => ({
     alignItems: "center",
     justifyContent: "space-between",
     paddingVertical: t.spacing.lg,
-    paddingHorizontal: t.spacing.sm,
   },
   title: {
     fontFamily: t.text.font.semibold,
@@ -87,8 +86,7 @@ const useStyles = createStyles((t) => ({
     color: t.colors.grey100,
   },
   footer: {
-    paddingTop: t.spacing.lg,
-    paddingHorizontal: t.spacing.lg,
+    paddingVertical: t.spacing.lg,
     gap: t.spacing.md,
   },
   leaveBtn: {

@@ -51,3 +51,19 @@ tags:
 
 - assertVisible:
     id: round-title
+- assertVisible:
+    id: settings-button
+- takeScreenshot: .maestro/screenshots/round-screen
+
+# Settings Screen
+- tapOn:
+    id: settings-button
+- waitForAnimationToEnd
+
+- assertVisible:
+    id: settings-title
+- assertVisible:
+    id: leave-game
+- assertVisible:
+    id: close-settings
+- takeScreenshot: .maestro/screenshots/settings-screen

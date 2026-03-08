@@ -14,7 +14,8 @@
     "convex:dev": "bunx convex dev",
     "test": "bun test",
     "test:watch": "bun test --watch",
-    "test:e2e": "maestro test .maestro/",
+    "test:e2e": "export MAESTRO_CONVEX_SITE_URL=https://rosy-anteater-532.convex.site && maestro test .maestro/e2e/",
+    "test:smoke": "maestro test .maestro/smoke/",
     "prepare": "husky"
   },
   "dependencies": {

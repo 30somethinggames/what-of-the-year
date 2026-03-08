@@ -5,5 +5,3 @@ flows:
   - "e2e/*"
   - "e2e/multiplayer/*"
 
-env:
-  CONVEX_SITE_URL: https://rosy-anteater-532.convex.site
