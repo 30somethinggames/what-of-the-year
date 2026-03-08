@@ -56,25 +56,22 @@ export const getAllSelections = query({
   },
 });
 
-const optionArg = v.optional(
-  v.object({
-    id: v.number(),
-    name: v.string(),
-    cover: v.optional(v.string()),
-    rating: v.optional(v.number()),
-    first_release_date: v.optional(v.number()),
-    summary: v.optional(v.string()),
-  }),
-);
+const optionArg = v.object({
+  id: v.number(),
+  name: v.string(),
+  cover: v.optional(v.string()),
+  rating: v.optional(v.number()),
+  first_release_date: v.optional(v.number()),
+  summary: v.optional(v.string()),
+});
 
 export const saveSelection = mutation({
   args: {
     sessionId: v.id("sessions"),
     roundNumber: v.number(),
-    name: v.string(),
     option: optionArg,
   },
-  handler: async (ctx, { sessionId, roundNumber, name, option }) => {
+  handler: async (ctx, { sessionId, roundNumber, option }) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Unauthenticated");
     const uid = identity.subject;
@@ -93,7 +90,7 @@ export const saveSelection = mutation({
       sessionId,
       roundId: round._id,
       uid,
-      pick: buildPickArg(name, option),
+      pick: buildPickArg(option),
       points: MAX_ROUNDS + 1 - roundNumber,
       roundNumber,
       savedAt: Date.now(),
@@ -126,10 +123,9 @@ export const editSelection = mutation({
   args: {
     sessionId: v.id("sessions"),
     roundNumber: v.number(),
-    name: v.string(),
     option: optionArg,
   },
-  handler: async (ctx, { sessionId, roundNumber, name, option }) => {
+  handler: async (ctx, { sessionId, roundNumber, option }) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Unauthenticated");
     const uid = identity.subject;
@@ -145,7 +141,7 @@ export const editSelection = mutation({
     if (!existing) throw new Error("Selection not found");
 
     await ctx.db.patch(existing._id, {
-      pick: buildPickArg(name, option),
+      pick: buildPickArg(option),
       savedAt: Date.now(),
     });
   },

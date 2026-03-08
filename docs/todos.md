@@ -1,4 +1,3 @@
-1. should you only be able to select what is provided?
 1. handle host duties
    - player should be able to do it solo
    - host can kick people

@@ -46,18 +46,16 @@ export function Round({ sessionId, topic, year }: Props) {
   if (!session || !round || !activeRound) return <Error />;
 
   const isEditing = editingRound !== null;
-  const isDisabled = !inputValue.trim() || (!isEditing && hasPickedThisRound);
+  const isDisabled = !selectedOption || (!isEditing && hasPickedThisRound);
 
   const onEnter = async () => {
-    if (isDisabled) return;
-    const name = inputValue.trim();
-    const option = selectedOption?.name === name ? selectedOption : undefined;
+    if (isDisabled || !selectedOption) return;
     try {
       if (isEditing) {
-        await editSelection({ sessionId, roundNumber: editingRound, name, option });
+        await editSelection({ sessionId, roundNumber: editingRound, option: selectedOption });
         setEditingRound(null);
       } else {
-        await saveSelection({ sessionId, roundNumber: activeRound, name, option });
+        await saveSelection({ sessionId, roundNumber: activeRound, option: selectedOption });
       }
     } catch {
       // Write failed — real-time listener will reflect current state
@@ -68,10 +66,22 @@ export function Round({ sessionId, topic, year }: Props) {
 
   const onSelectOption = (option: Option) => setSelectedOption(option);
 
+  const handleInputChange = (text: string) => {
+    setInputValue(text);
+    setSelectedOption(null);
+  };
+
   const onEdit = (item: (typeof mySelections)[number]) => {
     setEditingRound(item.roundNumber);
     setInputValue(item.pick.name);
-    setSelectedOption(null);
+    setSelectedOption({
+      id: Number(item.pick.id),
+      name: item.pick.name,
+      cover: item.pick.cover,
+      rating: item.pick.rating ?? 0,
+      first_release_date: item.pick.first_release_date ?? 0,
+      summary: item.pick.summary,
+    });
   };
 
   const onCancelEdit = () => {
@@ -108,7 +118,7 @@ export function Round({ sessionId, topic, year }: Props) {
             <Autocomplete
               testID="pick-input"
               value={inputValue}
-              onChangeText={setInputValue}
+              onChangeText={handleInputChange}
               onSelectOption={onSelectOption}
               options={availableOptions}
               placeholder={isEditing ? "Edit your pick" : "Enter your pick"}

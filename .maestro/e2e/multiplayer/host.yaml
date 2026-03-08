@@ -55,11 +55,15 @@ tags:
     id: lobby-start
 - waitForAnimationToEnd
 
-# Round 10 — all players pick, auto-advances
+# Round 10 — host selects from autocomplete, other players pick via API
 - assertVisible: "Round 10"
 - tapOn:
     id: pick-input
-- inputText: "Elden Ring"
+- inputText: "a"
+- assertVisible:
+    id: suggestion-item
+- tapOn:
+    id: suggestion-item
 - tapOn:
     id: submit-pick
 
@@ -76,7 +80,11 @@ tags:
 - assertVisible: "Round 9"
 - tapOn:
     id: pick-input
-- inputText: "Zelda"
+- inputText: "b"
+- assertVisible:
+    id: suggestion-item
+- tapOn:
+    id: suggestion-item
 - tapOn:
     id: submit-pick
 
@@ -93,7 +101,11 @@ tags:
 - assertVisible: "Round 8"
 - tapOn:
     id: pick-input
-- inputText: "Hades"
+- inputText: "c"
+- assertVisible:
+    id: suggestion-item
+- tapOn:
+    id: suggestion-item
 - tapOn:
     id: submit-pick
 

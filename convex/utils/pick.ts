@@ -7,14 +7,7 @@ interface Option {
   summary?: string;
 }
 
-function buildPick(name: string) {
-  return {
-    id: name.toLowerCase().replace(/\s+/g, "-"),
-    name,
-  };
-}
-
-function buildPickFromOption(option: Option) {
+export function buildPickArg(option: Option) {
   return {
     id: String(option.id),
     name: option.name,
@@ -23,8 +16,4 @@ function buildPickFromOption(option: Option) {
     first_release_date: option.first_release_date,
     summary: option.summary,
   };
-}
-
-export function buildPickArg(name: string, option?: Option) {
-  return option ? buildPickFromOption(option) : buildPick(name);
 }

@@ -45,43 +45,46 @@ tags:
     id: lobby-start
 - waitForAnimationToEnd
 
-# Round 10 — keyboard avoidance + submit
+# Round 10 — select from autocomplete + submit
 - assertVisible: "Round 10"
 - tapOn:
     id: pick-input
+- inputText: "a"
 - assertVisible:
-    id: submit-pick
-- inputText: "Pick Ten"
-- assertVisible:
-    id: submit-pick
+    id: suggestion-item
+- tapOn:
+    id: suggestion-item
 - tapOn:
     id: submit-pick
-- assertVisible: "Pick Ten"
 
-# Edit Selection — modify the Round 10 pick
+# Edit Selection — re-save the Round 10 pick
 - tapOn: "Edit"
-- tapOn:
-    id: pick-input
-- eraseText: 20
-- inputText: "Updated Ten"
+- assertVisible:
+    id: cancel-edit
 - tapOn:
     id: submit-pick
-- assertVisible: "Updated Ten"
 
-# Round 9 — auto-advanced after Round 10 pick
+# Round 9
 - assertVisible: "Round 9"
 - tapOn:
     id: pick-input
-- inputText: "Pick Nine"
+- inputText: "c"
+- assertVisible:
+    id: suggestion-item
+- tapOn:
+    id: suggestion-item
 - tapOn:
     id: submit-pick
-- assertVisible: "Pick Nine"
 
 # Round 8
 - assertVisible: "Round 8"
 - tapOn:
     id: pick-input
-- inputText: "Pick Eight"
+- inputText: "d"
+- assertVisible:
+    id: suggestion-item
+- tapOn:
+    id: suggestion-item
 - tapOn:
     id: submit-pick
 
@@ -89,7 +92,11 @@ tags:
 - assertVisible: "Round 7"
 - tapOn:
     id: pick-input
-- inputText: "Pick Seven"
+- inputText: "e"
+- assertVisible:
+    id: suggestion-item
+- tapOn:
+    id: suggestion-item
 - tapOn:
     id: submit-pick
 
@@ -97,7 +104,11 @@ tags:
 - assertVisible: "Round 6"
 - tapOn:
     id: pick-input
-- inputText: "Pick Six"
+- inputText: "f"
+- assertVisible:
+    id: suggestion-item
+- tapOn:
+    id: suggestion-item
 - tapOn:
     id: submit-pick
 
@@ -105,7 +116,11 @@ tags:
 - assertVisible: "Round 5"
 - tapOn:
     id: pick-input
-- inputText: "Pick Five"
+- inputText: "g"
+- assertVisible:
+    id: suggestion-item
+- tapOn:
+    id: suggestion-item
 - tapOn:
     id: submit-pick
 
@@ -113,7 +128,11 @@ tags:
 - assertVisible: "Round 4"
 - tapOn:
     id: pick-input
-- inputText: "Pick Four"
+- inputText: "h"
+- assertVisible:
+    id: suggestion-item
+- tapOn:
+    id: suggestion-item
 - tapOn:
     id: submit-pick
 
@@ -121,7 +140,11 @@ tags:
 - assertVisible: "Round 3"
 - tapOn:
     id: pick-input
-- inputText: "Pick Three"
+- inputText: "m"
+- assertVisible:
+    id: suggestion-item
+- tapOn:
+    id: suggestion-item
 - tapOn:
     id: submit-pick
 
@@ -129,7 +152,11 @@ tags:
 - assertVisible: "Round 2"
 - tapOn:
     id: pick-input
-- inputText: "Pick Two"
+- inputText: "p"
+- assertVisible:
+    id: suggestion-item
+- tapOn:
+    id: suggestion-item
 - tapOn:
     id: submit-pick
 
@@ -137,7 +164,11 @@ tags:
 - assertVisible: "Round 1"
 - tapOn:
     id: pick-input
-- inputText: "Pick One"
+- inputText: "s"
+- assertVisible:
+    id: suggestion-item
+- tapOn:
+    id: suggestion-item
 - tapOn:
     id: submit-pick
 - waitForAnimationToEnd
@@ -145,8 +176,5 @@ tags:
 # Results Screen
 - assertVisible:
     id: results-list
-- assertVisible: "Updated Ten"
-- assertVisible: "Pick Nine"
-- assertVisible: "Pick One"
 - assertVisible: "E2E Tester"
 - assertVisible: "10pts"

@@ -107,7 +107,11 @@ export function Autocomplete({
             keyExtractor={(item) => String(item.id)}
             keyboardShouldPersistTaps="handled"
             renderItem={({ item }) => (
-              <Pressable style={s.suggestion} onPress={() => handleSelect(item)}>
+              <Pressable
+                testID="suggestion-item"
+                style={s.suggestion}
+                onPress={() => handleSelect(item)}
+              >
                 <Text style={s.suggestionText} numberOfLines={1}>
                   {item.name}
                 </Text>
