@@ -1,5 +1,6 @@
-# Get staged TypeScript files
+#!/bin/sh
 
+# Get staged TypeScript files
 STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(tsx?|ts)$' || true)
 
 if [ -n "$STAGED_FILES" ]; then
