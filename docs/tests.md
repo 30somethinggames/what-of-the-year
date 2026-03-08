@@ -1,16 +1,33 @@
-## E2E Multiplayer Testing Strategy
+## Testing Strategy
 
-Test multi-device interactions in a multiplayer game using Maestro on iOS/Android with Convex-scripted players.
+### Unit Tests
 
-### Approach: Maestro + Convex Test Helpers
+```bash
+bun test          # run once
+bun test --watch  # watch mode
+```
 
-Maestro drives the real device UI for one player (the host). Other players are simulated by calling Convex HTTP endpoints that directly insert players, selections, etc. into the database — bypassing auth since they're test-only internal mutations.
+### Smoke Tests
 
-This gives us:
+Quick sanity check that screens render and key elements are visible. No backend interaction beyond creating a session.
 
-- Real native e2e on iOS and Android
-- Multiplayer state verification via Convex's real-time subscriptions
-- Single toolchain, no extra simulators needed
+```bash
+bun run test:smoke
+```
+
+**Covers:** Home → Setup → Lobby → Round → Settings (assertVisible checks only)
+
+### E2E Tests
+
+Full game flows on a real simulator. Multiplayer players are simulated via Convex HTTP test endpoints.
+
+```bash
+bun run test:e2e
+```
+
+**Single Player** (`single-player.yaml`): Home → Setup → Lobby → 10 rounds with autocomplete → edit pick → results with points
+
+**Multiplayer Host** (`multiplayer/host.yaml`): Host creates game, API adds 2 players, 3 rounds of mixed picks, host advances remaining rounds via settings, end game, results with rankings
 
 ### Architecture
 
@@ -20,67 +37,33 @@ convex/test/
 └── http.ts    # HTTP action wrappers (POST /test/add-player, etc.)
 
 .maestro/
-├── config.yaml                     # Global config + env (CONVEX_SITE_URL)
 ├── scripts/
-│   ├── add-player.js               # Calls /test/add-player
-│   ├── make-selection.js           # Calls /test/make-selection
-│   └── cleanup.js                  # Calls /test/cleanup
+│   ├── add-player.js         # Calls /test/add-player
+│   ├── make-selection.js     # Calls /test/make-selection
+│   └── cleanup.js            # Calls /test/cleanup
 ├── smoke/
-│   ├── home-screen.yaml            # Home renders
-│   ├── select-topic-and-year.yaml  # Picker + navigation
-│   ├── setup-screen.yaml           # Setup renders
-│   └── round-screen.yaml           # Round renders
+│   └── smoke.yaml            # Full smoke flow
 └── e2e/
-    ├── full-single-player-flow.yaml    # Home → lobby → round
-    ├── round-edit-selection.yaml       # Make + edit a selection
-    ├── platform-picker.yaml            # Picker swipe behavior
-    ├── keyboard-avoidance.yaml         # Keyboard doesn't hide input
-    ├── multiplayer-lobby.yaml          # Scripted players join, count updates
-    ├── multiplayer-round.yaml          # Both players select → auto-advance
-    └── multiplayer-results.yaml        # Multiple rounds, point aggregation
+    ├── single-player.yaml
+    └── multiplayer/
+        └── host.yaml
 ```
 
-### Test Coverage
+### Multiplayer Testing Approach
 
-**Single-player flows (pure Maestro):**
+Maestro drives the real device UI for one player (the host). Other players are simulated by calling Convex HTTP endpoints that insert players and selections into the database — bypassing auth via test-only internal mutations.
 
-- Home → select topic/year → navigate to setup
-- Setup → enter name, pick avatar, create session → land in lobby
-- Lobby → start session → round screen
-- Round → search, select, edit selection
-- Picker swipe behavior (platform-specific)
-- Keyboard avoidance on round screen
+This gives us:
 
-**Multiplayer flows (Maestro + Convex scripting):**
+- Real native e2e on iOS and Android
+- Multiplayer state verification via Convex's real-time subscriptions
+- Single device, no extra simulators needed
 
-- Lobby: create session, script adds players, assert player list updates in real-time
-- Round progression: host + bot select → round auto-advances
-- Results: multiple rounds with overlapping picks, verify ranking/points
-
-### Running Tests
-
-```bash
-# Set the Convex site URL (swap .cloud → .site from your EXPO_PUBLIC_CONVEX_URL)
-export CONVEX_SITE_URL=https://your-deployment.convex.site
-
-# Regenerate Convex types
-bun convex dev
-
-# Run all tests
-maestro test .maestro/
-
-# Run by tag
-maestro test --tags=smoke .maestro/
-maestro test --tags=e2e .maestro/
-maestro test --tags=multiplayer .maestro/
-
-# Run a single test
-maestro test .maestro/e2e/multiplayer-lobby.yaml
-```
+Scripts reference `MAESTRO_CONVEX_SITE_URL` which is set inline in the `test:e2e` script.
 
 ### Production Safety
 
-The test HTTP routes (`/test/*`) are gated behind the `IS_TEST` environment variable. Each HTTP action checks `process.env.IS_TEST === "true"` at runtime and returns a 404 if it's not set.
+Test HTTP routes (`/test/*`) are gated behind the `IS_TEST` environment variable. Each HTTP action checks `process.env.IS_TEST === "true"` at runtime and returns 404 if not set.
 
-- **Dev deployment:** Set `IS_TEST=true` via the Convex dashboard or `bun convex env set IS_TEST true`
-- **Production deployment:** Don't set `IS_TEST` — test routes return 404
+- **Dev:** `bunx convex env set IS_TEST true`
+- **Prod:** Don't set `IS_TEST` — test routes return 404

@@ -43,4 +43,5 @@ yarn-error.*
 
 /convex/_generated/
 
+CLAUDE.md
 .claude/**
