@@ -6,7 +6,7 @@ import { Pressable, Text, View } from "react-native";
 import { AppVersion } from "components/app-version";
 import { Button } from "components/button";
 import { Container } from "components/container";
-import { PlayerList } from "components/player-list";
+import { PlayerList } from "components/lists/players";
 import { Loading } from "components/states/loading";
 import type { SessionID } from "db/types";
 import { usePlayers } from "db/use-players";

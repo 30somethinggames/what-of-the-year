@@ -1,5 +1,5 @@
 {
-  "ignorePatterns": [".github/**", "README.md", "./convex/_generated/**"],
+  "ignorePatterns": [".github/**", "README.md", "convex/_generated/**"],
   "rules": {
     "jsx-a11y/alt-text": "error",
     "jsx-a11y/aria-props": "error",

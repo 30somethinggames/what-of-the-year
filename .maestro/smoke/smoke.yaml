@@ -14,7 +14,7 @@ tags:
 - assertVisible: "of"
 - assertVisible:
     id: home-start
-- takeScreenshot: .maestro/screenshots/home-screen
+- assertScreenshot: .maestro/screenshots/home-screen.png
 
 # Setup Screen
 - tapOn:
@@ -28,7 +28,7 @@ tags:
 - assertVisible:
     id: setup-submit
 - assertVisible: "Game of 2026"
-- takeScreenshot: .maestro/screenshots/setup-screen
+- assertScreenshot: .maestro/screenshots/setup-screen.png
 
 # Round Screen — enter name and start
 - tapOn:
@@ -53,7 +53,7 @@ tags:
     id: round-title
 - assertVisible:
     id: settings-button
-- takeScreenshot: .maestro/screenshots/round-screen
+- assertScreenshot: .maestro/screenshots/round-screen.png
 
 # Settings Screen
 - tapOn:
@@ -66,4 +66,4 @@ tags:
     id: leave-game
 - assertVisible:
     id: close-settings
-- takeScreenshot: .maestro/screenshots/settings-screen
+- assertScreenshot: .maestro/screenshots/settings-screen.png

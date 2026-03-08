@@ -1,14 +1,13 @@
 import { api } from "convex/_generated/api";
 import { useMutation } from "convex/react";
-import { Image } from "expo-image";
 import { useState } from "react";
-import { FlatList, Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
 import { Autocomplete } from "components/autocomplete";
 import { Button } from "components/button";
 import { Container } from "components/container";
 import { KeyboardAvoidingView } from "components/keyboard-avoiding-view";
-import { Row } from "components/row";
+import { Picks } from "components/lists/picks";
 import { Error } from "components/states/error";
 import { Loading } from "components/states/loading";
 import type { TOPIC_KEY } from "constants/topics";
@@ -97,23 +96,7 @@ export function Round({ sessionId, topic, year }: Props) {
           <Text testID="round-title" style={s.title}>
             Round {activeRound}
           </Text>
-          <FlatList
-            data={mySelections}
-            keyExtractor={(item) => String(item.roundNumber)}
-            contentContainerStyle={s.list}
-            renderItem={({ item }) => (
-              <Row>
-                <Text style={s.rank}>#{item.roundNumber}</Text>
-                {item.pick.cover ? (
-                  <Image source={{ uri: item.pick.cover }} style={s.cover} />
-                ) : null}
-                <Text style={s.pick}>{item.pick.name}</Text>
-                <Pressable onPress={() => onEdit(item)} hitSlop={8}>
-                  <Text style={s.editButton}>Edit</Text>
-                </Pressable>
-              </Row>
-            )}
-          />
+          <Picks testID="round-list" data={mySelections} onEdit={onEdit} />
           <View style={s.footer}>
             <Autocomplete
               testID="pick-input"
@@ -144,32 +127,6 @@ const useStyles = createStyles((t) => ({
     fontSize: t.text.size.lg,
     color: t.colors.black100,
     paddingVertical: t.spacing.md,
-  },
-  list: { gap: t.spacing.sm, flexGrow: 1 },
-  rank: {
-    fontFamily: t.text.font.bold,
-    fontSize: t.text.size.md,
-    color: t.colors.black100,
-    minWidth: 28,
-  },
-  pick: {
-    flex: 1,
-    fontFamily: t.text.font.regular,
-    fontSize: t.text.size.md,
-    color: t.colors.black100,
-  },
-  cover: {
-    width: 40,
-    height: 56,
-    borderRadius: t.border.radius.sm,
-    borderWidth: t.border.size.sm,
-    borderColor: t.border.color,
-    backgroundColor: "transparent",
-  },
-  editButton: {
-    fontFamily: t.text.font.bold,
-    fontSize: t.text.size.sm,
-    color: t.colors.grey100,
   },
   footer: {
     paddingTop: t.spacing.md,

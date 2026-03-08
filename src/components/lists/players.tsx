@@ -3,8 +3,8 @@ import { FlatList, Pressable, Text, View } from "react-native";
 import type { Player } from "db/types";
 import { createStyles } from "utils/theme";
 
-import { Avatar } from "./avatar";
-import { Row } from "./row";
+import { Avatar } from "../avatar";
+import { Row } from "./components/row";
 
 interface Props {
   data: Player[];

@@ -1,9 +1,6 @@
 1. host ends game — auto-navigate all players to home with a message ("The host ended the game")
    - currently players see `<Error />` when session is deleted, no redirect
    - needs: session `state` field or deletion detection, global listener, toast/alert on redirect
-1. handle host duties
-   - player should be able to do it solo
-   - host can kick people
 1. E2E Multiplayer Testing Strategy
    - screen testing by screenshot - available in maestro
    - Figure out [doc](./testing-strat.md)

@@ -7,7 +7,7 @@ import { Share, Text, View } from "react-native";
 
 import { Button } from "components/button";
 import { Container } from "components/container";
-import { PlayerList } from "components/player-list";
+import { PlayerList } from "components/lists/players";
 import { Error } from "components/states/error";
 import { Loading } from "components/states/loading";
 import { createStyles } from "utils/theme";
