@@ -24,6 +24,7 @@ export function Lobby({ topic, year, sessionId }: LobbyProps) {
   });
 
   const leaveSession = useMutation(api.players.leaveSession);
+  const kickFromLobby = useMutation(api.players.kickFromLobby);
   const startSession = useMutation(api.sessions.startSession);
 
   if (isLoading) return <Loading />;
@@ -58,7 +59,11 @@ export function Lobby({ topic, year, sessionId }: LobbyProps) {
       <Text testID="session-id" style={s.hidden}>
         {sessionId}
       </Text>
-      <PlayerList data={players} maxPlayerCount={maxPlayerCount} />
+      <PlayerList
+        data={players}
+        maxPlayerCount={maxPlayerCount}
+        onKick={isHost ? (uid) => kickFromLobby({ sessionId, uid }) : undefined}
+      />
 
       <View style={s.footer}>
         {isHost ? (

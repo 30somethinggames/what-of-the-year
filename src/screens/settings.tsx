@@ -26,6 +26,7 @@ export function Settings({ sessionId, round }: Props) {
     round,
   );
   const advanceRound = useMutation(api.rounds.advanceRound);
+  const kickFromGame = useMutation(api.players.kickFromGame);
 
   if (isPlayersLoading || isSelectionsLoading) {
     return <Loading />;
@@ -53,7 +54,12 @@ export function Settings({ sessionId, round }: Props) {
           <Text style={s.closeBtn}>✕</Text>
         </Pressable>
       </View>
-      <PlayerList data={players} completedUids={completedUids} maxPlayerCount={10} />
+      <PlayerList
+        data={players}
+        completedUids={completedUids}
+        maxPlayerCount={10}
+        onKick={isHost ? (uid) => kickFromGame({ sessionId, uid }) : undefined}
+      />
       <View style={s.footer}>
         {isHost && (
           <Button

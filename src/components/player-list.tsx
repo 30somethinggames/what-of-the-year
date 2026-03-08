@@ -1,4 +1,4 @@
-import { FlatList, Text, View } from "react-native";
+import { FlatList, Pressable, Text, View } from "react-native";
 
 import type { Player } from "db/types";
 import { createStyles } from "utils/theme";
@@ -10,8 +10,9 @@ interface Props {
   data: Player[];
   completedUids?: Set<string>;
   maxPlayerCount?: number;
+  onKick?: (uid: string) => void;
 }
-export function PlayerList({ data, completedUids, maxPlayerCount }: Props) {
+export function PlayerList({ data, completedUids, maxPlayerCount, onKick }: Props) {
   const s = useStyles();
 
   const playerCount = data.length;
@@ -29,6 +30,11 @@ export function PlayerList({ data, completedUids, maxPlayerCount }: Props) {
             <Text style={s.playerName}>{item.name}</Text>
             {item.isHost && <Text style={s.hostBadge}>Host</Text>}
             {completedUids && <Text style={s.status}>{hasCompleted ? "✓" : "..."}</Text>}
+            {onKick && !item.isHost && (
+              <Pressable testID="kick-player" onPress={() => onKick(item.uid)} hitSlop={8}>
+                <Text style={s.kickBtn}>✕</Text>
+              </Pressable>
+            )}
           </Row>
         );
       }}
@@ -58,6 +64,10 @@ const useStyles = createStyles((t) => ({
   status: {
     fontSize: t.text.size.lg,
     color: t.colors.black100,
+  },
+  kickBtn: {
+    fontSize: t.text.size.lg,
+    color: t.colors.red100,
   },
   footer: {
     alignItems: "flex-end",

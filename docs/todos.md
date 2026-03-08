@@ -1,3 +1,6 @@
+1. host ends game — auto-navigate all players to home with a message ("The host ended the game")
+   - currently players see `<Error />` when session is deleted, no redirect
+   - needs: session `state` field or deletion detection, global listener, toast/alert on redirect
 1. handle host duties
    - player should be able to do it solo
    - host can kick people
@@ -13,6 +16,7 @@
 ## V2
 
 1. bad-words
+1. host handoff — transfer host to another player instead of ending the game
 1. [drag and drop](drag-and-drop.md)
 1. db
    - general look through / clean up

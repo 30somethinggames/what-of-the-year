@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 
 import { mutation, query } from "./_generated/server";
+import { getRoundByNumber } from "./utils/rounds";
 
 export const joinSession = mutation({
   args: {
@@ -63,6 +64,107 @@ export const leaveSession = mutation({
     await ctx.db.patch(sessionId, {
       playerCount: session.playerCount - 1,
     });
+  },
+});
+
+export const kickFromLobby = mutation({
+  args: {
+    sessionId: v.id("sessions"),
+    uid: v.string(),
+  },
+  handler: async (ctx, { sessionId, uid }) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthenticated");
+
+    const host = await ctx.db
+      .query("players")
+      .withIndex("by_session_uid", (q) => q.eq("sessionId", sessionId).eq("uid", identity.subject))
+      .unique();
+    if (!host?.isHost) throw new Error("Only the host can kick players");
+
+    const player = await ctx.db
+      .query("players")
+      .withIndex("by_session_uid", (q) => q.eq("sessionId", sessionId).eq("uid", uid))
+      .unique();
+    if (!player) throw new Error("Player not found");
+    if (player.isHost) throw new Error("Cannot kick the host");
+
+    const session = await ctx.db.get(sessionId);
+    if (!session) throw new Error("Session not found");
+    if (!session.isOpen) throw new Error("Cannot kick from lobby after game has started");
+
+    await ctx.db.delete(player._id);
+    await ctx.db.patch(sessionId, {
+      playerCount: session.playerCount - 1,
+    });
+  },
+});
+
+export const kickFromGame = mutation({
+  args: {
+    sessionId: v.id("sessions"),
+    uid: v.string(),
+  },
+  handler: async (ctx, { sessionId, uid }) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthenticated");
+
+    const host = await ctx.db
+      .query("players")
+      .withIndex("by_session_uid", (q) => q.eq("sessionId", sessionId).eq("uid", identity.subject))
+      .unique();
+    if (!host?.isHost) throw new Error("Only the host can kick players");
+
+    const player = await ctx.db
+      .query("players")
+      .withIndex("by_session_uid", (q) => q.eq("sessionId", sessionId).eq("uid", uid))
+      .unique();
+    if (!player) throw new Error("Player not found");
+    if (player.isHost) throw new Error("Cannot kick the host");
+
+    const session = await ctx.db.get(sessionId);
+    if (!session) throw new Error("Session not found");
+
+    // Delete all selections by the kicked player
+    const selections = await ctx.db
+      .query("selections")
+      .withIndex("by_session", (q) => q.eq("sessionId", sessionId))
+      .filter((q) => q.eq(q.field("uid"), uid))
+      .collect();
+
+    for (const sel of selections) {
+      await ctx.db.delete(sel._id);
+    }
+
+    // Delete the player
+    await ctx.db.delete(player._id);
+    const newPlayerCount = session.playerCount - 1;
+    await ctx.db.patch(sessionId, { playerCount: newPlayerCount });
+
+    // Recheck the current open round — may need to close if remaining players are done
+    const activeRound = await getRoundByNumber(ctx.db, sessionId, session.activeRoundNumber);
+    if (activeRound && activeRound.state === "open") {
+      // Recalculate selectionsComplete: count remaining selections for this round
+      const roundSelections = await ctx.db
+        .query("selections")
+        .withIndex("by_round_uid", (q) => q.eq("roundId", activeRound._id))
+        .collect();
+
+      const newSelectionsComplete = roundSelections.length;
+      await ctx.db.patch(activeRound._id, { selectionsComplete: newSelectionsComplete });
+
+      if (newSelectionsComplete > 0 && newSelectionsComplete >= newPlayerCount) {
+        await ctx.db.patch(activeRound._id, { state: "closed", closedAt: Date.now() });
+
+        if (activeRound.number > 1) {
+          const nextRound = await getRoundByNumber(ctx.db, sessionId, activeRound.number - 1);
+          if (nextRound) {
+            await ctx.db.patch(nextRound._id, { state: "open", startedAt: Date.now() });
+            await ctx.db.patch(sessionId, { activeRoundNumber: activeRound.number - 1 });
+          }
+        }
+      }
+    }
   },
 });
 
