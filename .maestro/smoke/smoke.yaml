@@ -1,0 +1,45 @@
+appId: host.exp.Exponent
+name: Smoke Tests
+tags:
+  - smoke
+---
+- launchApp
+- tapOn: What of the Year
+
+# Home Screen
+- assertVisible: "Start"
+
+# Setup Screen
+- tapOn: "Start"
+- waitForAnimationToEnd
+
+- assertVisible: "Random"
+- assertVisible: "User name"
+- assertVisible: "Start"
+- assertVisible: "Game of 2026"
+
+# Select Topic and Year — go back and change selection
+- tapOn:
+    id: BackButton
+
+- swipe:
+    start: 50%, 37%
+    end: 50%, 27%
+
+- swipe:
+    start: 50%, 62%
+    end: 50%, 52%
+
+- tapOn: "Start"
+- waitForAnimationToEnd
+
+- assertVisible: "Movie of 2025"
+
+# Round Screen — enter name and start
+- tapOn: "User name"
+- inputText: "Test User"
+
+- tapOn: "Start"
+- waitForAnimationToEnd
+
+- assertVisible: "Round 1"

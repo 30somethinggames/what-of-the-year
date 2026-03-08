@@ -1,9 +1,0 @@
-appId: host.exp.Exponent
-name: Home
-tags:
-  - smoke
----
-- launchApp
-- tapOn: what-of-the-year
-
-- assertVisible: "Start"

@@ -20,22 +20,24 @@ convex/test/
 └── http.ts    # HTTP action wrappers (POST /test/add-player, etc.)
 
 .maestro/
-├── config.yaml                 # Global env (CONVEX_SITE_URL)
+├── config.yaml                     # Global config + env (CONVEX_SITE_URL)
 ├── scripts/
-│   ├── add-player.js           # Calls /test/add-player
-│   ├── make-selection.js       # Calls /test/make-selection
-│   └── cleanup.js              # Calls /test/cleanup
-├── home-screen.yaml            # Smoke: home renders
-├── select-topic-and-year.yaml  # Smoke: picker + navigation
-├── setup-screen.yaml           # Smoke: setup renders
-├── round-screen.yaml           # Smoke: round renders
-├── full-single-player-flow.yaml    # E2E: home → lobby → round
-├── round-edit-selection.yaml       # E2E: make + edit a selection
-├── platform-picker.yaml           # E2E: picker swipe behavior
-├── keyboard-avoidance.yaml        # E2E: keyboard doesn't hide input
-├── multiplayer-lobby.yaml          # E2E: scripted players join, count updates
-├── multiplayer-round.yaml         # E2E: both players select → auto-advance
-└── multiplayer-results.yaml       # E2E: multiple rounds, point aggregation
+│   ├── add-player.js               # Calls /test/add-player
+│   ├── make-selection.js           # Calls /test/make-selection
+│   └── cleanup.js                  # Calls /test/cleanup
+├── smoke/
+│   ├── home-screen.yaml            # Home renders
+│   ├── select-topic-and-year.yaml  # Picker + navigation
+│   ├── setup-screen.yaml           # Setup renders
+│   └── round-screen.yaml           # Round renders
+└── e2e/
+    ├── full-single-player-flow.yaml    # Home → lobby → round
+    ├── round-edit-selection.yaml       # Make + edit a selection
+    ├── platform-picker.yaml            # Picker swipe behavior
+    ├── keyboard-avoidance.yaml         # Keyboard doesn't hide input
+    ├── multiplayer-lobby.yaml          # Scripted players join, count updates
+    ├── multiplayer-round.yaml          # Both players select → auto-advance
+    └── multiplayer-results.yaml        # Multiple rounds, point aggregation
 ```
 
 ### Test Coverage
@@ -73,7 +75,7 @@ maestro test --tags=e2e .maestro/
 maestro test --tags=multiplayer .maestro/
 
 # Run a single test
-maestro test .maestro/multiplayer-lobby.yaml
+maestro test .maestro/e2e/multiplayer-lobby.yaml
 ```
 
 ### Production Safety

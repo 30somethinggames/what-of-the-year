@@ -1,21 +1,20 @@
 appId: host.exp.Exponent
-name: Full Single Player Flow
+name: Single Player
 tags:
   - e2e
   - single-player
 ---
 # Clean up any leftover test data
-- runScript: scripts/cleanup.js
+- runScript: ../scripts/cleanup.js
 
 - launchApp
-- tapOn: what-of-the-year
+- tapOn: What of the Year
 
-# Home screen — default topic and year
+# Home → Setup → Lobby
 - assertVisible: "Start"
 - tapOn: "Start"
 - waitForAnimationToEnd
 
-# Topic/setup screen — enter name and create session
 - assertVisible: "Random"
 - assertVisible: "User name"
 
@@ -36,5 +35,24 @@ tags:
 - tapOn: "Start"
 - waitForAnimationToEnd
 
-# Round screen — verify round 10 is active (rounds count down from 10)
 - assertVisible: "Round 10"
+
+# Keyboard Avoidance — tap input, verify button stays visible
+- tapOn: "Enter your pick"
+- assertVisible: "Enter"
+- inputText: "Original Pick"
+- assertVisible: "Enter"
+
+# Submit pick
+- tapOn: "Enter"
+- assertVisible: "Original Pick"
+
+# Edit Selection — modify the pick
+- tapOn: "Edit"
+- assertVisible: "Save"
+
+- tapOn: "Edit your pick"
+- inputText: "Updated Pick"
+- tapOn: "Save"
+
+- assertVisible: "Updated Pick"

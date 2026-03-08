@@ -5,7 +5,7 @@ tags:
   - platform
 ---
 - launchApp
-- tapOn: what-of-the-year
+- tapOn: What of the Year
 
 # Verify both pickers render
 - assertVisible:
