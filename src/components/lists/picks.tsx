@@ -73,7 +73,7 @@ export function Picks({ data, testID, onEdit }: Props) {
       testID={testID}
       data={data}
       keyExtractor={(item) => item.pick.id}
-      contentContainerStyle={s.list}
+      contentContainerStyle={s.root}
       renderItem={({ item, index }) =>
         isRankedPick(item) ? (
           <RankedRow item={item} rank={index + 1} />
@@ -86,7 +86,7 @@ export function Picks({ data, testID, onEdit }: Props) {
 }
 
 const useStyles = createStyles((t) => ({
-  list: {
+  root: {
     gap: t.spacing.sm,
     flexGrow: 1,
   },

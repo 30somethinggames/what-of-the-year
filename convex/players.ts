@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 
 import { mutation, query } from "./_generated/server";
+import { SessionStatus } from "./constants";
 import { getRoundByNumber } from "./utils/rounds";
 
 export const joinSession = mutation({
@@ -16,7 +17,7 @@ export const joinSession = mutation({
 
     const session = await ctx.db.get(sessionId);
     if (!session) throw new Error("Session not found");
-    if (!session.isOpen) throw new Error("Session is closed");
+    if (session.status !== SessionStatus.LOBBY) throw new Error("Session is closed");
     if (session.playerCount >= session.maxPlayers) throw new Error("Session is full");
 
     // Check if already joined
@@ -91,7 +92,8 @@ export const kickFromLobby = mutation({
 
     const session = await ctx.db.get(sessionId);
     if (!session) throw new Error("Session not found");
-    if (!session.isOpen) throw new Error("Cannot kick from lobby after game has started");
+    if (session.status !== SessionStatus.LOBBY)
+      throw new Error("Cannot kick from lobby after game has started");
 
     await ctx.db.delete(player._id);
     await ctx.db.patch(sessionId, {

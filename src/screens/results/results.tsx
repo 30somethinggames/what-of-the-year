@@ -23,7 +23,7 @@ export function Results({ sessionId }: Props) {
   );
 }
 
-const useStyles = createStyles((t) => ({
+const useStyles = createStyles(() => ({
   root: {
     flex: 1,
   },

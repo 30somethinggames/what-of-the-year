@@ -1,7 +1,9 @@
 import { api } from "convex/_generated/api";
+import { SessionStatus } from "convex/constants";
 import { useMutation } from "convex/react";
 import { router } from "expo-router";
-import { Pressable, Text, View } from "react-native";
+import { useEffect } from "react";
+import { Alert, Pressable, Text, View } from "react-native";
 
 import { AppVersion } from "components/app-version";
 import { Button } from "components/button";
@@ -11,6 +13,7 @@ import { Loading } from "components/states/loading";
 import type { SessionID } from "db/types";
 import { usePlayers } from "db/use-players";
 import { useSelections } from "db/use-selections";
+import { useSession } from "db/use-sessions";
 import { createStyles } from "utils/theme";
 
 interface Props {
@@ -20,13 +23,24 @@ interface Props {
 export function Settings({ sessionId, round }: Props) {
   const s = useStyles();
 
+  const { session } = useSession(sessionId as SessionID);
   const { isLoading: isPlayersLoading, players, isHost } = usePlayers(sessionId as SessionID);
   const { isLoading: isSelectionsLoading, selections } = useSelections(
     sessionId as SessionID,
     round,
   );
   const advanceRound = useMutation(api.rounds.advanceRound);
+  const endSession = useMutation(api.sessions.endSession);
   const kickFromGame = useMutation(api.players.kickFromGame);
+
+  // Navigate home when host ends the game (for non-host players viewing settings)
+  useEffect(() => {
+    if (!isHost && session?.status === SessionStatus.ENDED) {
+      Alert.alert("Game Over", "The host ended the game.", [
+        { text: "OK", onPress: () => router.replace("/") },
+      ]);
+    }
+  }, [session?.status, isHost]);
 
   if (isPlayersLoading || isSelectionsLoading) {
     return <Loading />;
@@ -42,7 +56,12 @@ export function Settings({ sessionId, round }: Props) {
     router.back();
   };
 
-  const onLeaveGame = () => router.replace("/");
+  const onLeaveGame = async () => {
+    if (isHost) {
+      await endSession({ sessionId: sessionId as SessionID });
+    }
+    router.replace("/");
+  };
 
   return (
     <Container>

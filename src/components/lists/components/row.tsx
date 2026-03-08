@@ -14,7 +14,7 @@ const useStyles = createStyles((t) => ({
     alignItems: "center",
     backgroundColor: t.colors.white200,
     padding: t.spacing.sm,
-    borderRadius: t.border.radius.lg,
+    borderRadius: t.border.radius.md,
     borderWidth: t.border.size.sm,
     gap: t.spacing.md,
   },

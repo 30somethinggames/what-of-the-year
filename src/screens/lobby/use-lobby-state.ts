@@ -1,5 +1,7 @@
+import { SessionStatus } from "convex/constants";
 import { router } from "expo-router";
 import { useEffect } from "react";
+import { Alert } from "react-native";
 
 import { usePlayers } from "db/use-players";
 import { useSession } from "db/use-sessions";
@@ -20,15 +22,24 @@ export function useLobbyState({ sessionId, topic, year }: LobbyProps) {
 
   const maxPlayerCount = session?.maxPlayers;
 
+  // Navigate home when host ends the game
+  useEffect(() => {
+    if (session?.status === SessionStatus.ENDED) {
+      Alert.alert("Game Over", "The host ended the game.", [
+        { text: "OK", onPress: () => router.replace("/") },
+      ]);
+    }
+  }, [session?.status]);
+
   // Auto-navigate non-host players when game starts
   useEffect(() => {
-    if (!isLoading && session && !session.isOpen && !isHost) {
+    if (!isLoading && session && session.status === SessionStatus.ACTIVE && !isHost) {
       router.replace({
         pathname: "/[topic]/[year]/[sessionId]/[round]",
         params: { topic: topic.value, year, sessionId, round: String(session.activeRoundNumber) },
       });
     }
-  }, [isLoading, session?.isOpen, isHost, topic.value, year, sessionId]);
+  }, [isLoading, session?.status, isHost, topic.value, year, sessionId]);
 
   return {
     isLoading,

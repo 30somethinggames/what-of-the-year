@@ -2,6 +2,8 @@ import { authTables } from "@convex-dev/auth/server";
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
+import { SessionStatus } from "./constants";
+
 export default defineSchema({
   ...authTables,
   sessions: defineTable({
@@ -9,9 +11,13 @@ export default defineSchema({
     year: v.number(),
     maxRounds: v.number(),
     maxPlayers: v.number(),
-    isOpen: v.boolean(),
     playerCount: v.number(),
     activeRoundNumber: v.number(),
+    status: v.union(
+      v.literal(SessionStatus.LOBBY),
+      v.literal(SessionStatus.ACTIVE),
+      v.literal(SessionStatus.ENDED),
+    ),
   }),
 
   players: defineTable({

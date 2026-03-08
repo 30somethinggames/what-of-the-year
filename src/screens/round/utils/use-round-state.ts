@@ -1,5 +1,7 @@
+import { SessionStatus } from "convex/constants";
 import { router } from "expo-router";
 import { useEffect } from "react";
+import { Alert } from "react-native";
 
 import type { SessionID } from "db/types";
 import { useMySelections } from "db/use-my-selections";
@@ -23,6 +25,15 @@ export function useRoundState({ sessionId, topic, year }: Props) {
   useEffect(() => {
     if (activeRound) router.setParams({ round: String(activeRound) });
   }, [activeRound]);
+
+  // Navigate home when host ends the game
+  useEffect(() => {
+    if (session?.status === SessionStatus.ENDED) {
+      Alert.alert("Game Over", "The host ended the game.", [
+        { text: "OK", onPress: () => router.replace("/") },
+      ]);
+    }
+  }, [session?.status]);
 
   // Navigate to results when last round closes
   useEffect(() => {

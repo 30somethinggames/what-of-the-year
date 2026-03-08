@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 
 import { mutation, query } from "./_generated/server";
+import { SessionStatus } from "./constants";
 
 const MAX_ROUNDS = 10;
 const MAX_PLAYERS = 10;
@@ -29,9 +30,9 @@ export const createSession = mutation({
       year,
       maxRounds: MAX_ROUNDS,
       maxPlayers: MAX_PLAYERS,
-      isOpen: true,
       playerCount: 1,
       activeRoundNumber: 1,
+      status: SessionStatus.LOBBY,
     });
 
     await ctx.db.insert("players", {
@@ -62,6 +63,28 @@ export const createSession = mutation({
   },
 });
 
+export const endSession = mutation({
+  args: {
+    sessionId: v.id("sessions"),
+  },
+  handler: async (ctx, { sessionId }) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthenticated");
+
+    const host = await ctx.db
+      .query("players")
+      .withIndex("by_session_uid", (q) => q.eq("sessionId", sessionId).eq("uid", identity.subject))
+      .unique();
+
+    if (!host?.isHost) throw new Error("Only the host can end the session");
+
+    const session = await ctx.db.get(sessionId);
+    if (!session) throw new Error("Session not found");
+
+    await ctx.db.patch(sessionId, { status: SessionStatus.ENDED });
+  },
+});
+
 export const startSession = mutation({
   args: {
     sessionId: v.id("sessions"),
@@ -89,8 +112,8 @@ export const startSession = mutation({
     if (!round) throw new Error("Round not found");
 
     await ctx.db.patch(sessionId, {
-      isOpen: false,
       activeRoundNumber: MAX_ROUNDS,
+      status: SessionStatus.ACTIVE,
     });
 
     await ctx.db.patch(round._id, {
