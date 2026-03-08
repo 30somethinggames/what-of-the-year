@@ -85,10 +85,11 @@ export function Topic({ topic, year, existingSessionId }: Props) {
       <Container style={s.container}>
         <View style={s.avatar}>
           <Avatar source={avatar} size={120} />
-          <Button style={s.btn} label="Random" onPress={randomizeAvatar} />
+          <Button testID="random-avatar" style={s.btn} label="Random" onPress={randomizeAvatar} />
         </View>
         <View style={s.input}>
           <Input
+            testID="name-input"
             placeholder="User name"
             value={name}
             onChangeText={setName}
@@ -97,7 +98,7 @@ export function Topic({ topic, year, existingSessionId }: Props) {
           />
           {nameError ? <Text style={s.error}>{nameError}</Text> : null}
         </View>
-        <Button label={label} disabled={disabled} onPress={onSubmit} />
+        <Button testID="setup-submit" label={label} disabled={disabled} onPress={onSubmit} />
       </Container>
     </KeyboardAvoidingView>
   );

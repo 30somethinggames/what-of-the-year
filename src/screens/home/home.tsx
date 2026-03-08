@@ -39,7 +39,7 @@ export function Home() {
             asChild
             href={{ pathname: "/[topic]/[year]", params: { topic: topic.value, year: year.value } }}
           >
-            <Button label="Start" style={s.btn} />
+            <Button testID="home-start" label="Start" style={s.btn} />
           </Link>
           <AppVersion />
         </Animated.View>

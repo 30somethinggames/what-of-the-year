@@ -46,15 +46,23 @@ export function Settings({ sessionId, round }: Props) {
   return (
     <Container>
       <View style={s.header}>
-        <Text style={s.title}>Settings</Text>
-        <Pressable onPress={router.back} hitSlop={8}>
+        <Text testID="settings-title" style={s.title}>
+          Settings
+        </Text>
+        <Pressable testID="close-settings" onPress={router.back} hitSlop={8}>
           <Text style={s.closeBtn}>✕</Text>
         </Pressable>
       </View>
       <PlayerList data={players} completedUids={completedUids} maxPlayerCount={10} />
       <View style={s.footer}>
-        {isHost && <Button label={round > 1 ? "Next Round" : "End Game"} onPress={onNextRound} />}
-        <Button label="Leave Game" onPress={onLeaveGame} style={s.leaveBtn} />
+        {isHost && (
+          <Button
+            testID="advance-round"
+            label={round > 1 ? "Next Round" : "End Game"}
+            onPress={onNextRound}
+          />
+        )}
+        <Button testID="leave-game" label="Leave Game" onPress={onLeaveGame} style={s.leaveBtn} />
         <AppVersion />
       </View>
     </Container>

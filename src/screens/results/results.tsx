@@ -25,6 +25,7 @@ export function Results({ sessionId }: Props) {
   return (
     <Container style={s.root}>
       <FlatList
+        testID="results-list"
         data={results}
         keyExtractor={(item) => item.pick.id}
         contentContainerStyle={s.list}

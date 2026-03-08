@@ -84,7 +84,9 @@ export function Round({ sessionId, topic, year }: Props) {
     <>
       <KeyboardAvoidingView style={s.root}>
         <Container>
-          <Text style={s.title}>Round {activeRound}</Text>
+          <Text testID="round-title" style={s.title}>
+            Round {activeRound}
+          </Text>
           <FlatList
             data={mySelections}
             keyExtractor={(item) => String(item.roundNumber)}
@@ -104,14 +106,20 @@ export function Round({ sessionId, topic, year }: Props) {
           />
           <View style={s.footer}>
             <Autocomplete
+              testID="pick-input"
               value={inputValue}
               onChangeText={setInputValue}
               onSelectOption={onSelectOption}
               options={availableOptions}
               placeholder={isEditing ? "Edit your pick" : "Enter your pick"}
             />
-            <Button label={isEditing ? "Save" : "Enter"} onPress={onEnter} disabled={isDisabled} />
-            {isEditing && <Button label="Cancel" onPress={onCancelEdit} />}
+            <Button
+              testID="submit-pick"
+              label={isEditing ? "Save" : "Enter"}
+              onPress={onEnter}
+              disabled={isDisabled}
+            />
+            {isEditing && <Button testID="cancel-edit" label="Cancel" onPress={onCancelEdit} />}
           </View>
         </Container>
       </KeyboardAvoidingView>

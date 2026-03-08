@@ -11,48 +11,141 @@ tags:
 - tapOn: What of the Year
 
 # Home → Setup → Lobby
-- assertVisible: "Start"
-- tapOn: "Start"
+- assertVisible:
+    id: home-start
+- tapOn:
+    id: home-start
 - waitForAnimationToEnd
 
-- assertVisible: "Random"
-- assertVisible: "User name"
+- assertVisible:
+    id: random-avatar
+- assertVisible:
+    id: name-input
 
-- tapOn: "User name"
+- tapOn:
+    id: name-input
 - inputText: "E2E Tester"
 
-- tapOn: "Start"
+- tapOn:
+    id: setup-submit
 - waitForAnimationToEnd
 
 # Lobby — verify we landed as host
 - assertVisible: "E2E Tester"
 - assertVisible: "Host"
-- assertVisible: "Invite"
-- assertVisible: "Start"
-- assertVisible: "1 of 10"
+- assertVisible:
+    id: invite
+- assertVisible:
+    id: lobby-start
+- assertVisible:
+    id: player-count
 
 # Start the session
-- tapOn: "Start"
+- tapOn:
+    id: lobby-start
 - waitForAnimationToEnd
 
+# Round 10 — keyboard avoidance + submit
 - assertVisible: "Round 10"
+- tapOn:
+    id: pick-input
+- assertVisible:
+    id: submit-pick
+- inputText: "Pick Ten"
+- assertVisible:
+    id: submit-pick
+- tapOn:
+    id: submit-pick
+- assertVisible: "Pick Ten"
 
-# Keyboard Avoidance — tap input, verify button stays visible
-- tapOn: "Enter your pick"
-- assertVisible: "Enter"
-- inputText: "Original Pick"
-- assertVisible: "Enter"
-
-# Submit pick
-- tapOn: "Enter"
-- assertVisible: "Original Pick"
-
-# Edit Selection — modify the pick
+# Edit Selection — modify the Round 10 pick
 - tapOn: "Edit"
-- assertVisible: "Save"
+- tapOn:
+    id: pick-input
+- eraseText: 20
+- inputText: "Updated Ten"
+- tapOn:
+    id: submit-pick
+- assertVisible: "Updated Ten"
 
-- tapOn: "Edit your pick"
-- inputText: "Updated Pick"
-- tapOn: "Save"
+# Round 9 — auto-advanced after Round 10 pick
+- assertVisible: "Round 9"
+- tapOn:
+    id: pick-input
+- inputText: "Pick Nine"
+- tapOn:
+    id: submit-pick
+- assertVisible: "Pick Nine"
 
-- assertVisible: "Updated Pick"
+# Round 8
+- assertVisible: "Round 8"
+- tapOn:
+    id: pick-input
+- inputText: "Pick Eight"
+- tapOn:
+    id: submit-pick
+
+# Round 7
+- assertVisible: "Round 7"
+- tapOn:
+    id: pick-input
+- inputText: "Pick Seven"
+- tapOn:
+    id: submit-pick
+
+# Round 6
+- assertVisible: "Round 6"
+- tapOn:
+    id: pick-input
+- inputText: "Pick Six"
+- tapOn:
+    id: submit-pick
+
+# Round 5
+- assertVisible: "Round 5"
+- tapOn:
+    id: pick-input
+- inputText: "Pick Five"
+- tapOn:
+    id: submit-pick
+
+# Round 4
+- assertVisible: "Round 4"
+- tapOn:
+    id: pick-input
+- inputText: "Pick Four"
+- tapOn:
+    id: submit-pick
+
+# Round 3
+- assertVisible: "Round 3"
+- tapOn:
+    id: pick-input
+- inputText: "Pick Three"
+- tapOn:
+    id: submit-pick
+
+# Round 2
+- assertVisible: "Round 2"
+- tapOn:
+    id: pick-input
+- inputText: "Pick Two"
+- tapOn:
+    id: submit-pick
+
+# Round 1 — last pick triggers navigation to results
+- assertVisible: "Round 1"
+- tapOn:
+    id: pick-input
+- inputText: "Pick One"
+- tapOn:
+    id: submit-pick
+
+# Results Screen
+- assertVisible:
+    id: results-list
+- assertVisible: "Updated Ten"
+- assertVisible: "Pick Nine"
+- assertVisible: "Pick One"
+- assertVisible: "E2E Tester"
+- assertVisible: "pts"

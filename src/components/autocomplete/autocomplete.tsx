@@ -13,6 +13,7 @@ interface Props {
   onSelectOption: (option: Option) => void;
   options: Option[];
   placeholder: string;
+  testID?: string;
 }
 
 /**
@@ -21,7 +22,14 @@ interface Props {
  * As the user types, matching options are shown in a dropdown.
  * Selecting an option calls `onSelectOption` with the full Option object.
  */
-export function Autocomplete({ value, placeholder, onChangeText, onSelectOption, options }: Props) {
+export function Autocomplete({
+  value,
+  placeholder,
+  onChangeText,
+  onSelectOption,
+  options,
+  testID,
+}: Props) {
   const s = useStyles();
   const [showSuggestions, setShowSuggestions] = useState(false);
 
@@ -90,6 +98,7 @@ export function Autocomplete({ value, placeholder, onChangeText, onSelectOption,
         autoCorrect={false}
         autoCapitalize="words"
         placeholder={placeholder}
+        testID={testID}
       />
       {filtered?.length > 0 && (
         <View style={s.dropdown}>

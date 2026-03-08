@@ -34,7 +34,7 @@ export function PlayerList({ data, completedUids, maxPlayerCount }: Props) {
       }}
       ListFooterComponent={
         <View style={s.footer}>
-          <Text style={s.count}>{`${playerCount} of ${maxPlayerCount}`}</Text>
+          <Text testID="player-count" style={s.count}>{`${playerCount} of ${maxPlayerCount}`}</Text>
         </View>
       }
     />

@@ -8,7 +8,7 @@ interface Props {
 export function SettingsButton({ onPress }: Props) {
   const s = useStyles();
   return (
-    <Pressable onPress={onPress} hitSlop={8}>
+    <Pressable testID="settings-button" onPress={onPress} hitSlop={8}>
       <Text style={s.root}>☰</Text>
     </Pressable>
   );

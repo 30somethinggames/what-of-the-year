@@ -63,11 +63,11 @@ export function Lobby({ topic, year, sessionId }: LobbyProps) {
       <View style={s.footer}>
         {isHost ? (
           <>
-            <Button label="Invite" onPress={onShare} />
-            <Button label="Start" onPress={onStart} />
+            <Button testID="invite" label="Invite" onPress={onShare} />
+            <Button testID="lobby-start" label="Start" onPress={onStart} />
           </>
         ) : (
-          <Button label="Leave" onPress={onLeave} />
+          <Button testID="leave-lobby" label="Leave" onPress={onLeave} />
         )}
       </View>
     </Container>
