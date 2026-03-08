@@ -1,6 +1,4 @@
-var BASE_URL = "https://rosy-anteater-532.convex.site";
-
-var response = http.post(BASE_URL + "/test/add-player", {
+const response = http.post(MAESTRO_CONVEX_SITE_URL + "/test/add-player", {
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
     sessionId: output.sessionId,
@@ -9,5 +7,9 @@ var response = http.post(BASE_URL + "/test/add-player", {
   }),
 });
 
-var data = json(response.body);
+if (!response.ok) {
+  throw new Error("Add player failed: " + response.status + " " + response.body);
+}
+
+const data = json(response.body);
 output.lastPlayerUid = data.uid;

@@ -140,6 +140,7 @@ tags:
 - inputText: "Pick One"
 - tapOn:
     id: submit-pick
+- waitForAnimationToEnd
 
 # Results Screen
 - assertVisible:
@@ -148,4 +149,4 @@ tags:
 - assertVisible: "Pick Nine"
 - assertVisible: "Pick One"
 - assertVisible: "E2E Tester"
-- assertVisible: "pts"
+- assertVisible: "10pts"
