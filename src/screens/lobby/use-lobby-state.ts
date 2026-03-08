@@ -1,10 +1,10 @@
 import { SessionStatus } from "convex/constants";
 import { router } from "expo-router";
 import { useEffect } from "react";
-import { Alert } from "react-native";
 
 import { usePlayers } from "db/use-players";
 import { useSession } from "db/use-sessions";
+import { useGameOver } from "hooks/use-game-over";
 
 import type { LobbyProps } from "./types";
 
@@ -22,14 +22,7 @@ export function useLobbyState({ sessionId, topic, year }: LobbyProps) {
 
   const maxPlayerCount = session?.maxPlayers;
 
-  // Navigate home when host ends the game
-  useEffect(() => {
-    if (session?.status === SessionStatus.ENDED) {
-      Alert.alert("Game Over", "The host ended the game.", [
-        { text: "OK", onPress: () => router.replace("/") },
-      ]);
-    }
-  }, [session?.status]);
+  useGameOver({ isHost, session });
 
   // Auto-navigate non-host players when game starts
   useEffect(() => {

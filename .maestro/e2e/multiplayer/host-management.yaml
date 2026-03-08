@@ -1,0 +1,106 @@
+appId: host.exp.Exponent
+name: Host Management
+tags:
+  - e2e
+  - multiplayer
+---
+# Clean up any leftover test data
+- runScript: ../../scripts/cleanup.js
+
+- launchApp
+- tapOn: What of the Year
+
+# Home → Setup → Lobby
+- tapOn:
+    id: home-start
+- waitForAnimationToEnd
+
+- tapOn:
+    id: name-input
+- inputText: "Host Player"
+
+- tapOn:
+    id: setup-submit
+- waitForAnimationToEnd
+
+# Lobby — verify host
+- assertVisible: "Host Player"
+- assertVisible: "Host"
+- assertVisible:
+    id: player-count
+
+# Extract sessionId
+- copyTextFrom:
+    id: session-id
+- evalScript: ${output.sessionId = maestro.copiedText}
+
+# ═══ Kick from Lobby ═══
+
+# Add a player, then kick them
+- evalScript: ${output.playerName = 'Lobby Target'}
+- evalScript: ${output.playerAvatar = '🎯'}
+- runScript: ../../scripts/add-player.js
+
+- assertVisible: "Lobby Target"
+- tapOn:
+    id: kick-player
+- assertNotVisible: "Lobby Target"
+
+# ═══ Kick from Game ═══
+
+# Add a player for the game
+- evalScript: ${output.playerName = 'Game Target'}
+- evalScript: ${output.playerAvatar = '🎮'}
+- runScript: ../../scripts/add-player.js
+- evalScript: ${output.gameTargetUid = output.lastPlayerUid}
+
+- assertVisible: "Game Target"
+
+# Start game
+- tapOn:
+    id: lobby-start
+- waitForAnimationToEnd
+
+# Round 10 — both pick
+- assertVisible: "Round 10"
+- tapOn:
+    id: pick-input
+- inputText: "a"
+- assertVisible:
+    id: suggestion-item
+- tapOn:
+    id: suggestion-item
+- tapOn:
+    id: submit-pick
+
+- evalScript: ${output.playerUid = output.gameTargetUid}
+- evalScript: ${output.roundNumber = '10'}
+- evalScript: ${output.pickName = 'Elden Ring'}
+- runScript: ../../scripts/make-selection.js
+
+# Round 9 — open settings and kick the player
+- assertVisible: "Round 9"
+- tapOn:
+    id: settings-button
+- waitForAnimationToEnd
+
+- assertVisible: "Game Target"
+- tapOn:
+    id: kick-player
+- assertNotVisible: "Game Target"
+- tapOn:
+    id: close-settings
+
+# ═══ End Game Early ═══
+
+# Open settings and leave game (triggers endSession)
+- tapOn:
+    id: settings-button
+- waitForAnimationToEnd
+- tapOn:
+    id: leave-game
+- waitForAnimationToEnd
+
+# Verify we're back on the home screen
+- assertVisible:
+    id: home-start

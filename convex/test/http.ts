@@ -2,13 +2,17 @@ import { internal } from "../_generated/api";
 import { httpAction } from "../_generated/server";
 
 const NOT_FOUND = new Response("Not Found", { status: 404 });
+const UNAUTHORIZED = new Response("Unauthorized", { status: 401 });
 
-function isTestEnabled() {
-  return process.env.IS_TEST === "true";
+function guardTest(request: Request) {
+  if (process.env.IS_TEST !== "true") return NOT_FOUND;
+  if (request.headers.get("x-test-secret") !== process.env.TEST_SECRET) return UNAUTHORIZED;
+  return null;
 }
 
 export const addPlayer = httpAction(async (ctx, request) => {
-  if (!isTestEnabled()) return NOT_FOUND;
+  const denied = guardTest(request);
+  if (denied) return denied;
 
   const body = await request.json();
   const result = await ctx.runMutation(internal.test.seed.addPlayer, body);
@@ -19,7 +23,8 @@ export const addPlayer = httpAction(async (ctx, request) => {
 });
 
 export const makeSelection = httpAction(async (ctx, request) => {
-  if (!isTestEnabled()) return NOT_FOUND;
+  const denied = guardTest(request);
+  if (denied) return denied;
 
   const body = await request.json();
   await ctx.runMutation(internal.test.seed.makeSelection, body);
@@ -29,8 +34,9 @@ export const makeSelection = httpAction(async (ctx, request) => {
   });
 });
 
-export const cleanup = httpAction(async (ctx) => {
-  if (!isTestEnabled()) return NOT_FOUND;
+export const cleanup = httpAction(async (ctx, request) => {
+  const denied = guardTest(request);
+  if (denied) return denied;
 
   await ctx.runMutation(internal.test.seed.cleanup);
 

@@ -29,7 +29,7 @@ export default function ResultsIndex() {
           gestureEnabled: false,
         }}
       />
-      <Results sessionId={sessionId as SessionID} />
+      <Results sessionId={sessionId} />
     </>
   );
 }

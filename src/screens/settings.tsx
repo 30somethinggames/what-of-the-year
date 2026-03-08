@@ -1,9 +1,7 @@
 import { api } from "convex/_generated/api";
-import { SessionStatus } from "convex/constants";
 import { useMutation } from "convex/react";
 import { router } from "expo-router";
-import { useEffect } from "react";
-import { Alert, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
 import { AppVersion } from "components/app-version";
 import { Button } from "components/button";
@@ -14,6 +12,7 @@ import type { SessionID } from "db/types";
 import { usePlayers } from "db/use-players";
 import { useSelections } from "db/use-selections";
 import { useSession } from "db/use-sessions";
+import { useGameOver } from "hooks/use-game-over";
 import { createStyles } from "utils/theme";
 
 interface Props {
@@ -23,26 +22,16 @@ interface Props {
 export function Settings({ sessionId, round }: Props) {
   const s = useStyles();
 
-  const { session } = useSession(sessionId as SessionID);
-  const { isLoading: isPlayersLoading, players, isHost } = usePlayers(sessionId as SessionID);
-  const { isLoading: isSelectionsLoading, selections } = useSelections(
-    sessionId as SessionID,
-    round,
-  );
+  const { isLoading: isSessionLoading, session } = useSession(sessionId);
+  const { isLoading: isPlayersLoading, players, isHost } = usePlayers(sessionId);
+  const { isLoading: isSelectionsLoading, selections } = useSelections(sessionId, round);
   const advanceRound = useMutation(api.rounds.advanceRound);
   const endSession = useMutation(api.sessions.endSession);
   const kickFromGame = useMutation(api.players.kickFromGame);
 
-  // Navigate home when host ends the game (for non-host players viewing settings)
-  useEffect(() => {
-    if (!isHost && session?.status === SessionStatus.ENDED) {
-      Alert.alert("Game Over", "The host ended the game.", [
-        { text: "OK", onPress: () => router.replace("/") },
-      ]);
-    }
-  }, [session?.status, isHost]);
+  useGameOver({ isHost, session });
 
-  if (isPlayersLoading || isSelectionsLoading) {
+  if (isSessionLoading || isPlayersLoading || isSelectionsLoading) {
     return <Loading />;
   }
 
@@ -50,15 +39,15 @@ export function Settings({ sessionId, round }: Props) {
 
   const onNextRound = async () => {
     await advanceRound({
-      sessionId: sessionId as SessionID,
+      sessionId,
       currentRoundNumber: round,
     });
     router.back();
   };
 
-  const onLeaveGame = async () => {
+  const onLeaveGame = () => {
     if (isHost) {
-      await endSession({ sessionId: sessionId as SessionID });
+      endSession({ sessionId });
     }
     router.replace("/");
   };

@@ -1,5 +1,5 @@
 const response = http.post(MAESTRO_CONVEX_SITE_URL + "/test/make-selection", {
-  headers: { "Content-Type": "application/json" },
+  headers: { "Content-Type": "application/json", "x-test-secret": MAESTRO_TEST_SECRET },
   body: JSON.stringify({
     sessionId: output.sessionId,
     uid: output.playerUid,

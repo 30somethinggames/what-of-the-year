@@ -10,6 +10,7 @@ import { Container } from "components/container";
 import { PlayerList } from "components/lists/players";
 import { Error } from "components/states/error";
 import { Loading } from "components/states/loading";
+import { TestLabel } from "components/test-label";
 import { createStyles } from "utils/theme";
 
 import type { LobbyProps } from "./types";
@@ -56,9 +57,7 @@ export function Lobby({ topic, year, sessionId }: LobbyProps) {
 
   return (
     <Container style={s.root}>
-      <Text testID="session-id" style={s.hidden}>
-        {sessionId}
-      </Text>
+      <TestLabel testID="session-id" value={sessionId} />
       <PlayerList
         data={players}
         maxPlayerCount={maxPlayerCount}
@@ -82,11 +81,6 @@ export function Lobby({ topic, year, sessionId }: LobbyProps) {
 const useStyles = createStyles((t) => ({
   root: {
     flex: 1,
-  },
-  hidden: {
-    position: "absolute" as const,
-    opacity: 0,
-    height: 0,
   },
   footer: {
     gap: t.spacing.md,

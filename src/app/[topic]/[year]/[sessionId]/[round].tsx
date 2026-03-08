@@ -39,7 +39,7 @@ export default function RoundIndex() {
           headerTitle: () => <Header title={title} />,
         }}
       />
-      <Round sessionId={sessionId as SessionID} topic={topic.value} year={year} />
+      <Round sessionId={sessionId} topic={topic.value} year={year} />
     </>
   );
 }

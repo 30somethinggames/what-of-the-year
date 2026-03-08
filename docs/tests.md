@@ -29,6 +29,8 @@ bun run test:e2e
 
 **Multiplayer Host** (`multiplayer/host.yaml`): Host creates game, API adds 2 players, 3 rounds of mixed picks, host advances remaining rounds via settings, end game, results with rankings
 
+**Host Management** (`multiplayer/host-management.yaml`): Kick player from lobby, kick player from game, host ends game early via Leave Game
+
 ### Architecture
 
 ```
@@ -37,6 +39,7 @@ convex/test/
 └── http.ts    # HTTP action wrappers (POST /test/add-player, etc.)
 
 .maestro/
+├── config.yaml               # Global config: appId, flow patterns
 ├── scripts/
 │   ├── add-player.js         # Calls /test/add-player
 │   ├── make-selection.js     # Calls /test/make-selection
@@ -46,8 +49,17 @@ convex/test/
 └── e2e/
     ├── single-player.yaml
     └── multiplayer/
-        └── host.yaml
+        ├── host.yaml
+        └── host-management.yaml
 ```
+
+### Tags
+
+Flows are tagged and discovered via `--include-tags`. The `config.yaml` defines flow patterns to include subdirectories.
+
+- `smoke` — smoke tests
+- `e2e` — all e2e tests
+- `multiplayer` — multiplayer-specific e2e tests
 
 ### Multiplayer Testing Approach
 

@@ -1,9 +1,7 @@
 1. E2E Multiplayer Testing Strategy
-   - kick player from lobby (host kicks API-added player, assert they disappear)
-   - kick player from game (same during gameplay, verify selections cleaned up)
-   - host ends game early via `endSession` (settings → Leave Game mid-game)
-   - non-host leaves game
-   - guest perspective (seeing "host ended the game" alert — hard with single device + API players)
+   - **Non-host**
+     - leave game
+     - see "host ended the game" alert (hard with single device + API players)
 1. EAS
    - Embed fonts via `expo-font` config plugin in app.json instead of runtime `useFonts`
 1. Figure out [deeplinks](./universal-links.md)
