@@ -14,13 +14,14 @@
     "convex:dev": "bunx convex dev",
     "test": "bun test",
     "test:watch": "bun test --watch",
-    "test:e2e": "source .env.local && maestro test --include-tags=e2e .maestro/",
+    "test:e2e": "set -a && source .env.local && set +a && maestro test --include-tags=e2e .maestro/",
     "test:smoke": "maestro test .maestro/smoke/",
     "prepare": "husky"
   },
   "dependencies": {
     "@auth/core": "0.37.0",
     "@convex-dev/auth": "^0.0.91",
+    "@convex-dev/rate-limiter": "^0.3.2",
     "@expo-google-fonts/inter": "^0.4.2",
     "@react-native-async-storage/async-storage": "^2.2.0",
     "@react-navigation/elements": "^2.6.3",

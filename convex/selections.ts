@@ -3,12 +3,16 @@ import { v } from "convex/values";
 import type { Doc } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
 import { MAX_ROUNDS } from "./constants";
+import { rateLimiter } from "./ratelimits";
 import { buildPickArg } from "./utils/pick";
 import { getRoundByNumber } from "./utils/rounds";
 
 export const getSelections = query({
   args: { sessionId: v.id("sessions"), number: v.number() },
   handler: async (ctx, { sessionId, number }) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthenticated");
+
     const round = await getRoundByNumber(ctx.db, sessionId, number);
     if (!round) return [];
 
@@ -46,16 +50,6 @@ export const getMySelections = query({
   },
 });
 
-export const getAllSelections = query({
-  args: { sessionId: v.id("sessions") },
-  handler: async (ctx, { sessionId }) => {
-    return await ctx.db
-      .query("selections")
-      .withIndex("by_session", (q) => q.eq("sessionId", sessionId))
-      .collect();
-  },
-});
-
 const optionArg = v.object({
   id: v.number(),
   name: v.string(),
@@ -76,8 +70,11 @@ export const saveSelection = mutation({
     if (!identity) throw new Error("Unauthenticated");
     const uid = identity.subject;
 
+    await rateLimiter.limit(ctx, "saveSelection", { key: uid, throws: true });
+
     const round = await getRoundByNumber(ctx.db, sessionId, roundNumber);
     if (!round) throw new Error("Round not found");
+    if (round.state !== "open") throw new Error("Round is not open");
 
     const existing = await ctx.db
       .query("selections")
@@ -150,6 +147,9 @@ export const editSelection = mutation({
 export const getResults = query({
   args: { sessionId: v.id("sessions") },
   handler: async (ctx, { sessionId }) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthenticated");
+
     const [allSelections, players] = await Promise.all([
       ctx.db
         .query("selections")

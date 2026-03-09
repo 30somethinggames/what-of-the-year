@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test";
 
-import { MAX_NAME_LENGTH, validateName } from "../validate";
+import { MAX_NAME_LENGTH, validateAvatar, validateName } from "convex/utils/validate";
 
 describe("validateName", () => {
   it("returns null for valid names", () => {
@@ -36,5 +36,30 @@ describe("validateName", () => {
   it("returns null at exactly max length", () => {
     const exact = "A".repeat(MAX_NAME_LENGTH);
     expect(validateName(exact)).toBeNull();
+  });
+});
+
+describe("validateAvatar", () => {
+  it("returns null for valid DiceBear URLs", () => {
+    expect(validateAvatar("https://api.dicebear.com/7.x/bottts/svg?seed=abc123")).toBeNull();
+    expect(validateAvatar("https://api.dicebear.com/7.x/bottts/svg?seed=x9k2m")).toBeNull();
+  });
+
+  it("returns error for wrong prefix", () => {
+    expect(validateAvatar("https://evil.com/avatar.svg")).toBe("Invalid avatar URL");
+    expect(validateAvatar("javascript:alert(1)")).toBe("Invalid avatar URL");
+    expect(validateAvatar("")).toBe("Invalid avatar URL");
+  });
+
+  it("returns error for invalid seed", () => {
+    expect(validateAvatar("https://api.dicebear.com/7.x/bottts/svg?seed=")).toBe(
+      "Invalid avatar seed",
+    );
+    expect(validateAvatar("https://api.dicebear.com/7.x/bottts/svg?seed=<script>")).toBe(
+      "Invalid avatar seed",
+    );
+    expect(validateAvatar("https://api.dicebear.com/7.x/bottts/svg?seed=a b c")).toBe(
+      "Invalid avatar seed",
+    );
   });
 });

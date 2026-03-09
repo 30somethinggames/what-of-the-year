@@ -2,7 +2,9 @@ import { v } from "convex/values";
 
 import { mutation, query } from "./_generated/server";
 import { SessionStatus } from "./constants";
+import { rateLimiter } from "./ratelimits";
 import { getRoundByNumber } from "./utils/rounds";
+import { validateAvatar, validateName } from "./utils/validate";
 
 export const joinSession = mutation({
   args: {
@@ -11,9 +13,16 @@ export const joinSession = mutation({
     avatar: v.string(),
   },
   handler: async (ctx, { sessionId, name, avatar }) => {
+    const nameError = validateName(name);
+    if (nameError) throw new Error(nameError);
+    const avatarError = validateAvatar(avatar);
+    if (avatarError) throw new Error(avatarError);
+
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Unauthenticated");
     const uid = identity.subject;
+
+    await rateLimiter.limit(ctx, "joinSession", { key: uid, throws: true });
 
     const session = await ctx.db.get(sessionId);
     if (!session) throw new Error("Session not found");
@@ -173,6 +182,9 @@ export const kickFromGame = mutation({
 export const getPlayers = query({
   args: { sessionId: v.id("sessions") },
   handler: async (ctx, { sessionId }) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthenticated");
+
     return await ctx.db
       .query("players")
       .withIndex("by_session_uid", (q) => q.eq("sessionId", sessionId))

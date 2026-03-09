@@ -19,3 +19,13 @@ export function validateName(raw: string): string | null {
   if (raw.length > MAX_NAME_LENGTH) return `Name must be ${MAX_NAME_LENGTH} characters or less`;
   return null;
 }
+
+const AVATAR_PREFIX = "https://api.dicebear.com/7.x/bottts/svg?seed=";
+const VALID_SEED = /^[a-z0-9]+$/;
+
+export function validateAvatar(raw: string): string | null {
+  if (!raw.startsWith(AVATAR_PREFIX)) return "Invalid avatar URL";
+  const seed = raw.slice(AVATAR_PREFIX.length);
+  if (!seed || !VALID_SEED.test(seed)) return "Invalid avatar seed";
+  return null;
+}

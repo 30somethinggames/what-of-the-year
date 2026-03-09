@@ -2,6 +2,8 @@ import { v } from "convex/values";
 
 import { mutation, query } from "./_generated/server";
 import { SessionStatus } from "./constants";
+import { rateLimiter } from "./ratelimits";
+import { validateAvatar, validateName } from "./utils/validate";
 
 const MAX_ROUNDS = 10;
 const MAX_PLAYERS = 10;
@@ -9,6 +11,9 @@ const MAX_PLAYERS = 10;
 export const getSession = query({
   args: { sessionId: v.id("sessions") },
   handler: async (ctx, { sessionId }) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthenticated");
+
     return await ctx.db.get(sessionId);
   },
 });
@@ -21,9 +26,16 @@ export const createSession = mutation({
     avatar: v.string(),
   },
   handler: async (ctx, { topic, year, name, avatar }) => {
+    const nameError = validateName(name);
+    if (nameError) throw new Error(nameError);
+    const avatarError = validateAvatar(avatar);
+    if (avatarError) throw new Error(avatarError);
+
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Unauthenticated");
     const uid = identity.subject;
+
+    await rateLimiter.limit(ctx, "createSession", { key: uid, throws: true });
 
     const sessionId = await ctx.db.insert("sessions", {
       topic,

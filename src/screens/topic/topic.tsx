@@ -2,6 +2,7 @@ import { useAuthActions } from "@convex-dev/auth/react";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { api } from "convex/_generated/api";
 import { useConvexAuth, useMutation } from "convex/react";
+import { MAX_NAME_LENGTH, validateName } from "convex/utils/validate";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
@@ -15,8 +16,6 @@ import type { TopicType } from "constants/topics";
 import type { SessionID } from "db/types";
 import { useTopicData } from "queries/use-topic-data";
 import { createStyles } from "utils/theme";
-
-import { MAX_NAME_LENGTH, validateName } from "./utils/validate";
 
 interface Props {
   topic: TopicType;
