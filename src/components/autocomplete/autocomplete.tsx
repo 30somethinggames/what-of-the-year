@@ -87,6 +87,8 @@ export function Autocomplete({
     setShowSuggestions(false);
   };
 
+  const shouldDisplaySuggestions = showSuggestions && filtered?.length > 0;
+
   return (
     <View style={s.root}>
       <Input
@@ -100,7 +102,7 @@ export function Autocomplete({
         placeholder={placeholder}
         testID={testID}
       />
-      {filtered?.length > 0 && (
+      {shouldDisplaySuggestions && (
         <View style={s.dropdown}>
           <FlatList
             data={filtered}
@@ -113,9 +115,9 @@ export function Autocomplete({
                   <Text style={s.suggestionText} numberOfLines={1}>
                     {item.name}
                   </Text>
-                  {item.rating != null && (
+                  {item.rating != null ? (
                     <Text style={s.suggestionMeta}>{Math.round(item.rating)}</Text>
-                  )}
+                  ) : null}
                 </Pressable>
               );
             }}
