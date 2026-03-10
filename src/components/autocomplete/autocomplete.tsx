@@ -106,20 +106,19 @@ export function Autocomplete({
             data={filtered}
             keyExtractor={(item) => String(item.id)}
             keyboardShouldPersistTaps="handled"
-            renderItem={({ item }) => (
-              <Pressable
-                testID="suggestion-item"
-                style={s.suggestion}
-                onPress={() => handleSelect(item)}
-              >
-                <Text style={s.suggestionText} numberOfLines={1}>
-                  {item.name}
-                </Text>
-                {item.rating != null && (
-                  <Text style={s.suggestionMeta}>{Math.round(item.rating)}</Text>
-                )}
-              </Pressable>
-            )}
+            renderItem={({ item }) => {
+              const onPress = () => handleSelect(item);
+              return (
+                <Pressable testID="suggestion-item" style={s.suggestion} onPress={onPress}>
+                  <Text style={s.suggestionText} numberOfLines={1}>
+                    {item.name}
+                  </Text>
+                  {item.rating != null && (
+                    <Text style={s.suggestionMeta}>{Math.round(item.rating)}</Text>
+                  )}
+                </Pressable>
+              );
+            }}
           />
         </View>
       )}

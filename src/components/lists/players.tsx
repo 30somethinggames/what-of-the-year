@@ -24,6 +24,7 @@ export function PlayerList({ data, completedUids, maxPlayerCount, onKick }: Prop
       contentContainerStyle={s.root}
       renderItem={({ item }) => {
         const hasCompleted = completedUids?.has(item.uid);
+        const handleKick = () => onKick?.(item.uid);
         return (
           <Row>
             <Avatar source={item.avatar} size={40} />
@@ -31,7 +32,7 @@ export function PlayerList({ data, completedUids, maxPlayerCount, onKick }: Prop
             {item.isHost && <Text style={s.hostBadge}>Host</Text>}
             {completedUids && <Text style={s.status}>{hasCompleted ? "✓" : "..."}</Text>}
             {onKick && !item.isHost && (
-              <Pressable testID="kick-player" onPress={() => onKick(item.uid)} hitSlop={8}>
+              <Pressable testID="kick-player" onPress={handleKick} hitSlop={8}>
                 <Text style={s.kickBtn}>✕</Text>
               </Pressable>
             )}

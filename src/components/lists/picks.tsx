@@ -8,10 +8,6 @@ import { Row } from "./components/row";
 
 type PickItem = MySelection | RankedPick;
 
-function isRankedPick(item: PickItem): item is RankedPick {
-  return "totalPoints" in item;
-}
-
 interface BaseDisplayProps {
   rank: number;
   uri?: string;
@@ -75,7 +71,7 @@ export function Picks({ data, testID, onEdit }: Props) {
       keyExtractor={(item) => item.pick.id}
       contentContainerStyle={s.root}
       renderItem={({ item, index }) =>
-        isRankedPick(item) ? (
+        "totalPoints" in item ? (
           <RankedRow item={item} rank={index + 1} />
         ) : (
           <SelectionRow item={item} onEdit={onEdit} />
