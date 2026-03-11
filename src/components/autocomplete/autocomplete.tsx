@@ -65,8 +65,6 @@ export function Autocomplete({
     [onChangeText],
   );
 
-  const filtered = showSuggestions ? filterOptions(options, value) : [];
-
   const onFocus = () => {
     clearBlurTimeout();
     setShowSuggestions(true);
@@ -87,6 +85,7 @@ export function Autocomplete({
     setShowSuggestions(false);
   };
 
+  const filtered = showSuggestions ? filterOptions(options, value) : [];
   const shouldDisplaySuggestions = showSuggestions && filtered?.length > 0;
 
   return (

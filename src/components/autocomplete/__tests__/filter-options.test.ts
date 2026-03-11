@@ -47,10 +47,28 @@ describe("filterOptions", () => {
     expect(names).toEqual(["Star Wars", "Stardew Valley", "Starfield", "Street Fighter"]);
   });
 
-  it("does not match substrings in the middle of the name", () => {
+  it("matches words in the middle of the name", () => {
     const result = filterOptions(options, "la");
+    const names = result.map((o) => o.name);
 
-    expect(result).toEqual([]);
+    expect(names).toEqual(["The Last of Us"]);
+  });
+
+  it("matches 'mario' to 'Super Mario' via word boundary", () => {
+    const result = filterOptions(options, "mario");
+    const names = result.map((o) => o.name);
+
+    expect(names).toEqual(["Super Mario"]);
+  });
+
+  it("ranks prefix matches before word-boundary matches", () => {
+    const result = filterOptions(
+      [option(1, "Adventure Time"), option(2, "Sonic Adventure")],
+      "adventure",
+    );
+    const names = result.map((o) => o.name);
+
+    expect(names).toEqual(["Adventure Time", "Sonic Adventure"]);
   });
 
   it("trims and lowercases the query", () => {
@@ -60,17 +78,10 @@ describe("filterOptions", () => {
     expect(names).toEqual(["Super Mario", "Subnautica"]);
   });
 
-  it("caps results at 8", () => {
+  it("returns all matches without a cap", () => {
     const result = filterOptions(options, "s");
 
-    expect(result).toHaveLength(8);
-  });
-
-  it("returns at most 8 results when many options match", () => {
-    const manyOptions = Array.from({ length: 20 }, (_, i) => option(i, `Star ${i}`));
-    const result = filterOptions(manyOptions, "st");
-
-    expect(result).toHaveLength(8);
+    expect(result).toHaveLength(10);
   });
 
   it("returns empty array when options list is empty", () => {
