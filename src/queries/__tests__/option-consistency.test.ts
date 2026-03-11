@@ -1,8 +1,6 @@
 import { describe, expect, it } from "bun:test";
 
-import { formBookOptions } from "../use-books";
-import { formGameOptions } from "../use-games";
-import { formMovieOptions } from "../use-movies";
+import { formBookOptions, formGameOptions, formMovieOptions } from "../transforms";
 
 /**
  * Core test: ensure all transformers produce the same Option structure

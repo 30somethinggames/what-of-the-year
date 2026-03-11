@@ -3,30 +3,10 @@ import { api } from "convex/_generated/api";
 import { useAction } from "convex/react";
 
 import { TOPIC_KEY } from "constants/topics";
-import type { Option } from "types/option";
 
 import { DEFAULT_STALE_TIME } from "./constants";
+import { formMovieOptions } from "./transforms";
 import type { QUERY_ARGS } from "./types";
-
-export function formMovieOptions(
-  movies: {
-    id: number;
-    title: string;
-    poster_path: string;
-    vote_average: number;
-    release_date: string;
-    overview: string;
-  }[],
-): Option[] {
-  return movies.map((movie) => ({
-    id: movie.id,
-    name: movie.title,
-    cover: movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : undefined,
-    rating: movie.vote_average,
-    first_release_date: new Date(movie.release_date).getTime() / 1000,
-    summary: movie.overview,
-  }));
-}
 
 const MOVIES_QUERY_KEY = TOPIC_KEY.MOVIES;
 

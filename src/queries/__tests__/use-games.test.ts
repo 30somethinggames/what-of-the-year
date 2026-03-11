@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test";
 
-import { formGameOptions } from "../use-games";
+import { formGameOptions } from "../transforms";
 
 const mockGame = {
   id: 1,
