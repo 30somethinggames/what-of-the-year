@@ -25,13 +25,13 @@ jobs:
         run: bun install --frozen-lockfile
       
       - name: Run format check
-        run: bun run format:check
-      
+        run: bun run check:format
+
       - name: Run linter
-        run: bun run lint
-      
+        run: bun run check:lint
+
       - name: Run style linter
-        run: bun run lint:styles
+        run: bun run check:styles
       
       - name: Run tests
         run: bun test
