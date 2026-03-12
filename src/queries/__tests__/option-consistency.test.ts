@@ -37,14 +37,12 @@ describe("Option type consistency", () => {
     };
 
     const mockBook = {
-      id: "test123",
-      volumeInfo: {
-        title: "Test",
-        publishedDate: "2024-01-01",
-        description: "Test",
-        imageLinks: { thumbnail: "http://test.jpg" },
-        averageRating: 4.125,
-      },
+      key: "/works/OL123W",
+      title: "Test",
+      first_publish_year: 2024,
+      cover_i: 12345,
+      ratings_average: 4.125,
+      description: "Test",
     };
 
     const gameOption = formGameOptions([mockGame])[0];
@@ -100,13 +98,11 @@ describe("Option type consistency", () => {
     };
 
     const bookWithoutThumbnail = {
-      id: "test123",
-      volumeInfo: {
-        title: "Test",
-        publishedDate: "2024-01-01",
-        description: "Test",
-        averageRating: 4.0,
-      },
+      key: "/works/OL123W",
+      title: "Test",
+      first_publish_year: 2024,
+      ratings_average: 4.0,
+      description: "Test",
     };
 
     const gameOption = formGameOptions([gameWithoutCover])[0];

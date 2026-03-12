@@ -12,11 +12,11 @@ const BOOK_QUERY_KEY = TOPIC_KEY.BOOKS;
 
 export function useBooks({ key, year }: QUERY_ARGS) {
   const enabled = key === BOOK_QUERY_KEY && !!year;
-  const getBooks = useAction(api.googlebooks.getBooks);
+  const getBooks = useAction(api.openlibrary.getBooks);
 
   return useQuery({
     queryKey: [BOOK_QUERY_KEY, year],
-    queryFn: () => getBooks({ year: year! }),
+    queryFn: () => getBooks({ year }),
     select: formBookOptions,
     staleTime: DEFAULT_STALE_TIME,
     enabled,

@@ -1,28 +1,26 @@
 import type { Option } from "types/option";
 
-export interface Book {
-  id: string;
-  volumeInfo: {
-    title: string;
-    publishedDate: string;
-    description?: string;
-    imageLinks?: { thumbnail?: string };
-    averageRating?: number;
-  };
+interface Book {
+  key: string;
+  title: string;
+  first_publish_year?: number;
+  cover_i?: number;
+  ratings_average?: number;
+  description?: string;
 }
 
 export function formBookOptions(books: Book[]): Option[] {
   return books.map((book) => ({
-    id: typeof book.id === "string" ? parseInt(book.id, 36) : 0,
-    name: book.volumeInfo.title,
-    cover: book.volumeInfo.imageLinks?.thumbnail?.replace("http:", "https:"),
-    rating: book.volumeInfo.averageRating ? book.volumeInfo.averageRating * 20 : 0,
-    first_release_date: new Date(book.volumeInfo.publishedDate).getTime() / 1000,
-    summary: book.volumeInfo.description,
+    id: book.cover_i ?? (parseInt(book.key.replace(/\D/g, ""), 10) || 0),
+    name: book.title,
+    cover: book.cover_i ? `https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg` : undefined,
+    rating: book.ratings_average ? book.ratings_average * 20 : 0,
+    first_release_date: book.first_publish_year ?? 0,
+    summary: book.description,
   }));
 }
 
-export interface Game {
+interface Game {
   id: number;
   name: string;
   cover?: {
@@ -48,21 +46,21 @@ export function formGameOptions(games: Game[]): Option[] {
   }));
 }
 
-export function formMovieOptions(
-  movies: {
-    id: number;
-    title: string;
-    poster_path: string;
-    vote_average: number;
-    release_date: string;
-    overview: string;
-  }[],
-): Option[] {
+interface Movie {
+  id: number;
+  title: string;
+  poster_path: string;
+  vote_average: number;
+  release_date: string;
+  overview: string;
+}
+
+export function formMovieOptions(movies: Movie[]): Option[] {
   return movies.map((movie) => ({
     id: movie.id,
     name: movie.title,
     cover: movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : undefined,
-    rating: movie.vote_average,
+    rating: movie.vote_average * 10,
     first_release_date: new Date(movie.release_date).getTime() / 1000,
     summary: movie.overview,
   }));
