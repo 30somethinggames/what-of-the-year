@@ -1,9 +1,8 @@
 import { api } from "convex/_generated/api";
 import { MAX_ROUNDS } from "convex/constants";
 import { useMutation } from "convex/react";
-import * as Linking from "expo-linking";
 import { router } from "expo-router";
-import { Share, View } from "react-native";
+import { View } from "react-native";
 
 import { Button } from "components/button";
 import { Container } from "components/container";
@@ -14,7 +13,8 @@ import { TestLabel } from "components/test-label";
 import { createStyles } from "utils/theme";
 
 import type { LobbyProps } from "./types";
-import { useLobbyState } from "./use-lobby-state";
+import { onShare } from "./utils/on-share";
+import { useLobbyState } from "./utils/use-lobby-state";
 
 export function Lobby({ topic, year, sessionId }: LobbyProps) {
   const s = useStyles();
@@ -32,16 +32,6 @@ export function Lobby({ topic, year, sessionId }: LobbyProps) {
   // TODO figure out
   if (!session) return <Error />;
 
-  const onShare = async () => {
-    const url = Linking.createURL(`/${topic.value}/${year}`, {
-      queryParams: { sessionId },
-    });
-
-    await Share.share({
-      message: `Join my ${topic.label} of ${year}!\n${url}`,
-    });
-  };
-
   const onStart = async () => {
     await startSession({ sessionId });
     router.replace({
@@ -55,6 +45,8 @@ export function Lobby({ topic, year, sessionId }: LobbyProps) {
     router.replace("/");
   };
 
+  const handleOnShare = () => onShare({ topic, year, sessionId });
+
   return (
     <Container style={s.root}>
       <TestLabel testID="session-id" value={sessionId} />
@@ -67,7 +59,7 @@ export function Lobby({ topic, year, sessionId }: LobbyProps) {
       <View style={s.footer}>
         {isHost ? (
           <>
-            <Button testID="invite" label="Invite" onPress={onShare} />
+            <Button testID="invite" label="Invite" onPress={handleOnShare} />
             <Button testID="lobby-start" label="Start" onPress={onStart} />
           </>
         ) : (

@@ -6,7 +6,7 @@ import { usePlayers } from "db/use-players";
 import { useSession } from "db/use-sessions";
 import { useGameOver } from "hooks/use-game-over";
 
-import type { LobbyProps } from "./types";
+import type { LobbyProps } from "../types";
 
 /**
  * Composite hook for managing lobby state.
