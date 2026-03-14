@@ -37,7 +37,10 @@ export function Home() {
         <Animated.View style={[btnStyle, s.footer]}>
           <Link
             asChild
-            href={{ pathname: "/[topic]/[year]", params: { topic: topic.value, year: year.value } }}
+            href={{
+              pathname: "/[topic]/[year]",
+              params: { topic: topic.value, year: year.value },
+            }}
           >
             <Button testID="home-start" label="Start" style={s.btn} />
           </Link>

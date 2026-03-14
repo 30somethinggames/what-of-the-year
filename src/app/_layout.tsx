@@ -14,6 +14,7 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 
+import { ToastProvider } from "components/toast";
 import { WebContainer } from "components/web-container";
 import { DEFAULT_STALE_TIME } from "queries/constants";
 import { palette } from "utils/theme";
@@ -53,18 +54,20 @@ export default function Root() {
     <ConvexAuthProvider client={convex} storage={AsyncStorage}>
       <QueryClientProvider client={queryClient}>
         <WebContainer>
-          <Stack
-            screenOptions={{
-              headerBackButtonDisplayMode: "minimal",
-              headerShadowVisible: false,
-              headerStyle: { backgroundColor: palette.white100 },
-            }}
-          >
-            <Stack.Screen
-              name="[topic]/[year]/[sessionId]/settings"
-              options={{ presentation: "modal", headerShown: false }}
-            />
-          </Stack>
+          <ToastProvider>
+            <Stack
+              screenOptions={{
+                headerBackButtonDisplayMode: "minimal",
+                headerShadowVisible: false,
+                headerStyle: { backgroundColor: palette.white100 },
+              }}
+            >
+              <Stack.Screen
+                name="[topic]/[year]/[sessionId]/settings"
+                options={{ presentation: "modal", headerShown: false }}
+              />
+            </Stack>
+          </ToastProvider>
         </WebContainer>
       </QueryClientProvider>
     </ConvexAuthProvider>
