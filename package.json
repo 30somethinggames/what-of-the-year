@@ -16,6 +16,8 @@
     "test:watch": "bun test --watch",
     "test:e2e": "set -a && source .env.local && set +a && maestro test --include-tags=e2e .maestro/",
     "test:smoke": "maestro test .maestro/smoke/",
+    "test:web": "set -a && source .env.local && set +a && bunx playwright test",
+    "test:web:ui": "set -a && source .env.local && set +a && bunx playwright test --ui",
     "prepare": "husky"
   },
   "dependencies": {
@@ -50,6 +52,7 @@
   },
   "devDependencies": {
     "@dev-plugins/react-query": "^0.4.0",
+    "@playwright/test": "^1.58.2",
     "@types/bun": "^1.3.6",
     "@types/react": "~19.1.0",
     "husky": "^9.1.7",

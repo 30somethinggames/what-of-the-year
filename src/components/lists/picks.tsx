@@ -49,7 +49,7 @@ function SelectionRow({
       <BaseDisplay rank={item.roundNumber} uri={item.pick.cover} />
       <Text style={s.pick}>{item.pick.name}</Text>
       {onEdit ? (
-        <Pressable onPress={() => onEdit(item)} hitSlop={8}>
+        <Pressable testID="edit-pick" onPress={() => onEdit(item)} hitSlop={8}>
           <Text style={s.editButton}>Edit</Text>
         </Pressable>
       ) : null}
