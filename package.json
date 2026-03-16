@@ -2,7 +2,7 @@
   "name": "what-of-the-year",
   "version": "0.0.1",
   "private": true,
-  "author": "Ryan Seery",
+  "author": "Ryan Seery & Melissa DeLorenzo",
   "main": "expo-router/entry",
   "scripts": {
     "start": "expo start",

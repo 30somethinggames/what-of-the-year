@@ -2,6 +2,8 @@
    - **Non-host**
      - leave game
      - see "host ended the game" alert (hard with single device + API players)
+1. FONTS!
+1. web styles
 1. EAS
    - Embed fonts via `expo-font` config plugin in app.json instead of runtime `useFonts`
 1. Figure out [deeplinks](./universal-links.md)

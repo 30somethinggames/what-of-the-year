@@ -1,3 +1,5 @@
+import { Platform } from "react-native";
+
 import type { Theme } from "./types";
 
 export const palette = {
@@ -36,11 +38,14 @@ export const baseTheme: Theme = {
     },
   },
   text: {
-    shadow: {
-      textShadowColor: palette.black100,
-      textShadowOffset: { width: 0, height: 0 },
-      textShadowRadius: 1,
-    },
+    shadow: Platform.select({
+      web: { textShadow: `0px 0px 1px ${palette.black100}` },
+      default: {
+        textShadowColor: palette.black100,
+        textShadowOffset: { width: 0, height: 0 },
+        textShadowRadius: 1,
+      },
+    }),
     font: {
       regular: "Inter_400Regular",
       medium: "Inter_500Medium",
@@ -54,12 +59,15 @@ export const baseTheme: Theme = {
       xl: 24,
     },
   },
-  shadow: {
-    shadowColor: palette.black100,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-  },
+  shadow: Platform.select({
+    web: { boxShadow: `0px 2px 8px rgba(34, 34, 34, 0.1)` },
+    default: {
+      shadowColor: palette.black100,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 8,
+    },
+  }),
 };
 
 function makeTheme(topicColor: string): Theme {

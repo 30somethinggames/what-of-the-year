@@ -2,6 +2,24 @@ interface ShadowOffset {
   width: number;
   height: number;
 }
+
+type BoxShadow =
+  | { boxShadow: string }
+  | {
+      shadowColor: string;
+      shadowOffset: ShadowOffset;
+      shadowOpacity: number;
+      shadowRadius: number;
+    };
+
+type TextShadow =
+  | { textShadow: string }
+  | {
+      textShadowColor: string;
+      textShadowOffset: ShadowOffset;
+      textShadowRadius: number;
+    };
+
 export interface Theme {
   topic: {
     color: string;
@@ -36,11 +54,7 @@ export interface Theme {
     };
   };
   text: {
-    shadow: {
-      textShadowColor: string;
-      textShadowOffset: ShadowOffset;
-      textShadowRadius: number;
-    };
+    shadow: TextShadow;
     font: {
       regular: string;
       medium: string;
@@ -54,10 +68,5 @@ export interface Theme {
       xl: number;
     };
   };
-  shadow: {
-    shadowColor: string;
-    shadowOffset: ShadowOffset;
-    shadowOpacity: number;
-    shadowRadius: number;
-  };
+  shadow: BoxShadow;
 }

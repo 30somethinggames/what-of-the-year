@@ -47,7 +47,7 @@ export function ToastProvider({ children }: Props) {
   return (
     <ToastContext.Provider value={value}>
       {children}
-      <View style={s.container} pointerEvents="box-none">
+      <View style={s.container}>
         {toasts.map((toast, index) => (
           <Toast
             key={toast.id}
@@ -71,5 +71,6 @@ const useStyles = createStyles(() => ({
     right: 0,
     zIndex: 9999,
     elevation: 9999,
+    pointerEvents: "box-none",
   },
 }));
