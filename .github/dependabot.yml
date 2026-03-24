@@ -4,14 +4,6 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-    ignore:
-      - dependency-name: "expo"
-      - dependency-name: "expo-*"
-      - dependency-name: "@expo/*"
-      - dependency-name: "react"
-      - dependency-name: "react-dom"
-      - dependency-name: "react-native"
-      - dependency-name: "react-native-*"
     open-pull-requests-limit: 10
 
   - package-ecosystem: "github-actions"
