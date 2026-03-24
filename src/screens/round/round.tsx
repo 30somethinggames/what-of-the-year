@@ -23,8 +23,11 @@ interface Props {
 }
 
 export function Round({ sessionId, topic, year }: Props) {
-  const { isLoading, session, round, activeRound, mySelections, hasPickedThisRound } =
-    useRoundState({ sessionId, topic, year });
+  const { isLoading, session, round, mySelections, hasPickedThisRound } = useRoundState({
+    sessionId,
+    topic,
+    year,
+  });
 
   const saveSelection = useMutation(api.selections.saveSelection);
   const editSelection = useMutation(api.selections.editSelection);
@@ -38,7 +41,7 @@ export function Round({ sessionId, topic, year }: Props) {
   const availableOptions = useAvailableOptions(options, mySelections, editingRound);
 
   if (isLoading) return <Loading />;
-  if (!session || !round || !activeRound) return <Error />;
+  if (!session || !round) return <Error />;
 
   const isEditing = editingRound !== null;
   const isDisabled = !selectedOption || (!isEditing && hasPickedThisRound);
@@ -51,10 +54,17 @@ export function Round({ sessionId, topic, year }: Props) {
         setEditingRound(null);
       } else {
         // oxlint-disable-next-line no-console
-        console.log("[round] saveSelection", { activeRound, pick: selectedOption.name });
-        await saveSelection({ sessionId, roundNumber: activeRound, option: selectedOption });
+        console.log("[round] saveSelection", {
+          round: session.activeRoundNumber,
+          pick: selectedOption.name,
+        });
+        await saveSelection({
+          sessionId,
+          roundNumber: session.activeRoundNumber,
+          option: selectedOption,
+        });
         // oxlint-disable-next-line no-console
-        console.log("[round] saveSelection done", { activeRound });
+        console.log("[round] saveSelection done", { round: session.activeRoundNumber });
       }
     } catch (e) {
       // oxlint-disable-next-line no-console
@@ -93,7 +103,7 @@ export function Round({ sessionId, topic, year }: Props) {
   return (
     <Container>
       <span data-testid="round-title" className="py-md font-semibold text-lg text-black-100">
-        Round {activeRound}
+        Round {session.activeRoundNumber}
       </span>
       <Picks testID="round-list" data={mySelections} onEdit={onEdit} />
       <div className="mt-auto flex flex-col gap-md pt-md">

@@ -12,6 +12,7 @@
    - **Non-host**
      - leave game
      - see "host ended the game" alert (hard with single device + API players)
+1. Header
 
 ## V2
 

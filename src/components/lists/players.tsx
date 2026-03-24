@@ -30,7 +30,7 @@ export function PlayerList({ data, completedUids, maxPlayerCount, onKick }: Prop
                 onClick={() => onKick(item.uid)}
                 className="text-lg text-red-100"
               >
-                \u2715
+                {"\u2715"}
               </button>
             ) : null}
           </Row>

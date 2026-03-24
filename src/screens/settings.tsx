@@ -50,6 +50,12 @@ export function Settings({ sessionId, round }: Props) {
     navigate({ to: "/", replace: true });
   };
 
+  const onKick = (uid: string) => {
+    if (isHost) {
+      kickFromGame({ sessionId, uid });
+    }
+  };
+
   return (
     <Container>
       <div className="flex flex-row items-center justify-between py-lg">
@@ -68,8 +74,8 @@ export function Settings({ sessionId, round }: Props) {
       <PlayerList
         data={players}
         completedUids={completedUids}
-        maxPlayerCount={10}
-        onKick={isHost ? (uid) => kickFromGame({ sessionId, uid }) : undefined}
+        maxPlayerCount={session?.maxPlayers}
+        onKick={onKick}
       />
       <div className="mt-auto flex flex-col gap-md py-lg">
         {isHost ? (
