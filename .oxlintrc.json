@@ -1,11 +1,5 @@
 {
-  "ignorePatterns": [
-    ".github/**",
-    "README.md",
-    "convex/_generated/**",
-    "convex/convex.config.ts",
-    ".maestro/**"
-  ],
+  "ignorePatterns": [".github/**", "README.md", "convex/_generated/**", "convex/convex.config.ts"],
   "rules": {
     "jsx-a11y/alt-text": "error",
     "jsx-a11y/aria-props": "error",
@@ -26,18 +20,18 @@
         "patterns": [
           {
             "group": ["screens/*/*"],
-            "message": "Screen internals are private. Move shared functionality to a top-level dir (hooks/, utils/, db/, etc.)."
-          }
-        ]
-      }
-    ]
+            "message": "Screen internals are private. Move shared functionality to a top-level dir (hooks/, utils/, db/, etc.).",
+          },
+        ],
+      },
+    ],
   },
   "overrides": [
     {
       "files": ["src/app/**/*.tsx"],
       "rules": {
-        "import/no-default-export": "off"
-      }
-    }
-  ]
+        "import/no-default-export": "off",
+      },
+    },
+  ],
 }

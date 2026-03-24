@@ -1,11 +1,5 @@
 {
-  "ignorePatterns": [
-    ".github/**",
-    "README.md",
-    "convex/_generated/**",
-    "convex/convex.config.ts",
-    ".maestro/**"
-  ],
+  "ignorePatterns": [".github/**", "README.md", "convex/_generated/**", "convex/convex.config.ts"],
   "experimentalSortImports": {
     "groups": [["builtin"], ["external"], ["internal"], ["parent", "sibling", "index"]],
     "newlinesBetween": true,
@@ -18,7 +12,7 @@
       "types",
       "utils",
       "db",
-      "screens"
-    ]
-  }
+      "screens",
+    ],
+  },
 }
