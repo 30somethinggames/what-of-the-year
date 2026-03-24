@@ -1,7 +1,6 @@
-import { Link } from "expo-router";
+import { Link } from "@tanstack/react-router";
+import { motion } from "framer-motion";
 import { useState } from "react";
-import { View } from "react-native";
-import Animated from "react-native-reanimated";
 
 import { AppVersion } from "components/app-version";
 import { Button } from "components/button";
@@ -9,62 +8,55 @@ import { Container } from "components/container";
 import { Picker } from "components/picker";
 import { type TopicType, topics } from "constants/topics";
 import { type Year, years } from "constants/years";
-import { createStyles, themes } from "utils/theme";
 
-import { useHomeAnimation } from "./use-home-animation";
+const spring = { type: "spring" as const, damping: 20, stiffness: 300, mass: 0.8 };
 
 export function Home() {
   const [topic, setTopic] = useState<TopicType>(topics[0]);
   const [year, setYear] = useState<Year>(years[0]);
-  const s = useStyles({ backgroundColor: themes[topic.value].topic.color });
-  const { topicStyle, yearStyle, ofStyle, btnStyle } = useHomeAnimation();
 
   return (
-    <Animated.View style={s.root}>
-      <Container>
-        <View style={s.content}>
-          <Animated.View style={[s.pickerWrapper, topicStyle]}>
-            <Picker testID="topic-picker" data={topics} value={topic} onValueChange={setTopic} />
-          </Animated.View>
+    <Container className="justify-between" data-topic={topic.value}>
+      <div className="flex flex-1 flex-col items-center justify-center">
+        <motion.div
+          className="w-full"
+          initial={{ x: "-100vw" }}
+          animate={{ x: 0 }}
+          transition={{ ...spring, delay: 0.5 }}
+        >
+          <Picker testID="topic-picker" data={topics} value={topic} onValueChange={setTopic} />
+        </motion.div>
 
-          <Animated.Text style={[s.of, ofStyle]}>of</Animated.Text>
+        <motion.span
+          className="my-lg font-semibold text-[52px] text-black-100"
+          initial={{ opacity: 0, scale: 0.5 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ type: "spring", damping: 12, stiffness: 300 }}
+        >
+          of
+        </motion.span>
 
-          <Animated.View style={[s.pickerWrapper, yearStyle]}>
-            <Picker testID="year-picker" data={years} value={year} onValueChange={setYear} />
-          </Animated.View>
-        </View>
+        <motion.div
+          className="w-full"
+          initial={{ x: "100vw" }}
+          animate={{ x: 0 }}
+          transition={{ ...spring, delay: 0.65 }}
+        >
+          <Picker testID="year-picker" data={years} value={year} onValueChange={setYear} />
+        </motion.div>
+      </div>
 
-        <Animated.View style={[btnStyle, s.footer]}>
-          <Link
-            asChild
-            href={{
-              pathname: "/[topic]/[year]",
-              params: { topic: topic.value, year: year.value },
-            }}
-          >
-            <Button testID="home-start" label="Start" style={s.btn} />
-          </Link>
-          <AppVersion />
-        </Animated.View>
-      </Container>
-    </Animated.View>
+      <motion.div
+        className="flex flex-col gap-md"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ type: "spring", damping: 14, stiffness: 120, delay: 0.95 }}
+      >
+        <Link to="/$topic/$year" params={{ topic: topic.value, year: String(year.value) }}>
+          <Button testID="home-start" label="Start" />
+        </Link>
+        <AppVersion />
+      </motion.div>
+    </Container>
   );
 }
-
-const useStyles = createStyles((t, p: { backgroundColor: string }) => ({
-  root: { flex: 1 },
-  content: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  pickerWrapper: { width: "100%" },
-  of: {
-    fontFamily: t.text.font.semibold,
-    fontSize: 52,
-    color: t.colors.black100,
-    marginVertical: t.spacing.lg,
-  },
-  footer: { gap: t.spacing.md },
-  btn: { backgroundColor: p.backgroundColor },
-}));

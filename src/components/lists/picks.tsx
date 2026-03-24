@@ -1,37 +1,35 @@
-import { Image } from "expo-image";
-import { FlatList, Pressable, Text, View } from "react-native";
-
 import type { MySelection, RankedPick } from "db/types";
-import { createStyles } from "utils/theme";
 
 import { Row } from "./components/row";
 
 type PickItem = MySelection | RankedPick;
 
-interface BaseDisplayProps {
-  rank: number;
-  uri?: string;
-}
-function BaseDisplay({ rank, uri }: BaseDisplayProps) {
-  const s = useStyles();
+function BaseDisplay({ rank, uri }: { rank: number; uri?: string }) {
   return (
     <>
-      <Text style={s.rank}>#{rank}</Text>
-      {uri ? <Image source={{ uri }} style={s.cover} /> : null}
+      <span className="min-w-7 font-bold text-md text-black-100">#{rank}</span>
+      {uri ? (
+        <img
+          src={uri}
+          alt=""
+          className="h-14 w-10 rounded-sm border border-black-100 object-cover"
+        />
+      ) : null}
     </>
   );
 }
 
 function RankedRow({ item, rank }: { item: RankedPick; rank: number }) {
-  const s = useStyles();
   return (
     <Row>
       <BaseDisplay rank={rank} uri={item.pick.cover} />
-      <View style={s.pickInfo}>
-        <Text style={s.pickName}>{item.pick.name}</Text>
-        <Text style={s.voters}>{item.votes.map((v) => v.playerName).join(", ")}</Text>
-      </View>
-      <Text style={s.totalPoints}>{item.totalPoints}pts</Text>
+      <div className="flex flex-1 flex-col gap-0.5">
+        <span className="font-semibold text-md text-black-100">{item.pick.name}</span>
+        <span className="text-sm text-grey-100">
+          {item.votes.map((v) => v.playerName).join(", ")}
+        </span>
+      </div>
+      <span className="font-bold text-md text-black-100">{item.totalPoints}pts</span>
     </Row>
   );
 }
@@ -43,15 +41,19 @@ function SelectionRow({
   item: MySelection;
   onEdit?: (item: MySelection) => void;
 }) {
-  const s = useStyles();
   return (
     <Row>
       <BaseDisplay rank={item.roundNumber} uri={item.pick.cover} />
-      <Text style={s.pick}>{item.pick.name}</Text>
+      <span className="flex-1 text-md text-black-100">{item.pick.name}</span>
       {onEdit ? (
-        <Pressable testID="edit-pick" onPress={() => onEdit(item)} hitSlop={8}>
-          <Text style={s.editButton}>Edit</Text>
-        </Pressable>
+        <button
+          data-testid="edit-pick"
+          type="button"
+          onClick={() => onEdit(item)}
+          className="font-bold text-sm text-grey-100"
+        >
+          Edit
+        </button>
       ) : null}
     </Row>
   );
@@ -62,72 +64,17 @@ interface Props {
   testID?: string;
   onEdit?: (item: MySelection) => void;
 }
+
 export function Picks({ data, testID, onEdit }: Props) {
-  const s = useStyles();
   return (
-    <FlatList<PickItem>
-      testID={testID}
-      data={data}
-      keyExtractor={(item) => item.pick.id}
-      contentContainerStyle={s.root}
-      renderItem={({ item, index }) =>
+    <div data-testid={testID} className="flex flex-1 flex-col gap-sm">
+      {data.map((item, index) =>
         "totalPoints" in item ? (
-          <RankedRow item={item} rank={index + 1} />
+          <RankedRow key={item.pick.id} item={item} rank={index + 1} />
         ) : (
-          <SelectionRow item={item} onEdit={onEdit} />
-        )
-      }
-    />
+          <SelectionRow key={item.pick.id} item={item} onEdit={onEdit} />
+        ),
+      )}
+    </div>
   );
 }
-
-const useStyles = createStyles((t) => ({
-  root: {
-    gap: t.spacing.sm,
-    flexGrow: 1,
-  },
-  rank: {
-    fontFamily: t.text.font.bold,
-    fontSize: t.text.size.md,
-    color: t.colors.black100,
-    minWidth: 28,
-  },
-  pick: {
-    flex: 1,
-    fontFamily: t.text.font.regular,
-    fontSize: t.text.size.md,
-    color: t.colors.black100,
-  },
-  pickInfo: {
-    flex: 1,
-    gap: 2,
-  },
-  pickName: {
-    fontFamily: t.text.font.semibold,
-    fontSize: t.text.size.md,
-    color: t.colors.black100,
-  },
-  cover: {
-    width: 40,
-    height: 56,
-    borderRadius: t.border.radius.sm,
-    borderWidth: t.border.size.sm,
-    borderColor: t.border.color,
-    backgroundColor: "transparent",
-  },
-  voters: {
-    fontFamily: t.text.font.regular,
-    fontSize: t.text.size.sm,
-    color: t.colors.grey100,
-  },
-  totalPoints: {
-    fontFamily: t.text.font.bold,
-    fontSize: t.text.size.md,
-    color: t.colors.black100,
-  },
-  editButton: {
-    fontFamily: t.text.font.bold,
-    fontSize: t.text.size.sm,
-    color: t.colors.grey100,
-  },
-}));

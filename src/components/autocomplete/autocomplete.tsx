@@ -1,8 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { FlatList, Pressable, Text, View } from "react-native";
 
 import type { Option } from "types/option";
-import { createStyles } from "utils/theme";
 
 import { Input } from "../input";
 import { filterOptions } from "./filter-options";
@@ -16,12 +14,6 @@ interface Props {
   testID?: string;
 }
 
-/**
- * Text input with autocomplete suggestions from a list of Options.
- *
- * As the user types, matching options are shown in a dropdown.
- * Selecting an option calls `onSelectOption` with the full Option object.
- */
 export function Autocomplete({
   value,
   placeholder,
@@ -30,23 +22,9 @@ export function Autocomplete({
   options,
   testID,
 }: Props) {
-  const s = useStyles();
   const [showSuggestions, setShowSuggestions] = useState(false);
-
-  /**
-   * Holds the pending blur timeout so it can be cancelled.
-   *
-   * React Native fires `onBlur` before `onPress` when tapping a suggestion,
-   * which would unmount the dropdown before the press registers. To work
-   * around this, `onBlur` defers hiding suggestions by a short delay.
-   * If the user taps a suggestion within that window, `clearBlurTimeout`
-   * cancels the pending hide so the selection goes through.
-   *
-   * @see clearBlurTimeout
-   */
   const blurTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  /** Cancel any pending blur-hide and null out the ref. */
   const clearBlurTimeout = useCallback(() => {
     if (blurTimeoutRef.current != null) {
       clearTimeout(blurTimeoutRef.current);
@@ -54,7 +32,6 @@ export function Autocomplete({
     }
   }, []);
 
-  /** Clean up on unmount so we never setState after teardown. */
   useEffect(() => clearBlurTimeout, [clearBlurTimeout]);
 
   const handleChangeText = useCallback(
@@ -89,84 +66,36 @@ export function Autocomplete({
   const shouldDisplaySuggestions = showSuggestions && filtered?.length > 0;
 
   return (
-    <View style={s.root}>
+    <div className="relative w-full z-10">
       <Input
-        style={s.input}
+        testID={testID}
         value={value}
         onChangeText={handleChangeText}
         onFocus={onFocus}
         onBlur={onBlur}
-        autoCorrect={false}
+        autoCorrect="off"
         autoCapitalize="words"
         placeholder={placeholder}
-        testID={testID}
       />
-      {shouldDisplaySuggestions && (
-        <View style={s.dropdown}>
-          <FlatList
-            data={filtered}
-            keyExtractor={(item) => String(item.id)}
-            keyboardShouldPersistTaps="handled"
-            renderItem={({ item }) => {
-              const onPress = () => handleSelect(item);
-              return (
-                <Pressable testID="suggestion-item" style={s.suggestion} onPress={onPress}>
-                  <Text style={s.suggestionText} numberOfLines={1}>
-                    {item.name}
-                  </Text>
-                  {item.rating != null ? (
-                    <Text style={s.suggestionMeta}>{Math.round(item.rating)}</Text>
-                  ) : null}
-                </Pressable>
-              );
-            }}
-          />
-        </View>
-      )}
-    </View>
+      {shouldDisplaySuggestions ? (
+        <div className="mt-1 max-h-60 overflow-y-auto rounded-md border-[1.5px] border-black-100 bg-white-200">
+          {filtered.map((item) => (
+            <button
+              key={String(item.id)}
+              data-testid="suggestion-item"
+              type="button"
+              className="flex w-full flex-row items-center gap-sm p-sm text-left hover:bg-white-100"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => handleSelect(item)}
+            >
+              <span className="flex-1 truncate text-md text-black-100">{item.name}</span>
+              {item.rating != null ? (
+                <span className="text-sm text-grey-100">{Math.round(item.rating)}</span>
+              ) : null}
+            </button>
+          ))}
+        </div>
+      ) : null}
+    </div>
   );
 }
-
-const useStyles = createStyles((t) => ({
-  root: {
-    width: "100%",
-    gap: t.spacing.sm / 2,
-    zIndex: 1,
-  },
-  input: {
-    width: "100%",
-    backgroundColor: t.colors.white200,
-    borderWidth: t.border.size.md,
-    borderColor: t.border.color,
-    borderRadius: t.border.radius.md,
-    padding: t.spacing.sm,
-    fontFamily: t.text.font.regular,
-    fontSize: t.text.size.md,
-    color: t.colors.black100,
-  },
-  dropdown: {
-    backgroundColor: t.colors.white200,
-    borderWidth: t.border.size.md,
-    borderColor: t.colors.black100,
-    borderRadius: t.border.radius.md,
-    maxHeight: 240,
-    overflow: "hidden",
-  },
-  suggestion: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: t.spacing.sm,
-    gap: t.spacing.sm,
-  },
-  suggestionText: {
-    flex: 1,
-    fontFamily: t.text.font.regular,
-    fontSize: t.text.size.md,
-    color: t.colors.black100,
-  },
-  suggestionMeta: {
-    fontFamily: t.text.font.regular,
-    fontSize: t.text.size.sm,
-    color: t.colors.grey100,
-  },
-}));

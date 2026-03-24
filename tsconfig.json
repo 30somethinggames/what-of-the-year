@@ -1,11 +1,21 @@
 {
-  "extends": "expo/tsconfig.base",
   "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
     "strict": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
     "baseUrl": ".",
-    "types": ["bun-types"],
+    "types": ["vite/client", "bun-types"],
     "paths": {
-      "app/*": ["src/app/*"],
+      "convex/_generated/*": ["convex/_generated/*"],
+      "convex/constants": ["convex/constants"],
+      "convex/utils/*": ["convex/utils/*"],
       "components/*": ["src/components/*"],
       "constants/*": ["src/constants/*"],
       "hooks/*": ["src/hooks/*"],
@@ -16,5 +26,5 @@
       "screens/*": ["src/screens/*"]
     }
   },
-  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"]
+  "include": ["src", "convex"]
 }

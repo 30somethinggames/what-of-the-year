@@ -1,67 +1,20 @@
-import {
-  Pressable,
-  type PressableProps,
-  type PressableStateCallbackType,
-  StyleSheet,
-  Text,
-} from "react-native";
-
-import { haptics } from "utils/haptics";
-import { createStyles } from "utils/theme";
-
-interface Props extends PressableProps {
+interface Props extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   label: string;
+  testID?: string;
+  style?: React.CSSProperties;
 }
 
-export function Button({ label, style, disabled, onPress, ...props }: Props) {
-  const s = useStyles();
-  const fStyle = (state: PressableStateCallbackType) => {
-    const resolvedStyle = typeof style === "function" ? style(state) : style;
-    return StyleSheet.flatten([
-      s.root,
-      resolvedStyle,
-      !disabled && state.pressed && s.pressed,
-      disabled && s.disabled,
-    ]);
-  };
-
-  const handlePress = (e: Parameters<NonNullable<PressableProps["onPress"]>>[0]) => {
-    haptics.light();
-    onPress?.(e);
-  };
-
+export function Button({ label, disabled, style, testID, className, ...props }: Props) {
   return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={label}
-      style={fStyle}
+    <button
+      type="button"
+      data-testid={testID}
       disabled={disabled}
-      onPress={handlePress}
+      className={`w-full rounded-lg py-md bg-topic text-white-200 font-semibold text-xl text-center transition-opacity [text-shadow:0px_0px_1px_var(--color-black-100)] active:opacity-70 disabled:opacity-50 disabled:cursor-default ${className ?? ""}`}
+      style={style}
       {...props}
     >
-      <Text style={s.text}>{label}</Text>
-    </Pressable>
+      {label}
+    </button>
   );
 }
-
-const useStyles = createStyles((t) => ({
-  root: {
-    width: "100%",
-    alignItems: "center",
-    borderRadius: t.border.radius.lg,
-    paddingVertical: t.spacing.md,
-    backgroundColor: t.topic.color,
-  },
-  text: {
-    ...t.text.shadow,
-    color: t.colors.white200,
-    fontFamily: t.text.font.semibold,
-    fontSize: t.text.size.xl,
-  },
-  pressed: {
-    opacity: 0.7,
-  },
-  disabled: {
-    opacity: 0.5,
-  },
-}));

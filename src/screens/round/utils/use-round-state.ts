@@ -1,4 +1,4 @@
-import { router } from "expo-router";
+import { useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 
 import type { SessionID } from "db/types";
@@ -15,6 +15,7 @@ interface Props {
 }
 
 export function useRoundState({ sessionId, topic, year }: Props) {
+  const navigate = useNavigate();
   const { isLoading: sessionLoading, session, activeRound } = useSession(sessionId);
   const { isLoading: roundLoading, round } = useRound(sessionId, activeRound);
   const { isLoading: mySelectionsLoading, mySelections } = useMySelections(sessionId);
@@ -22,21 +23,16 @@ export function useRoundState({ sessionId, topic, year }: Props) {
 
   const isLoading = sessionLoading || roundLoading || mySelectionsLoading || playersLoading;
 
-  // Keep URL param in sync for deep linking
-  useEffect(() => {
-    if (activeRound) router.setParams({ round: String(activeRound) });
-  }, [activeRound]);
-
   useGameOver({ isHost, session });
 
-  // Navigate to results when last round closes
   useEffect(() => {
     if (!round || !activeRound) return;
     if (activeRound === 1 && round.number === 1 && round.state === "closed") {
-      router.replace({
-        pathname: "/[topic]/[year]/[sessionId]/results",
+      navigate({
+        to: "/$topic/$year/$sessionId/results",
         params: { topic, year, sessionId },
-      } as never);
+        replace: true,
+      });
     }
   }, [round?.number, round?.state, activeRound, sessionId, topic, year]);
 

@@ -22,6 +22,7 @@ test("smoke: home → setup → lobby → round → settings", async ({ page }) 
   await expect(page.getByText("Game of 2026")).toBeVisible();
 
   await page.getByTestId("name-input").pressSequentially("Test User");
+  await expect(page.getByTestId("setup-submit")).toBeEnabled();
   await page.getByTestId("setup-submit").click();
 
   // → Lobby Screen

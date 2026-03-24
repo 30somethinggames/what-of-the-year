@@ -1,7 +1,0 @@
-appId: host.exp.Exponent
-
-flows:
-  - "smoke/*"
-  - "e2e/*"
-  - "e2e/multiplayer/*"
-

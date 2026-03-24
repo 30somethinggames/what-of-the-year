@@ -10,7 +10,7 @@ export default defineConfig({
     timeout: 15_000,
   },
   use: {
-    baseURL: "http://localhost:8081",
+    baseURL: "http://localhost:5173",
     trace: "on-first-retry",
     screenshot: "only-on-failure",
   },
@@ -21,8 +21,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "CI=1 bunx expo start",
-    url: "http://localhost:8081",
+    command: "bun run dev",
+    url: "http://localhost:5173",
     reuseExistingServer: true,
     timeout: 120_000,
   },

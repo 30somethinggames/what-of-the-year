@@ -1,47 +1,19 @@
-import { TextInput, type TextInputProps, View } from "react-native";
-
-import { createStyles } from "utils/theme";
-
-interface Props extends TextInputProps {
+interface Props extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange"> {
   error?: string;
+  testID?: string;
+  onChangeText?: (text: string) => void;
 }
-export function Input({ error, style, ...rest }: Props) {
-  const s = useStyles();
 
+export function Input({ error, testID, onChangeText, className, ...rest }: Props) {
   return (
-    <View style={s.wrapper}>
-      <TextInput
-        autoCorrect={false}
-        autoCapitalize="words"
-        placeholderTextColor={s.placeholder.color}
-        style={[s.root, error ? s.rootError : undefined, style]}
+    <div className="w-full">
+      <input
+        data-testid={testID}
+        autoComplete="off"
+        className={`w-full bg-white-200 border border-black-100 rounded-md px-md py-sm text-md text-black-100 placeholder:text-grey-100 outline-none ${error ? "border-red-100" : ""} ${className ?? ""}`}
+        onChange={onChangeText ? (e) => onChangeText(e.target.value) : undefined}
         {...rest}
       />
-    </View>
+    </div>
   );
 }
-
-const useStyles = createStyles((t) => ({
-  wrapper: {
-    width: "100%",
-    gap: t.spacing.sm / 2,
-  },
-  root: {
-    width: "100%",
-    backgroundColor: t.colors.white200,
-    borderWidth: t.border.size.sm,
-    borderColor: t.colors.black100,
-    borderRadius: t.border.radius.md,
-    paddingHorizontal: t.spacing.md,
-    paddingVertical: t.spacing.sm,
-    fontFamily: t.text.font.regular,
-    fontSize: t.text.size.md,
-    color: t.colors.black100,
-  },
-  rootError: {
-    borderColor: t.colors.red100,
-  },
-  placeholder: {
-    color: t.colors.grey100,
-  },
-}));

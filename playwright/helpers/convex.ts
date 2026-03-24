@@ -1,5 +1,5 @@
-const siteUrl = process.env.CONVEX_SITE_URL ?? process.env.MAESTRO_CONVEX_SITE_URL;
-const testSecret = process.env.TEST_SECRET ?? process.env.MAESTRO_TEST_SECRET;
+const siteUrl = process.env.CONVEX_SITE_URL;
+const testSecret = process.env.TEST_SECRET;
 
 if (!siteUrl || !testSecret) {
   throw new Error("CONVEX_SITE_URL and TEST_SECRET must be set");

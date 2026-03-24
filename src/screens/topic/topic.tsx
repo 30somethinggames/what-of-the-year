@@ -1,21 +1,16 @@
-import { useAuthActions } from "@convex-dev/auth/react";
-import { useHeaderHeight } from "@react-navigation/elements";
+import { useNavigate } from "@tanstack/react-router";
 import { api } from "convex/_generated/api";
-import { useConvexAuth, useMutation } from "convex/react";
+import { useMutation } from "convex/react";
 import { MAX_NAME_LENGTH, validateName } from "convex/utils/validate";
-import { router } from "expo-router";
-import { useEffect, useState } from "react";
-import { Text, View } from "react-native";
+import { useState } from "react";
 
 import { Avatar, useRandomAvatar } from "components/avatar";
 import { Button } from "components/button";
 import { Container } from "components/container";
 import { Input } from "components/input";
-import { KeyboardAvoidingView } from "components/keyboard-avoiding-view";
 import type { TopicType } from "constants/topics";
 import type { SessionID } from "db/types";
 import { useTopicData } from "queries/use-topic-data";
-import { createStyles } from "utils/theme";
 
 interface Props {
   topic: TopicType;
@@ -24,29 +19,20 @@ interface Props {
 }
 
 export function Topic({ topic, year, existingSessionId }: Props) {
-  const headerHeight = useHeaderHeight();
-  const s = useStyles({ headerHeight });
+  const navigate = useNavigate();
   const { isLoading } = useTopicData({ key: topic.value, year });
-  const { isAuthenticated, isLoading: isPending } = useConvexAuth();
-  const { signIn } = useAuthActions();
   const mutateJoin = useMutation(api.players.joinSession);
   const mutateCreate = useMutation(api.sessions.createSession);
   const { avatar, randomizeAvatar } = useRandomAvatar();
   const [name, setName] = useState("");
 
-  useEffect(() => {
-    if (!isAuthenticated && !isPending) signIn("anonymous");
-  }, [isAuthenticated, isPending]);
-
   const nameError = validateName(name);
   const isJoining = !!existingSessionId;
-  const disabled = isLoading || isPending || name.length < 1 || nameError != null;
-  const label = isPending ? "Loading..." : isJoining ? "Join" : "Create";
+  const disabled = isLoading || name.length < 1 || nameError != null;
+  const label = isJoining ? "Join" : "Create";
 
   const onSubmit = async () => {
     try {
-      let sessionId: string;
-
       if (isJoining) {
         try {
           await mutateJoin({
@@ -58,7 +44,6 @@ export function Topic({ topic, year, existingSessionId }: Props) {
           const error = e as Error;
           if (error.message !== "Already joined this session") throw e;
         }
-        sessionId = existingSessionId;
       } else {
         const result = await mutateCreate({
           topic: topic.value,
@@ -66,13 +51,12 @@ export function Topic({ topic, year, existingSessionId }: Props) {
           name,
           avatar,
         });
-        sessionId = result.sessionId;
+        navigate({
+          to: "/$topic/$year/$sessionId",
+          params: { topic: topic.value, year, sessionId: result.sessionId },
+          replace: true,
+        });
       }
-
-      router.replace({
-        pathname: "/[topic]/[year]/[sessionId]",
-        params: { topic: topic.value, year, sessionId, round: "1" },
-      });
     } catch (e) {
       // oxlint-disable-next-line no-console
       console.error("Failed to submit:", e);
@@ -80,50 +64,28 @@ export function Topic({ topic, year, existingSessionId }: Props) {
   };
 
   return (
-    <KeyboardAvoidingView style={s.root}>
-      <Container style={s.container}>
-        <View style={s.avatar}>
-          <Avatar source={avatar} size={120} />
-          <Button testID="random-avatar" style={s.btn} label="Random" onPress={randomizeAvatar} />
-        </View>
-        <View style={s.input}>
-          <Input
-            testID="name-input"
-            placeholder="User name"
-            value={name}
-            onChangeText={setName}
-            error={nameError ?? undefined}
-            maxLength={MAX_NAME_LENGTH}
-          />
-          {nameError ? <Text style={s.error}>{nameError}</Text> : null}
-        </View>
-        <Button testID="setup-submit" label={label} disabled={disabled} onPress={onSubmit} />
-      </Container>
-    </KeyboardAvoidingView>
+    <Container className="items-center justify-center gap-lg">
+      <div className="flex w-full flex-row items-center justify-between">
+        <Avatar source={avatar} size={120} />
+        <Button
+          testID="random-avatar"
+          label="Random"
+          onClick={randomizeAvatar}
+          style={{ width: 120 }}
+        />
+      </div>
+      <div className="flex w-full flex-col gap-sm">
+        <Input
+          testID="name-input"
+          placeholder="User name"
+          value={name}
+          onChangeText={setName}
+          error={nameError ?? undefined}
+          maxLength={MAX_NAME_LENGTH}
+        />
+        {nameError ? <span className="text-sm text-red-100 px-sm">{nameError}</span> : null}
+      </div>
+      <Button testID="setup-submit" label={label} disabled={disabled} onClick={onSubmit} />
+    </Container>
   );
 }
-
-const useStyles = createStyles((t, p: { headerHeight: number }) => ({
-  root: { flex: 1 },
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: t.spacing.lg,
-    marginTop: -p.headerHeight / 2,
-  },
-  avatar: {
-    width: "100%",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  btn: { width: 120 },
-  input: { width: "100%", gap: t.spacing.sm },
-  error: {
-    color: t.colors.red100,
-    fontFamily: t.text.font.regular,
-    fontSize: t.text.size.sm,
-    paddingHorizontal: t.spacing.sm,
-  },
-}));

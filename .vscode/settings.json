@@ -13,6 +13,7 @@
   "[typescriptreact]": {
     "editor.defaultFormatter": "oxc.oxc-vscode"
   },
+  "css.customData": [".vscode/tailwind.json"],
   "cSpell.words": ["IGDB", "TMDB", "Uids", "whatoftheyear"],
   "npm.packageManager": "bun",
   "chat.tools.terminal.autoApprove": {

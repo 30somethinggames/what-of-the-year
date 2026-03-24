@@ -1,12 +1,10 @@
 import { api } from "convex/_generated/api";
 import { useMutation } from "convex/react";
 import { useState } from "react";
-import { Text, View } from "react-native";
 
 import { Autocomplete } from "components/autocomplete";
 import { Button } from "components/button";
 import { Container } from "components/container";
-import { KeyboardAvoidingView } from "components/keyboard-avoiding-view";
 import { Picks } from "components/lists/picks";
 import { Error } from "components/states/error";
 import { Loading } from "components/states/loading";
@@ -14,7 +12,6 @@ import type { TOPIC_KEY } from "constants/topics";
 import type { SessionID } from "db/types";
 import { useTopicData } from "queries/use-topic-data";
 import type { Option } from "types/option";
-import { createStyles } from "utils/theme";
 
 import { useAvailableOptions } from "./utils/use-available-options";
 import { useRoundState } from "./utils/use-round-state";
@@ -26,7 +23,6 @@ interface Props {
 }
 
 export function Round({ sessionId, topic, year }: Props) {
-  const s = useStyles();
   const { isLoading, session, round, activeRound, mySelections, hasPickedThisRound } =
     useRoundState({ sessionId, topic, year });
 
@@ -54,10 +50,15 @@ export function Round({ sessionId, topic, year }: Props) {
         await editSelection({ sessionId, roundNumber: editingRound, option: selectedOption });
         setEditingRound(null);
       } else {
+        // oxlint-disable-next-line no-console
+        console.log("[round] saveSelection", { activeRound, pick: selectedOption.name });
         await saveSelection({ sessionId, roundNumber: activeRound, option: selectedOption });
+        // oxlint-disable-next-line no-console
+        console.log("[round] saveSelection done", { activeRound });
       }
-    } catch {
-      // Write failed — real-time listener will reflect current state
+    } catch (e) {
+      // oxlint-disable-next-line no-console
+      console.error("[round] saveSelection error", e);
     }
     setInputValue("");
     setSelectedOption(null);
@@ -90,46 +91,28 @@ export function Round({ sessionId, topic, year }: Props) {
   };
 
   return (
-    <>
-      <KeyboardAvoidingView style={s.root}>
-        <Container>
-          <Text testID="round-title" style={s.title}>
-            Round {activeRound}
-          </Text>
-          <Picks testID="round-list" data={mySelections} onEdit={onEdit} />
-          <View style={s.footer}>
-            <Autocomplete
-              testID="pick-input"
-              value={inputValue}
-              onChangeText={handleInputChange}
-              onSelectOption={onSelectOption}
-              options={availableOptions}
-              placeholder={isEditing ? "Edit your pick" : "Enter your pick"}
-            />
-            <Button
-              testID="submit-pick"
-              label={isEditing ? "Save" : "Enter"}
-              onPress={onEnter}
-              disabled={isDisabled}
-            />
-            {isEditing && <Button testID="cancel-edit" label="Cancel" onPress={onCancelEdit} />}
-          </View>
-        </Container>
-      </KeyboardAvoidingView>
-    </>
+    <Container>
+      <span data-testid="round-title" className="py-md font-semibold text-lg text-black-100">
+        Round {activeRound}
+      </span>
+      <Picks testID="round-list" data={mySelections} onEdit={onEdit} />
+      <div className="mt-auto flex flex-col gap-md pt-md">
+        <Autocomplete
+          testID="pick-input"
+          value={inputValue}
+          onChangeText={handleInputChange}
+          onSelectOption={onSelectOption}
+          options={availableOptions}
+          placeholder={isEditing ? "Edit your pick" : "Enter your pick"}
+        />
+        <Button
+          testID="submit-pick"
+          label={isEditing ? "Save" : "Enter"}
+          onClick={onEnter}
+          disabled={isDisabled}
+        />
+        {isEditing ? <Button testID="cancel-edit" label="Cancel" onClick={onCancelEdit} /> : null}
+      </div>
+    </Container>
   );
 }
-
-const useStyles = createStyles((t) => ({
-  root: { flex: 1 },
-  title: {
-    fontFamily: t.text.font.semibold,
-    fontSize: t.text.size.lg,
-    color: t.colors.black100,
-    paddingVertical: t.spacing.md,
-  },
-  footer: {
-    paddingTop: t.spacing.md,
-    gap: t.spacing.md,
-  },
-}));

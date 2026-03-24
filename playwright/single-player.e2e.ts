@@ -14,16 +14,23 @@ async function pickRound(page: Page, letter: string) {
 }
 
 test("single-player: full game", async ({ page }) => {
+  page.on("console", (msg) => {
+    if (msg.text().includes("[round]")) {
+      // oxlint-disable-next-line no-console
+      console.log(`[browser] ${msg.text()}`);
+    }
+  });
   await page.goto("/");
 
   // Home → Setup
   await page.getByTestId("home-start").click();
   await page.getByTestId("name-input").pressSequentially("E2E Tester");
+  await expect(page.getByTestId("setup-submit")).toBeEnabled();
   await page.getByTestId("setup-submit").click();
 
   // Lobby
   await expect(page.getByText("E2E Tester")).toBeVisible();
-  await expect(page.getByText("Host")).toBeVisible();
+  await expect(page.getByText("Host", { exact: true })).toBeVisible();
   await expect(page.getByTestId("lobby-start")).toBeVisible();
   await page.getByTestId("lobby-start").click();
 

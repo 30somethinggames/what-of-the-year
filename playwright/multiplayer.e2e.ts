@@ -12,14 +12,15 @@ test("multiplayer: host flow with advance-round", async ({ page }) => {
   // Home → Setup
   await page.getByTestId("home-start").click();
   await page.getByTestId("name-input").pressSequentially("Host Player");
+  await expect(page.getByTestId("setup-submit")).toBeEnabled();
   await page.getByTestId("setup-submit").click();
 
   // Lobby — read session ID, verify host state
   await expect(page.getByText("Host Player")).toBeVisible();
-  await expect(page.getByText("Host")).toBeVisible();
+  await expect(page.getByText("Host", { exact: true })).toBeVisible();
   await expect(page.getByTestId("player-count")).toBeVisible();
 
-  const sessionId = await page.locator('[data-testid="session-id"]').getAttribute("aria-label");
+  const sessionId = await page.locator('[data-testid="session-id"]').getAttribute("data-value");
   if (!sessionId) throw new Error("Could not read session ID");
 
   // Add players via API

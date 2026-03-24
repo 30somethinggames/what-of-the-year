@@ -1,0 +1,78 @@
+@import "tailwindcss";
+@import "@fontsource-variable/inter";
+
+@theme {
+  --color-black-100: #222222;
+  --color-blue-100: #3292c9;
+  --color-blue-200: #0a3d6b;
+  --color-green-100: #32c992;
+  --color-grey-100: #666666;
+  --color-red-100: #ed4337;
+  --color-white-100: #f1efea;
+  --color-white-200: #fff;
+  --color-yellow-100: #d1c432;
+
+  --font-sans: "Inter Variable", system-ui, sans-serif;
+
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.5rem;
+
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+}
+
+[data-topic="games"] {
+  --topic-color: #3292c9;
+}
+[data-topic="movies"] {
+  --topic-color: #32c992;
+}
+[data-topic="books"] {
+  --topic-color: #d1c432;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  font-family: var(--font-sans);
+  background-color: #fff;
+  color: var(--color-black-100);
+  -webkit-font-smoothing: antialiased;
+}
+
+@utility bg-topic {
+  background-color: var(--topic-color, #3292c9);
+}
+@utility text-topic {
+  color: var(--topic-color, #3292c9);
+}
+@utility border-topic {
+  border-color: var(--topic-color, #3292c9);
+}
+@utility border-t-topic {
+  border-top-color: var(--topic-color, #3292c9);
+}
+
+@layer base {
+  button {
+    cursor: pointer;
+    background: none;
+    border: none;
+  }
+}
+
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}

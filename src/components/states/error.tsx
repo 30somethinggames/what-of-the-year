@@ -1,7 +1,3 @@
-import { Text, View } from "react-native";
-
-import { createStyles } from "utils/theme";
-
 import { Avatar } from "../avatar";
 import { Button } from "../button";
 
@@ -13,34 +9,13 @@ interface Props {
 }
 
 export function Error({ message = "Something went wrong", onRetry }: Props) {
-  const s = useStyles();
   return (
-    <View style={s.root}>
+    <div className="flex flex-1 flex-row items-center justify-center gap-lg px-lg">
       <Avatar source={SAD_ROBOT} size={80} />
-      <View style={s.content}>
-        <Text style={s.message}>{message}</Text>
-        {onRetry && <Button label="Retry" onPress={onRetry} />}
-      </View>
-    </View>
+      <div className="flex shrink flex-col gap-md">
+        <p className="font-medium text-lg text-black-100">{message}</p>
+        {onRetry ? <Button label="Retry" onClick={onRetry} /> : null}
+      </div>
+    </div>
   );
 }
-
-const useStyles = createStyles((t) => ({
-  root: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: t.spacing.lg,
-    gap: t.spacing.lg,
-  },
-  content: {
-    flexShrink: 1,
-    gap: t.spacing.md,
-  },
-  message: {
-    color: t.colors.black100,
-    fontFamily: t.text.font.medium,
-    fontSize: t.text.size.lg,
-  },
-}));

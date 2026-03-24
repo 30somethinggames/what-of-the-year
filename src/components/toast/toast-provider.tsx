@@ -1,15 +1,11 @@
 import type { ReactNode } from "react";
 import { createContext, useCallback, useMemo, useState } from "react";
-import { View } from "react-native";
-
-import { createStyles } from "utils/theme";
 
 import { Toast } from "./toast";
 
 export type ToastVariant = "info" | "success" | "error";
 
 const MAX_TOASTS = 3;
-
 let nextId = 0;
 
 interface ToastItem {
@@ -42,12 +38,11 @@ export function ToastProvider({ children }: Props) {
   }, []);
 
   const value = useMemo(() => ({ show }), [show]);
-  const s = useStyles();
 
   return (
     <ToastContext.Provider value={value}>
       {children}
-      <View style={s.container}>
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-[9999]">
         {toasts.map((toast, index) => (
           <Toast
             key={toast.id}
@@ -58,19 +53,7 @@ export function ToastProvider({ children }: Props) {
             onRemove={remove}
           />
         ))}
-      </View>
+      </div>
     </ToastContext.Provider>
   );
 }
-
-const useStyles = createStyles(() => ({
-  container: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 9999,
-    elevation: 9999,
-    pointerEvents: "box-none",
-  },
-}));

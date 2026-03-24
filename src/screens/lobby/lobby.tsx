@@ -1,24 +1,22 @@
+import { useNavigate } from "@tanstack/react-router";
 import { api } from "convex/_generated/api";
 import { MAX_ROUNDS } from "convex/constants";
 import { useMutation } from "convex/react";
-import { router } from "expo-router";
-import { View } from "react-native";
 
 import { Button } from "components/button";
 import { Container } from "components/container";
 import { PlayerList } from "components/lists/players";
 import { Error } from "components/states/error";
 import { Loading } from "components/states/loading";
-import { TestLabel } from "components/test-label";
-import { createStyles } from "utils/theme";
 
+import { Topic } from "../topic";
 import type { LobbyProps } from "./types";
-import { onShare } from "./utils/on-share";
+import { onShare } from "./utils/on-share/on-share";
 import { useLobbyState } from "./utils/use-lobby-state";
 
 export function Lobby({ topic, year, sessionId }: LobbyProps) {
-  const s = useStyles();
-  const { isLoading, session, players, isHost, maxPlayerCount } = useLobbyState({
+  const navigate = useNavigate();
+  const { isLoading, session, players, currentUser, isHost, maxPlayerCount } = useLobbyState({
     topic,
     year,
     sessionId,
@@ -29,52 +27,47 @@ export function Lobby({ topic, year, sessionId }: LobbyProps) {
   const startSession = useMutation(api.sessions.startSession);
 
   if (isLoading) return <Loading />;
-  // TODO figure out
   if (!session) return <Error />;
+
+  if (!currentUser) {
+    return <Topic topic={topic} year={year} existingSessionId={sessionId} />;
+  }
 
   const onStart = async () => {
     await startSession({ sessionId });
-    router.replace({
-      pathname: "/[topic]/[year]/[sessionId]/[round]",
+    navigate({
+      to: "/$topic/$year/$sessionId/$round",
       params: { topic: topic.value, year, sessionId, round: String(MAX_ROUNDS) },
+      replace: true,
     });
   };
 
   const onLeave = async () => {
     await leaveSession({ sessionId });
-    router.replace("/");
+    navigate({ to: "/", replace: true });
   };
 
   const handleOnShare = () => onShare({ topic, year, sessionId });
 
   return (
-    <Container style={s.root}>
-      <TestLabel testID="session-id" value={sessionId} />
+    <Container>
+      <div data-testid="session-id" data-value={sessionId} className="hidden" />
       <PlayerList
         data={players}
         maxPlayerCount={maxPlayerCount}
         onKick={isHost ? (uid) => kickFromLobby({ sessionId, uid }) : undefined}
       />
 
-      <View style={s.footer}>
+      <div className="mt-auto flex flex-col gap-md">
         {isHost ? (
           <>
-            <Button testID="invite" label="Invite" onPress={handleOnShare} />
-            <Button testID="lobby-start" label="Start" onPress={onStart} />
+            <Button testID="invite" label="Invite" onClick={handleOnShare} />
+            <Button testID="lobby-start" label="Start" onClick={onStart} />
           </>
         ) : (
-          <Button testID="leave-lobby" label="Leave" onPress={onLeave} />
+          <Button testID="leave-lobby" label="Leave" onClick={onLeave} />
         )}
-      </View>
+      </div>
     </Container>
   );
 }
-
-const useStyles = createStyles((t) => ({
-  root: {
-    flex: 1,
-  },
-  footer: {
-    gap: t.spacing.md,
-  },
-}));
