@@ -1,9 +1,5 @@
-const siteUrl = process.env.CONVEX_SITE_URL;
-const testSecret = process.env.TEST_SECRET;
-
-if (!siteUrl || !testSecret) {
-  throw new Error("CONVEX_SITE_URL and TEST_SECRET must be set");
-}
+const siteUrl = process.env.CONVEX_SITE_URL ?? "";
+const testSecret = process.env.TEST_SECRET ?? "";
 
 const HEADERS = {
   "Content-Type": "application/json",

@@ -39,7 +39,12 @@ function RoundRoute() {
               exit={{ x: "-100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
             >
-              <Sidebar sessionId={sessionId as SessionID} onClose={() => setSidebarOpen(false)} />
+              <Sidebar
+                sessionId={sessionId as SessionID}
+                topic={topicKey}
+                year={year}
+                onClose={() => setSidebarOpen(false)}
+              />
             </motion.aside>
           </>
         ) : null}

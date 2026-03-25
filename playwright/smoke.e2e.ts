@@ -32,12 +32,12 @@ test("smoke: home → setup → lobby → round → settings", async ({ page }) 
   await page.getByTestId("lobby-start").click();
 
   // → Round Screen
-  await expect(page.getByTestId("round-title")).toBeVisible();
+  await expect(page.getByText("Round 10")).toBeVisible();
   await expect(page.getByTestId("settings-button")).toBeVisible();
 
-  // → Settings Screen
+  // → Sidebar
   await page.getByTestId("settings-button").click();
-  await expect(page.getByTestId("settings-title")).toBeVisible();
+  await expect(page.getByTestId("sidebar-title")).toBeVisible();
   await expect(page.getByTestId("leave-game")).toBeVisible();
-  await expect(page.getByTestId("close-settings")).toBeVisible();
+  await expect(page.getByTestId("close-sidebar")).toBeVisible();
 });

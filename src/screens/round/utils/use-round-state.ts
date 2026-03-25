@@ -1,3 +1,4 @@
+import { useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 
 import type { SessionID } from "db/types";
@@ -14,6 +15,7 @@ interface Props {
 }
 
 export function useRoundState({ sessionId, topic, year }: Props) {
+  const navigate = useNavigate();
   const { isLoading: sessionLoading, session, activeRound } = useSession(sessionId);
   const { round } = useRound(sessionId, activeRound);
   const { mySelections } = useMySelections(sessionId);
@@ -27,6 +29,16 @@ export function useRoundState({ sessionId, topic, year }: Props) {
     if (!activeRound) return;
     window.history.replaceState(null, "", `/${topic}/${year}/${sessionId}/${activeRound}`);
   }, [activeRound, sessionId, topic, year]);
+
+  useEffect(() => {
+    if (activeRound === 1 && round?.state === "closed") {
+      navigate({
+        to: "/$topic/$year/$sessionId/results",
+        params: { topic, year, sessionId },
+        replace: true,
+      });
+    }
+  }, [activeRound, round?.state, navigate, topic, year, sessionId]);
 
   const hasPickedThisRound = activeRound
     ? mySelections.some((s) => s.roundNumber === activeRound)

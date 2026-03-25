@@ -12,10 +12,12 @@ import { useSession } from "db/use-sessions";
 
 interface Props {
   sessionId: SessionID;
+  topic: string;
+  year: string;
   onClose?: () => void;
 }
 
-export function Sidebar({ sessionId, onClose }: Props) {
+export function Sidebar({ sessionId, topic, year, onClose }: Props) {
   const navigate = useNavigate();
   const { session, activeRound } = useSession(sessionId);
   const { players, isHost } = usePlayers(sessionId);
@@ -30,10 +32,17 @@ export function Sidebar({ sessionId, onClose }: Props) {
 
   const onNextRound = async () => {
     if (!activeRound) return;
-    await advanceRound({
+    const { hasNextRound } = await advanceRound({
       sessionId,
       currentRoundNumber: activeRound,
     });
+    if (!hasNextRound) {
+      navigate({
+        to: "/$topic/$year/$sessionId/results",
+        params: { topic, year, sessionId },
+        replace: true,
+      });
+    }
   };
 
   const onLeaveGame = () => {
@@ -50,9 +59,16 @@ export function Sidebar({ sessionId, onClose }: Props) {
   return (
     <div className="flex flex-1 flex-col px-md py-md">
       <div className="flex items-center justify-between pb-md">
-        <span className="font-semibold text-xl text-black-100">Players</span>
+        <span data-testid="sidebar-title" className="font-semibold text-xl text-black-100">
+          Players
+        </span>
         {onClose ? (
-          <button type="button" onClick={onClose} className="text-lg text-grey-100">
+          <button
+            data-testid="close-sidebar"
+            type="button"
+            onClick={onClose}
+            className="text-lg text-grey-100"
+          >
             ✕
           </button>
         ) : null}

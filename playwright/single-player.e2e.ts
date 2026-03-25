@@ -10,6 +10,7 @@ async function pickRound(page: Page, letter: string) {
   await page.getByTestId("pick-input").fill(letter);
   await expect(page.getByTestId("suggestion-item").first()).toBeVisible();
   await page.getByTestId("suggestion-item").first().click();
+  await expect(page.getByTestId("submit-pick")).toBeEnabled();
   await page.getByTestId("submit-pick").click();
 }
 
@@ -39,11 +40,14 @@ test("single-player: full game", async ({ page }) => {
   await page.getByTestId("pick-input").fill("a");
   await expect(page.getByTestId("suggestion-item").first()).toBeVisible();
   await page.getByTestId("suggestion-item").first().click();
+  await expect(page.getByTestId("submit-pick")).toBeEnabled();
   await page.getByTestId("submit-pick").click();
 
   await page.getByTestId("edit-pick").click();
   await expect(page.getByTestId("cancel-edit")).toBeVisible();
+  await expect(page.getByTestId("submit-pick")).toBeEnabled();
   await page.getByTestId("submit-pick").click();
+  await expect(page.getByTestId("submit-pick")).toContainText("Enter");
 
   // Rounds 9–1
   const letters = ["c", "d", "e", "f", "g", "h", "m", "p", "s"];
@@ -54,6 +58,6 @@ test("single-player: full game", async ({ page }) => {
 
   // Results
   await expect(page.getByTestId("results-list")).toBeVisible();
-  await expect(page.getByText("E2E Tester")).toBeVisible();
-  await expect(page.getByText("10pts")).toBeVisible();
+  await expect(page.getByText("E2E Tester").first()).toBeVisible();
+  await expect(page.getByText("10pts").first()).toBeVisible();
 });

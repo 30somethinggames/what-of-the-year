@@ -45,6 +45,8 @@ test("multiplayer: host flow with advance-round", async ({ page }) => {
   await page.getByTestId("pick-input").fill("a");
   await expect(page.getByTestId("suggestion-item").first()).toBeVisible();
   await page.getByTestId("suggestion-item").first().click();
+  await expect(page.getByTestId("submit-pick")).toBeEnabled();
+
   await page.getByTestId("submit-pick").click();
 
   await makeSelection({ sessionId, uid: player2Uid, roundNumber: 10, pickName: "Elden Ring" });
@@ -55,35 +57,39 @@ test("multiplayer: host flow with advance-round", async ({ page }) => {
   await page.getByTestId("pick-input").fill("b");
   await expect(page.getByTestId("suggestion-item").first()).toBeVisible();
   await page.getByTestId("suggestion-item").first().click();
+  await expect(page.getByTestId("submit-pick")).toBeEnabled();
+
   await page.getByTestId("submit-pick").click();
 
   await makeSelection({ sessionId, uid: player2Uid, roundNumber: 9, pickName: "Zelda" });
   await makeSelection({ sessionId, uid: player3Uid, roundNumber: 9, pickName: "Mario" });
 
-  // Round 8 — player 3 unresponsive, host advances via settings
+  // Round 8 — player 3 unresponsive, host advances via sidebar
   await expect(page.getByText("Round 8")).toBeVisible();
   await page.getByTestId("pick-input").fill("c");
   await expect(page.getByTestId("suggestion-item").first()).toBeVisible();
   await page.getByTestId("suggestion-item").first().click();
+  await expect(page.getByTestId("submit-pick")).toBeEnabled();
+
   await page.getByTestId("submit-pick").click();
 
   await makeSelection({ sessionId, uid: player2Uid, roundNumber: 8, pickName: "Hades" });
 
+  // Open sidebar and advance through remaining rounds
   await page.getByTestId("settings-button").click();
-  await expect(page.getByTestId("settings-title")).toBeVisible();
+  await expect(page.getByTestId("sidebar-title")).toBeVisible();
   await expect(page.getByTestId("advance-round")).toBeVisible();
   await page.getByTestId("advance-round").click();
 
-  // Advance rounds 7–2 via settings
+  // Advance rounds 7–2 (sidebar stays open)
   for (let round = 7; round >= 2; round--) {
     await expect(page.getByText(`Round ${round}`)).toBeVisible();
-    await page.getByTestId("settings-button").click();
+    await expect(page.getByTestId("advance-round")).toBeVisible();
     await page.getByTestId("advance-round").click();
   }
 
   // Round 1 — End Game
   await expect(page.getByText("Round 1")).toBeVisible();
-  await page.getByTestId("settings-button").click();
   await expect(page.getByText("End Game")).toBeVisible();
   await page.getByTestId("advance-round").click();
 
@@ -93,5 +99,5 @@ test("multiplayer: host flow with advance-round", async ({ page }) => {
   await expect(page.getByText("Zelda")).toBeVisible();
   await expect(page.getByText("Mario")).toBeVisible();
   await expect(page.getByText("Hades")).toBeVisible();
-  await expect(page.getByText(/\d+pts/)).toBeVisible();
+  await expect(page.getByText(/\d+pts/).first()).toBeVisible();
 });
