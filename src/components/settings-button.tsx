@@ -1,6 +1,16 @@
-export function SettingsButton() {
+interface Props {
+  onClick?: () => void;
+  className?: string;
+}
+
+export function SettingsButton({ onClick, className }: Props) {
   return (
-    <button data-testid="settings-button" className="px-sm text-[28px] text-black-100">
+    <button
+      data-testid="settings-button"
+      type="button"
+      className={`px-sm text-[28px] text-black-100 ${className ?? ""}`}
+      onClick={onClick}
+    >
       ☰
     </button>
   );

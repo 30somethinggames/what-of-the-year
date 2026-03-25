@@ -29,13 +29,13 @@
 }
 
 [data-topic="games"] {
-  --topic-color: #3292c9;
+  --topic-color: var(--color-blue-100);
 }
 [data-topic="movies"] {
-  --topic-color: #32c992;
+  --topic-color: var(--color-green-100);
 }
 [data-topic="books"] {
-  --topic-color: #d1c432;
+  --topic-color: var(--color-yellow-100);
 }
 
 html,
@@ -43,22 +43,22 @@ body,
 #root {
   height: 100%;
   font-family: var(--font-sans);
-  background-color: #fff;
+  background-color: var(--color-white-200);
   color: var(--color-black-100);
   -webkit-font-smoothing: antialiased;
 }
 
 @utility bg-topic {
-  background-color: var(--topic-color, #3292c9);
+  background-color: var(--topic-color, var(--color-blue-100));
 }
 @utility text-topic {
-  color: var(--topic-color, #3292c9);
+  color: var(--topic-color, var(--color-blue-100));
 }
 @utility border-topic {
-  border-color: var(--topic-color, #3292c9);
+  border-color: var(--topic-color, var(--color-blue-100));
 }
 @utility border-t-topic {
-  border-top-color: var(--topic-color, #3292c9);
+  border-top-color: var(--topic-color, var(--color-blue-100));
 }
 
 @layer base {

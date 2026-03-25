@@ -15,11 +15,11 @@ interface Props {
 
 export function useRoundState({ sessionId, topic, year }: Props) {
   const { isLoading: sessionLoading, session, activeRound } = useSession(sessionId);
-  const { isLoading: roundLoading, round } = useRound(sessionId, activeRound);
-  const { isLoading: mySelectionsLoading, mySelections } = useMySelections(sessionId);
-  const { isLoading: playersLoading, isHost } = usePlayers(sessionId);
+  const { round } = useRound(sessionId, activeRound);
+  const { mySelections } = useMySelections(sessionId);
+  const { isHost } = usePlayers(sessionId);
 
-  const isLoading = sessionLoading || roundLoading || mySelectionsLoading || playersLoading;
+  const isLoading = !session && sessionLoading;
 
   useGameOver({ isHost, session });
 

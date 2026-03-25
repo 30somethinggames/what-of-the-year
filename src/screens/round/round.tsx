@@ -23,7 +23,7 @@ interface Props {
 }
 
 export function Round({ sessionId, topic, year }: Props) {
-  const { isLoading, session, round, mySelections, hasPickedThisRound } = useRoundState({
+  const { isLoading, session, mySelections, hasPickedThisRound } = useRoundState({
     sessionId,
     topic,
     year,
@@ -41,7 +41,7 @@ export function Round({ sessionId, topic, year }: Props) {
   const availableOptions = useAvailableOptions(options, mySelections, editingRound);
 
   if (isLoading) return <Loading />;
-  if (!session || !round) return <Error />;
+  if (!session) return <Error />;
 
   const isEditing = editingRound !== null;
   const isDisabled = !selectedOption || (!isEditing && hasPickedThisRound);
@@ -102,9 +102,6 @@ export function Round({ sessionId, topic, year }: Props) {
 
   return (
     <Container>
-      <span data-testid="round-title" className="py-md font-semibold text-lg text-black-100">
-        Round {session.activeRoundNumber}
-      </span>
       <Picks testID="round-list" data={mySelections} onEdit={onEdit} />
       <div className="mt-auto flex flex-col gap-md pt-md">
         <Autocomplete
