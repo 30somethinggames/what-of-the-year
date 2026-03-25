@@ -2,7 +2,6 @@ import { useNavigate } from "@tanstack/react-router";
 import { api } from "convex/_generated/api";
 import { useMutation } from "convex/react";
 
-import { AppVersion } from "components/app-version";
 import { Button } from "components/button";
 import { Container } from "components/container";
 import { PlayerList } from "components/lists/players";
@@ -91,7 +90,6 @@ export function Settings({ sessionId, round }: Props) {
           onClick={onLeaveGame}
           style={{ backgroundColor: "var(--color-red-100)" }}
         />
-        <AppVersion />
       </div>
     </Container>
   );

@@ -2,7 +2,6 @@ import { useNavigate } from "@tanstack/react-router";
 import { api } from "convex/_generated/api";
 import { useMutation } from "convex/react";
 
-import { AppVersion } from "components/app-version";
 import { Button } from "components/button";
 import { PlayerList } from "components/lists/players";
 import { Loading } from "components/states/loading";
@@ -78,7 +77,6 @@ export function Sidebar({ sessionId, onClose }: Props) {
           onClick={onLeaveGame}
           style={{ backgroundColor: "var(--color-red-100)" }}
         />
-        <AppVersion />
       </div>
     </div>
   );

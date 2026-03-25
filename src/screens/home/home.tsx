@@ -2,7 +2,6 @@ import { Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { useState } from "react";
 
-import { AppVersion } from "components/app-version";
 import { Button } from "components/button";
 import { Container } from "components/container";
 import { Picker } from "components/picker";
@@ -55,7 +54,6 @@ export function Home() {
         <Link to="/$topic/$year" params={{ topic: topic.value, year: String(year.value) }}>
           <Button testID="home-start" label="Start" />
         </Link>
-        <AppVersion />
       </motion.div>
     </Container>
   );
