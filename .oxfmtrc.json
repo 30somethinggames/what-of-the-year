@@ -1,5 +1,11 @@
 {
-  "ignorePatterns": [".github/**", "README.md", "convex/_generated/**", "convex/convex.config.ts", "docs/**"],
+  "ignorePatterns": [
+    ".github/**",
+    "README.md",
+    "convex/_generated/**",
+    "convex/convex.config.ts",
+    "docs/**"
+  ],
   "experimentalSortImports": {
     "groups": [["builtin"], ["external"], ["internal"], ["parent", "sibling", "index"]],
     "newlinesBetween": true,
