@@ -78,9 +78,12 @@ jobs:
             --preview-name "pr-${{ github.event.pull_request.number }}"
 
       - name: Run Playwright tests
+        env:
+          TEST_SECRET: ${{ secrets.TEST_SECRET }}
+          PLAYWRIGHT_FORCE_TTY: "120"
+          FORCE_COLOR: "1"
         run: |
           CONVEX_SITE_URL=$(cat /tmp/convex-site-url.txt) \
-          TEST_SECRET="${{ secrets.TEST_SECRET }}" \
           bunx playwright test
 
       - name: Upload test artifacts

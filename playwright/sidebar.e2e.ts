@@ -1,11 +1,5 @@
 import { expect, test } from "@playwright/test";
 
-import { cleanup } from "./helpers/convex";
-
-test.beforeAll(async () => {
-  await cleanup();
-});
-
 test("sidebar: opens and closes via button and backdrop", async ({ page }) => {
   await page.goto("/");
 

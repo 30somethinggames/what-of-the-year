@@ -1,11 +1,5 @@
 import { expect, test } from "@playwright/test";
 
-import { cleanup } from "./helpers/convex";
-
-test.beforeAll(async () => {
-  await cleanup();
-});
-
 test("smoke: home → setup → lobby → round → settings", async ({ page }) => {
   await page.goto("/");
 

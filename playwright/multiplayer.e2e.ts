@@ -1,10 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { addPlayer, cleanup, makeSelection } from "./helpers/convex";
-
-test.beforeAll(async () => {
-  await cleanup();
-});
+import { addPlayer, makeSelection } from "./helpers/convex";
 
 test("multiplayer: host flow with advance-round", async ({ page }) => {
   await page.goto("/");
