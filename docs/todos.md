@@ -9,6 +9,10 @@
 1. Results: verify scoring breakdown
 1. Error states: invalid session ID, unauthenticated access
 
+## clean up
+
+1. remove workarounds for testing form native
+
 ## V2
 
 1. bad-words
