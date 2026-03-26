@@ -3,10 +3,10 @@ import { defineConfig, devices } from "@playwright/test";
 export default defineConfig({
   testDir: "./playwright",
   testMatch: "*.e2e.ts",
-  fullyParallel: true,
-  workers: process.env.CI ? 4 : 1,
+  forbidOnly: !!process.env.CI,
+  workers: 1,
   retries: 1,
-  reporter: process.env.CI ? "list" : "list",
+  reporter: process.env.CI ? "github" : "list",
   timeout: 30_000,
   expect: {
     timeout: 15_000,
