@@ -1,5 +1,11 @@
 import { expect, test, type Page } from "@playwright/test";
 
+import { cleanup } from "./helpers/convex";
+
+test.beforeAll(async () => {
+  await cleanup();
+});
+
 async function pickRound(page: Page, letter: string) {
   await page.getByTestId("pick-input").fill(letter);
   await expect(page.getByTestId("suggestion-item").first()).toBeVisible();

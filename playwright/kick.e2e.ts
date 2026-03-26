@@ -1,6 +1,10 @@
 import { expect, test } from "@playwright/test";
 
-import { addPlayer } from "./helpers/convex";
+import { addPlayer, cleanup } from "./helpers/convex";
+
+test.beforeAll(async () => {
+  await cleanup();
+});
 
 test("kick: host kicks a player from the game sidebar", async ({ page }) => {
   await page.goto("/");

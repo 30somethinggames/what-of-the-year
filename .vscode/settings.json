@@ -3,16 +3,16 @@
   "oxc.lint.run": "onType",
   "editor.codeActionsOnSave": {
     "source.organizeImports.oxc": "always",
-    "source.fixAll.oxc": "explicit"
+    "source.fixAll.oxc": "explicit",
   },
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "oxc.oxc-vscode",
   "[typescript]": {
-    "editor.defaultFormatter": "oxc.oxc-vscode"
+    "editor.defaultFormatter": "oxc.oxc-vscode",
   },
   "[typescriptreact]": {
-    "editor.defaultFormatter": "oxc.oxc-vscode"
+    "editor.defaultFormatter": "oxc.oxc-vscode",
   },
   "files.associations": { "*.css": "tailwindcss" },
-  "npm.packageManager": "bun"
+  "npm.packageManager": "bun",
 }

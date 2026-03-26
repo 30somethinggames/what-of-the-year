@@ -1,6 +1,12 @@
 import { expect, test } from "@playwright/test";
 
+import { cleanup } from "./helpers/convex";
+
 const ITEM_HEIGHT = 90;
+
+test.beforeAll(async () => {
+  await cleanup();
+});
 
 test("home: changing topic and year pickers updates navigation", async ({ page }) => {
   await page.goto("/");
