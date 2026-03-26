@@ -73,9 +73,11 @@ jobs:
             --cmd 'echo "CLOUD_URL=$VITE_CONVEX_URL" && echo "$VITE_CONVEX_URL" > /tmp/convex-cloud-url.txt && echo "$VITE_CONVEX_SITE_URL" > /tmp/convex-site-url.txt' \
             --cmd-url-env-var-name VITE_CONVEX_URL
 
-      - name: Set TEST_SECRET on preview
+      - name: Set environment variables on preview
         run: |
           bunx convex env set TEST_SECRET "${{ secrets.TEST_SECRET }}" \
+            --preview-name "pr-${{ github.event.pull_request.number }}"
+          bunx convex env set JWT_PRIVATE_KEY "${{ secrets.JWT_PRIVATE_KEY }}" \
             --preview-name "pr-${{ github.event.pull_request.number }}"
 
       - name: Run Playwright tests
