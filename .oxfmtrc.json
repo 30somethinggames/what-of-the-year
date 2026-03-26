@@ -5,7 +5,7 @@
     "convex/_generated/**",
     "convex/convex.config.ts",
     "docs/**",
-    "src/routeTree.gen.ts",
+    "src/routeTree.gen.ts"
   ],
   "experimentalSortImports": {
     "groups": [["builtin"], ["external"], ["internal"], ["parent", "sibling", "index"]],
@@ -19,7 +19,7 @@
       "types",
       "utils",
       "db",
-      "screens",
-    ],
-  },
+      "screens"
+    ]
+  }
 }
