@@ -89,7 +89,7 @@ jobs:
         run: |
           bunx convex env set TEST_SECRET "${{ secrets.TEST_SECRET }}" \
             --preview-name "pr-${{ github.event.pull_request.number }}"
-          bunx convex env set JWT_PRIVATE_KEY "$JWT_PRIVATE_KEY" \
+          echo "$JWT_PRIVATE_KEY" | bunx convex env set JWT_PRIVATE_KEY \
             --preview-name "pr-${{ github.event.pull_request.number }}"
 
       - name: Run Playwright tests
