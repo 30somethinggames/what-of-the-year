@@ -37,6 +37,7 @@ jobs:
         run: bun test
 
   e2e:
+    needs: checks
     runs-on: ubuntu-latest
 
     permissions:
