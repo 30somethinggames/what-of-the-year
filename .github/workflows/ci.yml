@@ -5,10 +5,6 @@ on:
     branches:
       - main
 
-concurrency:
-  group: ci-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
-
 jobs:
   checks:
     runs-on: ubuntu-latest
@@ -41,14 +37,15 @@ jobs:
         run: bun test
 
   e2e:
-    needs: checks
     runs-on: ubuntu-latest
 
     permissions:
       contents: read
 
     env:
-      CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
+      VITE_CONVEX_URL: ${{ secrets.VITE_CONVEX_URL }}
+      CONVEX_SITE_URL: ${{ secrets.CONVEX_SITE_URL }}
+      TEST_SECRET: ${{ secrets.TEST_SECRET }}
 
     steps:
       - name: Checkout code
@@ -62,53 +59,11 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
-      - name: Cache Playwright browsers
-        id: playwright-cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('bun.lock') }}
-
       - name: Install Playwright browsers
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: bunx playwright install chromium
-
-      - name: Install Playwright system dependencies
-        run: bunx playwright install-deps chromium
-
-      - name: Deploy Convex preview and build
-        run: |
-          bunx convex deploy \
-            --preview-create "pr-${{ github.event.pull_request.number }}" \
-            --cmd 'echo "$VITE_CONVEX_URL" > /tmp/convex-cloud-url.txt && echo "$VITE_CONVEX_SITE_URL" > /tmp/convex-site-url.txt && bun run build' \
-            --cmd-url-env-var-name VITE_CONVEX_URL
-
-      - name: Set environment variables on preview
-        env:
-          JWT_PRIVATE_KEY: ${{ secrets.JWT_PRIVATE_KEY }}
-        run: |
-          bunx convex env set TEST_SECRET "${{ secrets.TEST_SECRET }}" \
-            --preview-name "pr-${{ github.event.pull_request.number }}"
-          echo "$JWT_PRIVATE_KEY" | bunx convex env set JWT_PRIVATE_KEY \
-            --preview-name "pr-${{ github.event.pull_request.number }}"
-          bunx convex env set JWKS '${{ secrets.JWKS }}' \
-            --preview-name "pr-${{ github.event.pull_request.number }}"
-          bunx convex env set IGDB_CLIENT_ID "${{ secrets.IGDB_CLIENT_ID }}" \
-            --preview-name "pr-${{ github.event.pull_request.number }}"
-          bunx convex env set IGDB_ACCESS_TOKEN "${{ secrets.IGDB_ACCESS_TOKEN }}" \
-            --preview-name "pr-${{ github.event.pull_request.number }}"
-          bunx convex env set TMDB_API_KEY "${{ secrets.TMDB_API_KEY }}" \
-            --preview-name "pr-${{ github.event.pull_request.number }}"
+        run: bunx playwright install chromium --with-deps
 
       - name: Run Playwright tests
-        env:
-          TEST_SECRET: ${{ secrets.TEST_SECRET }}
-          PLAYWRIGHT_FORCE_TTY: "120"
-          FORCE_COLOR: "1"
-        run: |
-          VITE_CONVEX_URL=$(cat /tmp/convex-cloud-url.txt) \
-          CONVEX_SITE_URL=$(cat /tmp/convex-site-url.txt) \
-          bunx playwright test
+        run: bunx playwright test
 
       - name: Upload test artifacts
         if: ${{ !cancelled() }}
