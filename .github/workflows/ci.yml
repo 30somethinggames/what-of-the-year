@@ -12,6 +12,9 @@ jobs:
     permissions:
       contents: read
 
+    env:
+      CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
