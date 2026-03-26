@@ -73,6 +73,11 @@ jobs:
           bunx convex env set TEST_SECRET "${{ secrets.TEST_SECRET }}" \
             --preview-name "pr-${{ github.event.pull_request.number }}"
 
+      - name: Build
+        run: |
+          CLOUD_URL=$(cat /tmp/convex-url.txt)
+          VITE_CONVEX_URL="$CLOUD_URL" bun run build
+
       - name: Run Playwright tests
         run: |
           CLOUD_URL=$(cat /tmp/convex-url.txt)
