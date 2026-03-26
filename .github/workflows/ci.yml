@@ -65,11 +65,12 @@ jobs:
       - name: Install Playwright browsers
         run: bunx playwright install chromium --with-deps
 
-      - name: Deploy Convex preview and build
+      - name: Deploy Convex preview
+        id: deploy
         run: |
           bunx convex deploy \
             --preview-create "pr-${{ github.event.pull_request.number }}" \
-            --cmd 'echo "VITE_CONVEX_URL=$VITE_CONVEX_URL" && echo "VITE_CONVEX_SITE_URL=$VITE_CONVEX_SITE_URL" && echo "$VITE_CONVEX_SITE_URL" > /tmp/convex-site-url.txt && bun run build' \
+            --cmd 'echo "CLOUD_URL=$VITE_CONVEX_URL" && echo "$VITE_CONVEX_URL" > /tmp/convex-cloud-url.txt && echo "$VITE_CONVEX_SITE_URL" > /tmp/convex-site-url.txt' \
             --cmd-url-env-var-name VITE_CONVEX_URL
 
       - name: Set TEST_SECRET on preview
@@ -83,6 +84,7 @@ jobs:
           PLAYWRIGHT_FORCE_TTY: "120"
           FORCE_COLOR: "1"
         run: |
+          VITE_CONVEX_URL=$(cat /tmp/convex-cloud-url.txt) \
           CONVEX_SITE_URL=$(cat /tmp/convex-site-url.txt) \
           bunx playwright test
 
