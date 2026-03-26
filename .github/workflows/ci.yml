@@ -43,9 +43,7 @@ jobs:
       contents: read
 
     env:
-      VITE_CONVEX_URL: ${{ secrets.VITE_CONVEX_URL }}
-      CONVEX_SITE_URL: ${{ secrets.CONVEX_SITE_URL }}
-      TEST_SECRET: ${{ secrets.TEST_SECRET }}
+      CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
 
     steps:
       - name: Checkout code
@@ -62,8 +60,27 @@ jobs:
       - name: Install Playwright browsers
         run: bunx playwright install chromium --with-deps
 
+      - name: Deploy Convex preview
+        run: |
+          bunx convex deploy \
+            --preview-create "pr-${{ github.event.pull_request.number }}" \
+            --cmd 'echo "$VITE_CONVEX_URL" > /tmp/convex-url.txt' \
+            --cmd-url-env-var-name VITE_CONVEX_URL
+
+      - name: Set TEST_SECRET on preview
+        run: |
+          bunx convex env set TEST_SECRET "${{ secrets.TEST_SECRET }}" \
+            --preview-name "pr-${{ github.event.pull_request.number }}"
+
       - name: Run Playwright tests
-        run: bunx playwright test
+        run: |
+          CLOUD_URL=$(cat /tmp/convex-url.txt)
+          SITE_URL="${CLOUD_URL/.convex.cloud/.convex.site}"
+
+          VITE_CONVEX_URL="$CLOUD_URL" \
+          CONVEX_SITE_URL="$SITE_URL" \
+          TEST_SECRET="${{ secrets.TEST_SECRET }}" \
+          bunx playwright test
 
       - name: Upload test artifacts
         if: ${{ !cancelled() }}
