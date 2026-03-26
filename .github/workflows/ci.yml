@@ -30,6 +30,9 @@ jobs:
       - name: Check linting
         run: bun run check:lint
 
+      - name: Run codegen
+        run: bunx convex codegen && bunx @tanstack/router-cli generate
+
       - name: Check types
         run: bun run check:types
 
