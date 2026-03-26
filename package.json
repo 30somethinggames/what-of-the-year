@@ -24,10 +24,12 @@
     "@fontsource-variable/inter": "^5.2.8",
     "@tanstack/react-query": "^5.90.20",
     "@tanstack/react-router": "^1.168.3",
+    "clsx": "^2.1.1",
     "convex": "^1.32.0",
     "framer-motion": "^12.38.0",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",

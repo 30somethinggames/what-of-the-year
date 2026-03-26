@@ -1,3 +1,6 @@
+## TODOS
+1. fix "ignoreDeprecations": "6.0", tsconfig
+
 ## V2
 
 1. bad-words
