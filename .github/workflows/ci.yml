@@ -69,7 +69,7 @@ jobs:
         run: |
           bunx convex deploy \
             --preview-create "pr-${{ github.event.pull_request.number }}" \
-            --cmd 'echo "$VITE_CONVEX_SITE_URL" > /tmp/convex-site-url.txt && bun run build' \
+            --cmd 'echo "VITE_CONVEX_URL=$VITE_CONVEX_URL" && echo "VITE_CONVEX_SITE_URL=$VITE_CONVEX_SITE_URL" && echo "$VITE_CONVEX_SITE_URL" > /tmp/convex-site-url.txt && bun run build' \
             --cmd-url-env-var-name VITE_CONVEX_URL
 
       - name: Set TEST_SECRET on preview
