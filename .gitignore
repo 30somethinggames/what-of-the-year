@@ -45,8 +45,6 @@ yarn-error.*
 /ios
 /android
 
-/convex/_generated/
-src/routeTree.gen.ts
 
 CLAUDE.md
 .claude/**
