@@ -6,29 +6,71 @@ on:
       - main
 
 jobs:
-  lint-and-test:
+  checks:
     runs-on: ubuntu-latest
-    
+
     permissions:
       contents: read
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
-      
+
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: '1.1.38'
-      
+          bun-version: latest
+
       - name: Install dependencies
         run: bun install --frozen-lockfile
-      
-      - name: Run format check
+
+      - name: Check formatting
         run: bun run check:format
 
-      - name: Run linter
+      - name: Check linting
         run: bun run check:lint
-      
-      - name: Run tests
+
+      - name: Check types
+        run: bun run check:types
+
+      - name: Run unit tests
         run: bun test
+
+  e2e:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    env:
+      VITE_CONVEX_URL: ${{ secrets.VITE_CONVEX_URL }}
+      CONVEX_SITE_URL: ${{ secrets.CONVEX_SITE_URL }}
+      TEST_SECRET: ${{ secrets.TEST_SECRET }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: bunx playwright install chromium --with-deps
+
+      - name: Run Playwright tests
+        run: bunx playwright test
+
+      - name: Upload test artifacts
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
