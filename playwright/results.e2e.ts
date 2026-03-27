@@ -1,10 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { addPlayer, cleanup, makeSelection } from "./helpers/convex";
-
-test.beforeAll(async () => {
-  await cleanup();
-});
+import { addPlayer, makeSelection } from "./helpers/convex";
 
 test("results: scoring breakdown with shared picks", async ({ page }) => {
   await page.goto("/");

@@ -1,11 +1,5 @@
 import { expect, test } from "@playwright/test";
 
-import { cleanup } from "./helpers/convex";
-
-test.beforeAll(async () => {
-  await cleanup();
-});
-
 test("lobby: invite copies session URL to clipboard", async ({ browser }) => {
   const context = await browser.newContext({
     permissions: ["clipboard-read", "clipboard-write"],

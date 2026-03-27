@@ -1,11 +1,5 @@
 import { expect, test } from "@playwright/test";
 
-import { cleanup } from "./helpers/convex";
-
-test.beforeAll(async () => {
-  await cleanup();
-});
-
 test("error: invalid session ID shows error or join form", async ({ page }) => {
   await page.goto("/games/2026/invalid-session-id");
 
