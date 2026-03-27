@@ -4,6 +4,8 @@
     "README.md",
     "convex/_generated/**",
     "convex/convex.config.ts",
+    "src/routeTree.gen.ts",
+    "docs/**",
     "src/routeTree.gen.ts"
   ],
   "rules": {

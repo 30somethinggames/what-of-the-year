@@ -14,9 +14,5 @@
     "editor.defaultFormatter": "oxc.oxc-vscode"
   },
   "files.associations": { "*.css": "tailwindcss" },
-  "cSpell.words": ["IGDB", "TMDB", "Uids", "whatoftheyear"],
-  "npm.packageManager": "bun",
-  "chat.tools.terminal.autoApprove": {
-    "bunx": true
-  }
+  "npm.packageManager": "bun"
 }

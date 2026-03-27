@@ -1,11 +1,9 @@
 import { internal } from "../_generated/api";
 import { httpAction } from "../_generated/server";
 
-const NOT_FOUND = new Response("Not Found", { status: 404 });
 const UNAUTHORIZED = new Response("Unauthorized", { status: 401 });
 
 function guardTest(request: Request) {
-  if (process.env.IS_TEST !== "true") return NOT_FOUND;
   if (request.headers.get("x-test-secret") !== process.env.TEST_SECRET) return UNAUTHORIZED;
   return null;
 }

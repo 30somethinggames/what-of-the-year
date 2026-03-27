@@ -1,3 +1,5 @@
+import { cn } from "utils/cn";
+
 interface Props {
   onClick?: () => void;
   className?: string;
@@ -8,7 +10,7 @@ export function SettingsButton({ onClick, className }: Props) {
     <button
       data-testid="settings-button"
       type="button"
-      className={`px-sm text-[28px] text-black-100 ${className ?? ""}`}
+      className={cn("px-sm text-[28px] text-black-100", className)}
       onClick={onClick}
     >
       ☰
