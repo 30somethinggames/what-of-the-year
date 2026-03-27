@@ -1,9 +1,6 @@
 name: CI
 
 on:
-  pull_request:
-    branches:
-      - main
   pull_request_target:
     branches:
       - main
@@ -14,9 +11,6 @@ concurrency:
 
 jobs:
   checks:
-    if: >
-      (github.event_name == 'pull_request' && github.actor != 'dependabot[bot]') ||
-      (github.event_name == 'pull_request_target' && github.actor == 'dependabot[bot]')
     runs-on: ubuntu-latest
 
     permissions:
@@ -49,9 +43,6 @@ jobs:
         run: bun test
 
   e2e:
-    if: >
-      (github.event_name == 'pull_request' && github.actor != 'dependabot[bot]') ||
-      (github.event_name == 'pull_request_target' && github.actor == 'dependabot[bot]')
     needs: checks
     runs-on: ubuntu-latest
 
