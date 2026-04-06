@@ -22,8 +22,8 @@
     "@convex-dev/auth": "^0.0.91",
     "@convex-dev/rate-limiter": "^0.3.2",
     "@fontsource-variable/inter": "^5.2.8",
-    "@tanstack/react-query": "^5.95.2",
-    "@tanstack/react-router": "^1.168.7",
+    "@tanstack/react-query": "^5.96.2",
+    "@tanstack/react-router": "^1.168.10",
     "clsx": "^2.1.1",
     "convex": "^1.34.1",
     "framer-motion": "^12.38.0",
@@ -32,19 +32,19 @@
     "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {
-    "@playwright/test": "^1.58.2",
+    "@playwright/test": "^1.59.1",
     "@tailwindcss/vite": "^4.2.2",
-    "@tanstack/router-plugin": "^1.167.8",
+    "@tanstack/router-plugin": "^1.167.12",
     "@types/bun": "^1.3.11",
     "@types/react": "~19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
     "husky": "^9.1.7",
-    "oxfmt": "^0.42.0",
-    "oxlint": "^1.57.0",
+    "oxfmt": "^0.43.0",
+    "oxlint": "^1.58.0",
     "tailwindcss": "^4.2.2",
     "typescript": "~6.0.2",
-    "vite": "^8.0.3"
+    "vite": "^8.0.4"
   },
   "engines": {
     "bun": ">=1.3.6"
