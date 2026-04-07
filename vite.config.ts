@@ -9,6 +9,8 @@ export default defineConfig({
     tsconfigPaths: true,
   },
   server: {
+    host: true,
+    port: 5173,
     allowedHosts: ["woty.seery.app"],
   },
 });
