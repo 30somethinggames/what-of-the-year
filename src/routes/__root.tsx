@@ -1,4 +1,4 @@
-import { Outlet, createRootRoute, useParams } from "@tanstack/react-router";
+import { Outlet, createRootRoute } from "@tanstack/react-router";
 
 import { ToastProvider } from "components/toast";
 
@@ -7,11 +7,8 @@ export const Route = createRootRoute({
 });
 
 function RootLayout() {
-  const params = useParams({ strict: false }) as { topic?: string };
-  const topic = params.topic;
-
   return (
-    <div className="flex h-full justify-center" data-topic={topic}>
+    <div className="flex h-full justify-center">
       <ToastProvider>
         <div className="flex h-full w-full max-w-140 flex-col overflow-x-hidden bg-white-100 shadow-md">
           <Outlet />

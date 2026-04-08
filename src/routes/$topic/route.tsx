@@ -17,7 +17,13 @@ function TopicLayout() {
     if (!isAuthenticated && !isLoading) signIn("anonymous");
   }, [isAuthenticated, isLoading]);
 
+  const { topic } = Route.useParams();
+
   if (!isAuthenticated) return <Loading />;
 
-  return <Outlet />;
+  return (
+    <div className="flex flex-1 flex-col" data-topic={topic}>
+      <Outlet />
+    </div>
+  );
 }

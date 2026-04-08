@@ -3,7 +3,6 @@
 1. Round -> Place
 1. FONTS
 1. results avatar. when you hover over it's the personal name
-1. fix IGDB 401 error — `convex/igdb.ts:27` returning unauthorized, likely expired API token
 
 ## V2
 
