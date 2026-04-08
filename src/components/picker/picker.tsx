@@ -1,76 +1,57 @@
-import { memo, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
-import { ITEM_HEIGHT } from "./styles";
-import type { PickerItem, PickerProps } from "./types";
-import { getInitialScrollIndex, keyExtractor } from "./utils";
+export interface PickerItem {
+  value: string | number;
+  label: string;
+}
 
-const Item = memo(function Item({ label }: { label: string }) {
-  return (
-    <div
-      className="flex items-center justify-center"
-      style={{ height: ITEM_HEIGHT, scrollSnapAlign: "start" }}
-    >
-      <span className="select-none font-semibold text-[72px] leading-none text-black-100 truncate">
-        {label}
-      </span>
-    </div>
-  );
-});
+interface Props<T extends PickerItem> {
+  data: T[];
+  value: T;
+  onValueChange: (v: T) => void;
+  testID?: string;
+}
 
-export function Picker<T extends PickerItem>({
-  data,
-  value,
-  onValueChange,
-  testID,
-}: PickerProps<T>) {
+export function Picker<T extends PickerItem>({ data, value, onValueChange, testID }: Props<T>) {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const initialScrollIndex = getInitialScrollIndex(data, value);
-  const activeIndex = useRef(initialScrollIndex);
-
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = initialScrollIndex * ITEM_HEIGHT;
-    }
-  }, []);
-
-  useEffect(() => {
-    const index = data.findIndex((d) => d.value === value.value);
-    if (index >= 0 && index !== activeIndex.current) {
-      activeIndex.current = index;
-      scrollRef.current?.scrollTo({ top: index * ITEM_HEIGHT, behavior: "smooth" });
-    }
-  }, [data, value]);
 
   useEffect(() => {
     const node = scrollRef.current;
     if (!node) return;
 
+    const index = Math.max(
+      0,
+      data.findIndex((d) => d.value === value.value),
+    );
+    node.scrollTop = index * node.clientHeight;
+
     const handleScrollEnd = () => {
-      const snappedIndex = Math.round(node.scrollTop / ITEM_HEIGHT);
-      const clamped = Math.max(0, Math.min(snappedIndex, data.length - 1));
-      if (clamped !== activeIndex.current) {
-        activeIndex.current = clamped;
+      const i = Math.round(node.scrollTop / node.clientHeight);
+      const clamped = Math.max(0, Math.min(i, data.length - 1));
+      if (data[clamped].value !== value.value) {
         onValueChange(data[clamped]);
       }
     };
 
     node.addEventListener("scrollend", handleScrollEnd);
     return () => node.removeEventListener("scrollend", handleScrollEnd);
-  }, [data, onValueChange]);
+  }, [data, value, onValueChange]);
 
   return (
     <div
       ref={scrollRef}
       data-testid={testID}
-      className="w-full cursor-ns-resize rounded-md border border-black-100 bg-white-200 scrollbar-none"
-      style={{
-        height: ITEM_HEIGHT + 3,
-        overflowY: "scroll",
-        scrollSnapType: "y mandatory",
-      }}
+      className="h-23.25 w-full cursor-ns-resize snap-y snap-mandatory overflow-y-scroll rounded-md border border-black-100 bg-white-200 scrollbar-none"
     >
       {data.map((item) => (
-        <Item key={keyExtractor(item)} label={item.label} />
+        <div
+          key={String(item.value)}
+          className="flex h-22.5 snap-start items-center justify-center"
+        >
+          <span className="select-none truncate font-semibold text-[72px] leading-none text-black-100">
+            {item.label}
+          </span>
+        </div>
       ))}
     </div>
   );

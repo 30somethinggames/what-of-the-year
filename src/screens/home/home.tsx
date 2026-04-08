@@ -16,7 +16,7 @@ export function Home() {
 
   return (
     <Container className="justify-between" data-topic={topic.value}>
-      <div className="flex flex-1 flex-col items-center justify-center">
+      <div className="flex flex-1 flex-col items-center justify-center overflow-hidden">
         <motion.div
           className="w-full"
           initial={{ x: "-100vw" }}

@@ -1,2 +1,2 @@
 export { Picker } from "./picker";
-export type { PickerItem, PickerProps } from "./types";
+export type { PickerItem } from "./picker";
