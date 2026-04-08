@@ -7,9 +7,5 @@ export const Route = createFileRoute("/")({
 });
 
 function HomeRoute() {
-  return (
-    <div className="flex h-full w-full max-w-140 flex-col overflow-x-hidden bg-white-100 shadow-md">
-      <Home />
-    </div>
-  );
+  return <Home />;
 }

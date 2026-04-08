@@ -79,7 +79,7 @@ export function Topic({ topic, year, existingSessionId }: Props) {
           testID="name-input"
           placeholder="User name"
           value={name}
-          onChangeText={setName}
+          onChange={(e) => setName(e.target.value)}
           error={nameError ?? undefined}
           maxLength={MAX_NAME_LENGTH}
         />

@@ -15,11 +15,11 @@ function ResultsRoute() {
   if (!topic) return null;
 
   return (
-    <div className="flex h-full w-full max-w-140 flex-col overflow-x-hidden bg-white-100 shadow-md">
+    <>
       <div className="flex items-center justify-center py-md">
         <span className="font-semibold text-lg">{`${topic.label} of ${year}`}</span>
       </div>
       <Results sessionId={sessionId as SessionID} />
-    </div>
+    </>
   );
 }

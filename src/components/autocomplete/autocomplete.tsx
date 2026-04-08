@@ -35,8 +35,8 @@ export function Autocomplete({
   useEffect(() => clearBlurTimeout, [clearBlurTimeout]);
 
   const handleChangeText = useCallback(
-    (text: string) => {
-      onChangeText(text);
+    (e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>) => {
+      onChangeText(e.target.value);
       setShowSuggestions(true);
     },
     [onChangeText],
@@ -70,7 +70,7 @@ export function Autocomplete({
       <Input
         testID={testID}
         value={value}
-        onChangeText={handleChangeText}
+        onChange={handleChangeText}
         onFocus={onFocus}
         onBlur={onBlur}
         autoCorrect="off"

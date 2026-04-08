@@ -13,7 +13,9 @@ function RootLayout() {
   return (
     <div className="flex h-full justify-center" data-topic={topic}>
       <ToastProvider>
-        <Outlet />
+        <div className="flex h-full w-full max-w-140 flex-col overflow-x-hidden bg-white-100 shadow-md">
+          <Outlet />
+        </div>
       </ToastProvider>
     </div>
   );

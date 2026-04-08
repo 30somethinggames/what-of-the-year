@@ -1,12 +1,11 @@
 import { cn } from "utils/cn";
 
-interface Props extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange"> {
+interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
   error?: string;
   testID?: string;
-  onChangeText?: (text: string) => void;
 }
 
-export function Input({ error, testID, onChangeText, className, ...rest }: Props) {
+export function Input({ error, testID, onChange, className, ...rest }: Props) {
   return (
     <div className="w-full">
       <input
@@ -17,7 +16,7 @@ export function Input({ error, testID, onChangeText, className, ...rest }: Props
           error && "border-red-100",
           className,
         )}
-        onChange={onChangeText ? (e) => onChangeText(e.target.value) : undefined}
+        onChange={onChange}
         {...rest}
       />
     </div>

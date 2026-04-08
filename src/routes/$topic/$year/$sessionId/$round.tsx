@@ -21,7 +21,7 @@ function RoundRoute() {
   if (!topic) return null;
 
   return (
-    <div className="flex h-full w-full max-w-140 flex-col bg-white-100 shadow-md">
+    <>
       <AnimatePresence>
         {sidebarOpen ? (
           <>
@@ -56,6 +56,6 @@ function RoundRoute() {
         <div className="w-10" />
       </div>
       <Round sessionId={sessionId as SessionID} topic={topic.value} year={year} />
-    </div>
+    </>
   );
 }

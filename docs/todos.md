@@ -1,6 +1,5 @@
 ## TODO
 
-1. bug, the topic is not resetting on home screen
 1. Round -> Place
 1. FONTS
 1. results avatar. when you hover over it's the personal name
