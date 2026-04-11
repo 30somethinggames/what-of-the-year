@@ -1,8 +1,16 @@
 ## Get started
 
 1. Request access to the Convex team from a project admin
+2. Create `.env.local` with the following variables:
 
-2. Copy `.env.example` to `.env.local` and follow the setup instructions inside
+   ```bash
+   CONVEX_DEPLOYMENT=dev:<your-deployment-slug>
+   VITE_CONVEX_URL=https://<your-deployment-slug>.convex.cloud
+   CONVEX_SITE_URL=https://<your-deployment-slug>.convex.site
+   TEST_SECRET=<run: openssl rand -hex 32>
+   ```
+- Run `bunx convex dev` to create your dev deployment and get the slug
+- Generate `TEST_SECRET` with `openssl rand -hex 32`, then set it on the deployment: `bunx convex env set TEST_SECRET <value>`
 
 3. Install dependencies
 
