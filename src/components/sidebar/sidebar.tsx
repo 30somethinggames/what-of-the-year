@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/react";
 import { useNavigate } from "@tanstack/react-router";
 
 import { Button } from "components/button";
@@ -32,28 +33,32 @@ export function Sidebar({ sessionId, topic, year, onClose }: Props) {
 
   const onNextRound = async () => {
     if (!activeRound) return;
-    const { hasNextRound } = await advanceRound({
-      sessionId,
-      currentRoundNumber: activeRound,
-    });
-    if (!hasNextRound) {
-      navigate({
-        to: "/$topic/$year/$sessionId/results",
-        params: { topic, year, sessionId },
-        replace: true,
+    try {
+      const { hasNextRound } = await advanceRound({
+        sessionId,
+        currentRoundNumber: activeRound,
       });
+      if (!hasNextRound) {
+        navigate({
+          to: "/$topic/$year/$sessionId/results",
+          params: { topic, year, sessionId },
+          replace: true,
+        });
+      }
+    } catch (e) {
+      Sentry.captureException(e);
     }
   };
 
   const onLeaveGame = () => {
     if (isHost) {
-      endSession({ sessionId });
+      endSession({ sessionId }).catch(Sentry.captureException);
     }
     navigate({ to: "/", replace: true });
   };
 
   const onKick = (uid: string) => {
-    kickFromGame({ sessionId, uid });
+    kickFromGame({ sessionId, uid }).catch(Sentry.captureException);
   };
 
   return (

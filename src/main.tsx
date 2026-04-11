@@ -6,6 +6,7 @@ import { createRoot } from "react-dom/client";
 
 import { ConvexReactClient } from "convex/react";
 import { DEFAULT_STALE_TIME } from "queries/constants";
+import { initSentry } from "utils/sentry";
 
 import { routeTree } from "./routeTree.gen";
 import "./index.css";
@@ -22,6 +23,8 @@ const queryClient = new QueryClient({
 });
 
 const router = createRouter({ routeTree });
+
+initSentry(router);
 
 declare module "@tanstack/react-router" {
   interface Register {

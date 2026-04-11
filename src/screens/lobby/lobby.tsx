@@ -1,9 +1,10 @@
+import * as Sentry from "@sentry/react";
 import { useNavigate } from "@tanstack/react-router";
 
 import { Button } from "components/button";
 import { Container } from "components/container";
 import { PlayerList } from "components/lists/players";
-import { Error } from "components/states/error";
+import { DisplayError } from "components/states/error";
 import { Loading } from "components/states/loading";
 import { api } from "convex/_generated/api";
 import { MAX_ROUNDS } from "convex/constants";
@@ -27,24 +28,32 @@ export function Lobby({ topic, year, sessionId }: LobbyProps) {
   const startSession = useMutation(api.sessions.startSession);
 
   if (isLoading) return <Loading />;
-  if (!session) return <Error />;
+  if (!session) return <DisplayError />;
 
   if (!currentUser) {
     return <Topic topic={topic} year={year} existingSessionId={sessionId} />;
   }
 
   const onStart = async () => {
-    await startSession({ sessionId });
-    navigate({
-      to: "/$topic/$year/$sessionId/$round",
-      params: { topic: topic.value, year, sessionId, round: String(MAX_ROUNDS) },
-      replace: true,
-    });
+    try {
+      await startSession({ sessionId });
+      navigate({
+        to: "/$topic/$year/$sessionId/$round",
+        params: { topic: topic.value, year, sessionId, round: String(MAX_ROUNDS) },
+        replace: true,
+      });
+    } catch (e) {
+      Sentry.captureException(e);
+    }
   };
 
   const onLeave = async () => {
-    await leaveSession({ sessionId });
-    navigate({ to: "/", replace: true });
+    try {
+      await leaveSession({ sessionId });
+      navigate({ to: "/", replace: true });
+    } catch (e) {
+      Sentry.captureException(e);
+    }
   };
 
   const handleOnShare = () => onShare({ topic, year, sessionId });

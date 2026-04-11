@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/react";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 
@@ -5,7 +6,7 @@ import { Autocomplete } from "components/autocomplete";
 import { Button } from "components/button";
 import { Container } from "components/container";
 import { Picks } from "components/lists/picks";
-import { Error } from "components/states/error";
+import { DisplayError } from "components/states/error";
 import { Loading } from "components/states/loading";
 import type { TOPIC_KEY } from "constants/topics";
 import { api } from "convex/_generated/api";
@@ -55,7 +56,7 @@ export function Round({ sessionId, topic, year }: Props) {
   const availableOptions = useAvailableOptions(options, mySelections, editingRound);
 
   if (isLoading) return <Loading />;
-  if (!session) return <Error />;
+  if (!session) return <DisplayError />;
 
   if (isRevealing) {
     const onSkip = async () => {
@@ -100,8 +101,7 @@ export function Round({ sessionId, topic, year }: Props) {
         });
       }
     } catch (e) {
-      // oxlint-disable-next-line no-console
-      console.error("[round] saveSelection error", e);
+      Sentry.captureException(e);
     }
     setInputValue("");
     setSelectedOption(null);

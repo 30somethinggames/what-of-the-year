@@ -8,7 +8,7 @@ interface Props {
   onRetry?: () => void;
 }
 
-export function Error({ message = "Something went wrong", onRetry }: Props) {
+export function DisplayError({ message = "Something went wrong", onRetry }: Props) {
   return (
     <div className="flex flex-1 flex-row items-center justify-center gap-lg px-lg">
       <Avatar source={SAD_ROBOT} size={80} />

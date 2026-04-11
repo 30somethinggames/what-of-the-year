@@ -1,10 +1,23 @@
+import { sentryVitePlugin } from "@sentry/vite-plugin";
 import tailwindcss from "@tailwindcss/vite";
 import tanstackRouter from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
 export default defineConfig({
-  plugins: [tanstackRouter({ routesDirectory: "src/routes" }), react(), tailwindcss()],
+  build: {
+    sourcemap: true,
+  },
+  plugins: [
+    tanstackRouter({ routesDirectory: "src/routes" }),
+    react(),
+    tailwindcss(),
+    sentryVitePlugin({
+      org: process.env.SENTRY_ORG,
+      project: process.env.SENTRY_PROJECT,
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+    }),
+  ],
   resolve: {
     tsconfigPaths: true,
   },

@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/react";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 
@@ -58,8 +59,7 @@ export function Topic({ topic, year, existingSessionId }: Props) {
         });
       }
     } catch (e) {
-      // oxlint-disable-next-line no-console
-      console.error("Failed to submit:", e);
+      Sentry.captureException(e);
     }
   };
 
