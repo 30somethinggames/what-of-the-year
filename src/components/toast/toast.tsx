@@ -41,6 +41,7 @@ export function Toast({ id, message, variant, index, onRemove }: Props) {
       onAnimationComplete={() => {
         if (dismissing) onRemove(id);
       }}
+      data-testid="toast"
       className="pointer-events-auto absolute left-md right-md flex min-h-14 flex-row items-center rounded-lg border-l-4 bg-white-200 shadow-md"
       style={{
         top: targetTop,

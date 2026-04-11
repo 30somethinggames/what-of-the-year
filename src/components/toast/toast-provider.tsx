@@ -37,10 +37,8 @@ export function ToastProvider({ children }: Props) {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
-  const value = useMemo(() => ({ show }), [show]);
-
   return (
-    <ToastContext.Provider value={value}>
+    <ToastContext.Provider value={{ show }}>
       {children}
       <div className="pointer-events-none absolute inset-x-0 top-0 z-9999">
         {toasts.map((toast, index) => (

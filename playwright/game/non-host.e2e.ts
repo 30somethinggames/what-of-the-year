@@ -73,3 +73,41 @@ test("non-host: lobby UI and round experience", async ({ browser }) => {
   await hostContext.close();
   await guestContext.close();
 });
+
+test("non-host: host leaving game shows toast and redirects to home", async ({ browser }) => {
+  const hostContext = await browser.newContext();
+  const hostPage = await hostContext.newPage();
+
+  await hostPage.goto("/");
+  await hostPage.getByTestId("home-start").click();
+  await hostPage.getByTestId("name-input").pressSequentially("Host");
+  await expect(hostPage.getByTestId("setup-submit")).toBeEnabled();
+  await hostPage.getByTestId("setup-submit").click();
+  await expect(hostPage.getByTestId("invite")).toBeVisible();
+
+  const sessionId = await hostPage.getByTestId("session-id").getAttribute("data-value");
+
+  const guestContext = await browser.newContext();
+  const guestPage = await guestContext.newPage();
+
+  await guestPage.goto(`/games/2026/${sessionId}`);
+  await guestPage.getByTestId("name-input").pressSequentially("Guest");
+  await expect(guestPage.getByTestId("setup-submit")).toBeEnabled();
+  await guestPage.getByTestId("setup-submit").click();
+
+  await hostPage.getByTestId("lobby-start").click();
+  await expect(guestPage.getByText("Round 10")).toBeVisible();
+
+  // Host leaves game mid-round (triggers endSession)
+  await hostPage.getByTestId("settings-button").click();
+  await expect(hostPage.getByTestId("leave-game")).toBeVisible();
+  await hostPage.getByTestId("leave-game").click();
+
+  // Guest sees error toast and is redirected to home
+  await expect(guestPage.getByTestId("toast")).toBeVisible();
+  await expect(guestPage.getByTestId("toast")).toHaveText("The host ended the game.");
+  await expect(guestPage.getByTestId("home-start")).toBeVisible();
+
+  await hostContext.close();
+  await guestContext.close();
+});
