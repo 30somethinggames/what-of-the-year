@@ -1,7 +1,4 @@
 import { useNavigate } from "@tanstack/react-router";
-import { api } from "convex/_generated/api";
-import { useMutation } from "convex/react";
-import { MAX_NAME_LENGTH, validateName } from "convex/utils/validate";
 import { useState } from "react";
 
 import { Avatar, useRandomAvatar } from "components/avatar";
@@ -9,6 +6,9 @@ import { Button } from "components/button";
 import { Container } from "components/container";
 import { Input } from "components/input";
 import type { TopicType } from "constants/topics";
+import { api } from "convex/_generated/api";
+import { useMutation } from "convex/react";
+import { MAX_NAME_LENGTH, validateName } from "convex/utils/validate";
 import type { SessionID } from "db/types";
 import { useTopicData } from "queries/use-topic-data";
 

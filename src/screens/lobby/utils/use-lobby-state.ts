@@ -1,7 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
-import { SessionStatus } from "convex/constants";
 import { useEffect } from "react";
 
+import { SessionStatus } from "convex/constants";
 import { usePlayers } from "db/use-players";
 import { useSession } from "db/use-sessions";
 import { useGameOver } from "hooks/use-game-over";

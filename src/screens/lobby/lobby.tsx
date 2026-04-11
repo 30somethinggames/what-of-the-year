@@ -1,13 +1,13 @@
 import { useNavigate } from "@tanstack/react-router";
-import { api } from "convex/_generated/api";
-import { MAX_ROUNDS } from "convex/constants";
-import { useMutation } from "convex/react";
 
 import { Button } from "components/button";
 import { Container } from "components/container";
 import { PlayerList } from "components/lists/players";
 import { Error } from "components/states/error";
 import { Loading } from "components/states/loading";
+import { api } from "convex/_generated/api";
+import { MAX_ROUNDS } from "convex/constants";
+import { useMutation } from "convex/react";
 
 import { Topic } from "../topic";
 import type { LobbyProps } from "./types";

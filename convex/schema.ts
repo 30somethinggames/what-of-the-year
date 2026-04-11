@@ -1,4 +1,5 @@
 import { authTables } from "@convex-dev/auth/server";
+
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
@@ -31,11 +32,18 @@ export default defineSchema({
   rounds: defineTable({
     sessionId: v.id("sessions"),
     number: v.number(),
-    state: v.union(v.literal("pending"), v.literal("open"), v.literal("closed")),
+    state: v.union(
+      v.literal("pending"),
+      v.literal("open"),
+      v.literal("closed"),
+      v.literal("revealing"),
+    ),
     weight: v.number(),
     selectionsComplete: v.number(),
     startedAt: v.union(v.number(), v.null()),
     closedAt: v.union(v.number(), v.null()),
+    revealJobId: v.optional(v.id("_scheduled_functions")),
+    revealEndsAt: v.optional(v.number()),
   }).index("by_session", ["sessionId"]),
 
   selections: defineTable({

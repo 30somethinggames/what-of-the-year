@@ -19,7 +19,8 @@
       "types",
       "utils",
       "db",
-      "screens"
+      "screens",
+      "convex"
     ]
   }
 }

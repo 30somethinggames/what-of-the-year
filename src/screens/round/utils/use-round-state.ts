@@ -5,6 +5,7 @@ import type { SessionID } from "db/types";
 import { useMySelections } from "db/use-my-selections";
 import { usePlayers } from "db/use-players";
 import { useRound } from "db/use-round";
+import { useSelections } from "db/use-selections";
 import { useSession } from "db/use-sessions";
 import { useGameOver } from "hooks/use-game-over";
 
@@ -19,9 +20,11 @@ export function useRoundState({ sessionId, topic, year }: Props) {
   const { isLoading: sessionLoading, session, activeRound } = useSession(sessionId);
   const { round } = useRound(sessionId, activeRound);
   const { mySelections } = useMySelections(sessionId);
-  const { isHost } = usePlayers(sessionId);
+  const { players, isHost } = usePlayers(sessionId);
+  const { selections } = useSelections(sessionId, activeRound);
 
   const isLoading = !session && sessionLoading;
+  const isRevealing = round?.state === "revealing";
 
   useGameOver({ isHost, session });
 
@@ -50,5 +53,9 @@ export function useRoundState({ sessionId, topic, year }: Props) {
     round,
     mySelections,
     hasPickedThisRound,
+    isRevealing,
+    selections,
+    players,
+    isHost,
   };
 }

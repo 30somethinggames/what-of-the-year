@@ -1,7 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
-import { SessionStatus } from "convex/constants";
 import { useEffect } from "react";
 
+import { SessionStatus } from "convex/constants";
 import type { Session } from "db/types";
 
 interface Args {

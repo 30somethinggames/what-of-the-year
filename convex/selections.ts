@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 
+import { internal } from "./_generated/api";
 import type { Doc } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
 import { MAX_ROUNDS } from "./constants";
@@ -102,16 +103,20 @@ export const saveSelection = mutation({
     const allComplete = selectionsComplete > 0 && selectionsComplete >= session.playerCount;
 
     if (allComplete) {
-      await ctx.db.patch(round._id, { state: "closed", closedAt: Date.now() });
+      const revealDurationMs = session.playerCount * 4_000 + 5_000;
+      const revealEndsAt = Date.now() + revealDurationMs;
 
-      if (roundNumber > 1) {
-        const nextRoundNumber = roundNumber - 1;
-        const nextRound = await getRoundByNumber(ctx.db, sessionId, nextRoundNumber);
-        if (!nextRound) throw new Error("Next round not found");
+      const jobId = await ctx.scheduler.runAfter(revealDurationMs, internal.rounds.completeReveal, {
+        sessionId,
+        roundNumber,
+      });
 
-        await ctx.db.patch(nextRound._id, { state: "open", startedAt: Date.now() });
-        await ctx.db.patch(sessionId, { activeRoundNumber: nextRoundNumber });
-      }
+      await ctx.db.patch(round._id, {
+        state: "revealing",
+        closedAt: Date.now(),
+        revealJobId: jobId,
+        revealEndsAt,
+      });
     }
   },
 });

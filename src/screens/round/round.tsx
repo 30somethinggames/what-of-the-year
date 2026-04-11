@@ -1,5 +1,4 @@
-import { api } from "convex/_generated/api";
-import { useMutation } from "convex/react";
+import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 
 import { Autocomplete } from "components/autocomplete";
@@ -9,10 +8,13 @@ import { Picks } from "components/lists/picks";
 import { Error } from "components/states/error";
 import { Loading } from "components/states/loading";
 import type { TOPIC_KEY } from "constants/topics";
+import { api } from "convex/_generated/api";
+import { useMutation } from "convex/react";
 import type { SessionID } from "db/types";
 import { useTopicData } from "queries/use-topic-data";
 import type { Option } from "types/option";
 
+import { Reveal } from "./reveal";
 import { useAvailableOptions } from "./utils/use-available-options";
 import { useRoundState } from "./utils/use-round-state";
 
@@ -23,7 +25,18 @@ interface Props {
 }
 
 export function Round({ sessionId, topic, year }: Props) {
-  const { isLoading, session, mySelections, hasPickedThisRound } = useRoundState({
+  const navigate = useNavigate();
+  const {
+    isLoading,
+    session,
+    round,
+    mySelections,
+    hasPickedThisRound,
+    isRevealing,
+    selections,
+    players,
+    isHost,
+  } = useRoundState({
     sessionId,
     topic,
     year,
@@ -31,6 +44,7 @@ export function Round({ sessionId, topic, year }: Props) {
 
   const saveSelection = useMutation(api.selections.saveSelection);
   const editSelection = useMutation(api.selections.editSelection);
+  const advanceRound = useMutation(api.rounds.advanceRound);
 
   const { data: options = [] } = useTopicData({ key: topic, year });
 
@@ -42,6 +56,32 @@ export function Round({ sessionId, topic, year }: Props) {
 
   if (isLoading) return <Loading />;
   if (!session) return <Error />;
+
+  if (isRevealing) {
+    const onSkip = async () => {
+      const { hasNextRound } = await advanceRound({
+        sessionId,
+        currentRoundNumber: session.activeRoundNumber,
+      });
+      if (!hasNextRound) {
+        navigate({
+          to: "/$topic/$year/$sessionId/results",
+          params: { topic, year: String(year), sessionId },
+          replace: true,
+        });
+      }
+    };
+
+    return (
+      <Reveal
+        selections={selections}
+        players={players}
+        revealEndsAt={round?.revealEndsAt ?? undefined}
+        isHost={isHost}
+        onSkip={onSkip}
+      />
+    );
+  }
 
   const isEditing = editingRound !== null;
   const isDisabled = !selectedOption || (!isEditing && hasPickedThisRound);

@@ -1,9 +1,9 @@
 import { useAuthActions } from "@convex-dev/auth/react";
 import { Outlet, createFileRoute } from "@tanstack/react-router";
-import { useConvexAuth } from "convex/react";
 import { useEffect } from "react";
 
 import { Loading } from "components/states/loading";
+import { useConvexAuth } from "convex/react";
 
 export const Route = createFileRoute("/$topic")({
   component: TopicLayout,

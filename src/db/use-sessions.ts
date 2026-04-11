@@ -1,6 +1,5 @@
 import { api } from "convex/_generated/api";
 import { useQuery } from "convex/react";
-
 import type { SessionID } from "db/types";
 
 export function useSession(sessionId: SessionID | undefined) {

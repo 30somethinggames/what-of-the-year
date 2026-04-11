@@ -60,6 +60,9 @@ body,
 @utility border-t-topic {
   border-top-color: var(--topic-color, var(--color-blue-100));
 }
+@utility bg-topic-light {
+  background-color: color-mix(in srgb, var(--topic-color, var(--color-blue-100)) 30%, white);
+}
 
 @layer base {
   button {

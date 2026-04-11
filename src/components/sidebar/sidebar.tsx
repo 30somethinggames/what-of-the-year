@@ -1,10 +1,10 @@
 import { useNavigate } from "@tanstack/react-router";
-import { api } from "convex/_generated/api";
-import { useMutation } from "convex/react";
 
 import { Button } from "components/button";
 import { PlayerList } from "components/lists/players";
 import { Loading } from "components/states/loading";
+import { api } from "convex/_generated/api";
+import { useMutation } from "convex/react";
 import type { SessionID } from "db/types";
 import { usePlayers } from "db/use-players";
 import { useSelections } from "db/use-selections";
@@ -91,7 +91,7 @@ export function Sidebar({ sessionId, topic, year, onClose }: Props) {
           testID="leave-game"
           label="Leave Game"
           onClick={onLeaveGame}
-          style={{ backgroundColor: "var(--color-red-100)" }}
+          className="bg-red-100"
         />
       </div>
     </div>

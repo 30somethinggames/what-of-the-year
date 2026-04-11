@@ -1,10 +1,10 @@
 import { ConvexAuthProvider } from "@convex-dev/auth/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
-import { ConvexReactClient } from "convex/react";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
+import { ConvexReactClient } from "convex/react";
 import { DEFAULT_STALE_TIME } from "queries/constants";
 
 import { routeTree } from "./routeTree.gen";
