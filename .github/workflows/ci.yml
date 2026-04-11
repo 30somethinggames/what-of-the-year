@@ -74,7 +74,6 @@ jobs:
           key: playwright-${{ runner.os }}-${{ hashFiles('bun.lock') }}
 
       - name: Install Playwright browsers
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: bunx playwright install chromium
 
       - name: Install Playwright system dependencies
