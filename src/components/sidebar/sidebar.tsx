@@ -1,104 +1,39 @@
-import * as Sentry from "@sentry/react";
-import { useNavigate } from "@tanstack/react-router";
+import { AnimatePresence, motion } from "framer-motion";
 
-import { Button } from "components/button";
-import { PlayerList } from "components/lists/players";
-import { Loading } from "components/states/loading";
-import { api } from "convex/_generated/api";
-import { useMutation } from "convex/react";
-import type { SessionID } from "db/types";
-import { usePlayers } from "db/use-players";
-import { useSelections } from "db/use-selections";
-import { useSession } from "db/use-sessions";
+import { SidebarContent, type SidebarContentProps } from "./sidebar-content";
 
-interface Props {
-  sessionId: SessionID;
-  topic: string;
-  year: string;
-  onClose?: () => void;
+interface Props extends SidebarContentProps {
+  isOpen: boolean;
 }
 
-export function Sidebar({ sessionId, topic, year, onClose }: Props) {
-  const navigate = useNavigate();
-  const { session, activeRound } = useSession(sessionId);
-  const { players, isHost } = usePlayers(sessionId);
-  const { selections } = useSelections(sessionId, activeRound);
-  const advanceRound = useMutation(api.rounds.advanceRound);
-  const endSession = useMutation(api.sessions.endSession);
-  const kickFromGame = useMutation(api.players.kickFromGame);
-
-  if (!session) return <Loading />;
-
-  const completedUids = new Set(selections.map((s) => s.uid));
-
-  const onNextRound = async () => {
-    if (!activeRound) return;
-    try {
-      const { hasNextRound } = await advanceRound({
-        sessionId,
-        currentRoundNumber: activeRound,
-      });
-      if (!hasNextRound) {
-        navigate({
-          to: "/$topic/$year/$sessionId/results",
-          params: { topic, year, sessionId },
-          replace: true,
-        });
-      }
-    } catch (e) {
-      Sentry.captureException(e);
-    }
-  };
-
-  const onLeaveGame = () => {
-    if (isHost) {
-      endSession({ sessionId }).catch(Sentry.captureException);
-    }
-    navigate({ to: "/", replace: true });
-  };
-
-  const onKick = (uid: string) => {
-    kickFromGame({ sessionId, uid }).catch(Sentry.captureException);
-  };
-
+export function Sidebar({ isOpen, handleClose, sessionId, topic, year }: Props) {
   return (
-    <div className="flex flex-1 flex-col px-md py-md">
-      <div className="flex items-center justify-between pb-md">
-        <span data-testid="sidebar-title" className="font-semibold text-xl text-black-100">
-          Players
-        </span>
-        {onClose ? (
-          <button
-            data-testid="close-sidebar"
-            type="button"
-            onClick={onClose}
-            className="text-lg text-grey-100"
-          >
-            ✕
-          </button>
-        ) : null}
-      </div>
-      <PlayerList
-        data={players}
-        completedUids={completedUids}
-        maxPlayerCount={session?.maxPlayers}
-        onKick={isHost ? onKick : undefined}
-      />
-      <div className="mt-auto flex flex-col gap-md pt-lg">
-        {isHost && activeRound ? (
-          <Button
-            testID="advance-round"
-            label={activeRound > 1 ? "Next Round" : "End Game"}
-            onClick={onNextRound}
+    <AnimatePresence>
+      {isOpen ? (
+        <>
+          <motion.div
+            className="fixed inset-0 z-40 bg-black-100/50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={handleClose}
           />
-        ) : null}
-        <Button
-          testID="leave-game"
-          label="Leave Game"
-          onClick={onLeaveGame}
-          className="bg-red-100"
-        />
-      </div>
-    </div>
+          <motion.aside
+            className="fixed inset-y-0 left-0 z-50 flex w-80 flex-col bg-white-100 shadow-lg"
+            initial={{ x: "-100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "-100%" }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+          >
+            <SidebarContent
+              sessionId={sessionId}
+              topic={topic}
+              year={year}
+              handleClose={handleClose}
+            />
+          </motion.aside>
+        </>
+      ) : null}
+    </AnimatePresence>
   );
 }

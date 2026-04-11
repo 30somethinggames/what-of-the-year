@@ -3,9 +3,5 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Home } from "screens/home";
 
 export const Route = createFileRoute("/")({
-  component: HomeRoute,
+  component: () => <Home />,
 });
-
-function HomeRoute() {
-  return <Home />;
-}
