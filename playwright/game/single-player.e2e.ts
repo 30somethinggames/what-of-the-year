@@ -6,15 +6,11 @@ async function pickRound(page: Page, letter: string) {
   await page.getByTestId("suggestion-item").first().click();
   await expect(page.getByTestId("submit-pick")).toBeEnabled();
   await page.getByTestId("submit-pick").click();
+  await expect(page.getByTestId("reveal-skip")).toBeVisible();
+  await page.getByTestId("reveal-skip").click();
 }
 
 test("single-player: full game", async ({ page }) => {
-  page.on("console", (msg) => {
-    if (msg.text().includes("[round]")) {
-      // oxlint-disable-next-line no-console
-      console.log(`[browser] ${msg.text()}`);
-    }
-  });
   await page.goto("/");
 
   // Home → Setup
@@ -37,6 +33,11 @@ test("single-player: full game", async ({ page }) => {
   await expect(page.getByTestId("submit-pick")).toBeEnabled();
   await page.getByTestId("submit-pick").click();
 
+  // Reveal phase — skip to continue
+  await expect(page.getByTestId("reveal-skip")).toBeVisible();
+  await page.getByTestId("reveal-skip").click();
+
+  // Edit pick after reveal
   await page.getByTestId("edit-pick").click();
   await expect(page.getByTestId("cancel-edit")).toBeVisible();
   await expect(page.getByTestId("submit-pick")).toBeEnabled();

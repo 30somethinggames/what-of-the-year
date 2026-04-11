@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { addPlayer, makeSelection } from "./helpers/convex";
+import { addPlayer, makeSelection } from "../helpers/convex";
 
 test("results: scoring breakdown with shared picks", async ({ page }) => {
   await page.goto("/");
@@ -38,7 +38,7 @@ test("results: scoring breakdown with shared picks", async ({ page }) => {
   await makeSelection({ sessionId, uid: p2Uid, roundNumber: 9, pickName: "Elden Ring" });
   await makeSelection({ sessionId, uid: p3Uid, roundNumber: 9, pickName: "Zelda" });
 
-  // Advance rounds 8→1 via sidebar
+  // Advance rounds 8→1 via sidebar (no picks made — advances directly, no reveal)
   await expect(page.getByText("Round 8")).toBeVisible();
   await page.getByTestId("settings-button").click();
   await expect(page.getByTestId("sidebar-title")).toBeVisible();

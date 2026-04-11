@@ -27,5 +27,5 @@
       "screens/*": ["src/screens/*"]
     }
   },
-  "include": ["src", "convex"]
+  "include": ["*.ts", "src", "convex", "playwright"]
 }

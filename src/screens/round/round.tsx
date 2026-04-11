@@ -93,18 +93,11 @@ export function Round({ sessionId, topic, year }: Props) {
         await editSelection({ sessionId, roundNumber: editingRound, option: selectedOption });
         setEditingRound(null);
       } else {
-        // oxlint-disable-next-line no-console
-        console.log("[round] saveSelection", {
-          round: session.activeRoundNumber,
-          pick: selectedOption.name,
-        });
         await saveSelection({
           sessionId,
           roundNumber: session.activeRoundNumber,
           option: selectedOption,
         });
-        // oxlint-disable-next-line no-console
-        console.log("[round] saveSelection done", { round: session.activeRoundNumber });
       }
     } catch (e) {
       // oxlint-disable-next-line no-console

@@ -5,8 +5,7 @@
     "convex/_generated/**",
     "convex/convex.config.ts",
     "src/routeTree.gen.ts",
-    "docs/**",
-    "src/routeTree.gen.ts"
+    "docs/**"
   ],
   "rules": {
     "jsx-a11y/alt-text": "error",

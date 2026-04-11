@@ -16,6 +16,7 @@ test("non-host: lobby UI and round experience", async ({ browser }) => {
   await hostPage.goto("/");
   await hostPage.getByTestId("home-start").click();
   await hostPage.getByTestId("name-input").pressSequentially("Host");
+  await expect(hostPage.getByTestId("setup-submit")).toBeEnabled();
   await hostPage.getByTestId("setup-submit").click();
   await expect(hostPage.getByTestId("invite")).toBeVisible();
 
@@ -27,6 +28,7 @@ test("non-host: lobby UI and round experience", async ({ browser }) => {
 
   await guestPage.goto(`/games/2026/${sessionId}`);
   await guestPage.getByTestId("name-input").pressSequentially("Guest");
+  await expect(guestPage.getByTestId("setup-submit")).toBeEnabled();
   await guestPage.getByTestId("setup-submit").click();
 
   // Non-host lobby: sees Leave, no Invite or Start
@@ -54,10 +56,17 @@ test("non-host: lobby UI and round experience", async ({ browser }) => {
   // Non-host makes a pick
   await pickRound(guestPage, "a");
 
-  // Host makes a pick → round auto-advances (both players picked)
+  // Host makes a pick → all submitted → reveal starts
   await pickRound(hostPage, "b");
 
-  // Both see round 9
+  // Reveal phase: host sees skip button, non-host does not
+  await expect(hostPage.getByTestId("reveal-container")).toBeVisible();
+  await expect(hostPage.getByTestId("reveal-skip")).toBeVisible();
+  await expect(guestPage.getByTestId("reveal-container")).toBeVisible();
+  await expect(guestPage.getByTestId("reveal-skip")).not.toBeVisible();
+
+  // Host skips reveal → both advance to round 9
+  await hostPage.getByTestId("reveal-skip").click();
   await expect(guestPage.getByText("Round 9")).toBeVisible();
   await expect(hostPage.getByText("Round 9")).toBeVisible();
 

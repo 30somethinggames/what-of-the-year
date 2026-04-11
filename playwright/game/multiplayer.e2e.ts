@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { addPlayer, makeSelection } from "./helpers/convex";
+import { addPlayer, makeSelection } from "../helpers/convex";
 
 test("multiplayer: host flow with advance-round", async ({ page }) => {
   await page.goto("/");
@@ -71,20 +71,29 @@ test("multiplayer: host flow with advance-round", async ({ page }) => {
 
   await makeSelection({ sessionId, uid: player2Uid, roundNumber: 8, pickName: "Hades" });
 
-  // Open sidebar and advance through remaining rounds
+  // Open sidebar and advance round 8 (host + player 2 picked — reveal runs)
   await page.getByTestId("settings-button").click();
   await expect(page.getByTestId("sidebar-title")).toBeVisible();
   await expect(page.getByTestId("advance-round")).toBeVisible();
   await page.getByTestId("advance-round").click();
 
-  // Advance rounds 7–2 (sidebar stays open)
+  // Close sidebar to see the reveal, then skip it
+  await page.getByTestId("close-sidebar").click();
+  await expect(page.getByTestId("reveal-container")).toBeVisible();
+  await expect(page.getByTestId("reveal-skip")).toBeVisible();
+  await page.getByTestId("reveal-skip").click();
+
+  // Advance rounds 7–2 via sidebar (no picks made — advances directly, no reveal)
+  await expect(page.getByText("Round 7")).toBeVisible();
+  await page.getByTestId("settings-button").click();
+  await expect(page.getByTestId("sidebar-title")).toBeVisible();
   for (let round = 7; round >= 2; round--) {
     await expect(page.getByText(`Round ${round}`)).toBeVisible();
     await expect(page.getByTestId("advance-round")).toBeVisible();
     await page.getByTestId("advance-round").click();
   }
 
-  // Round 1 — End Game
+  // Round 1 — End Game (no picks, advances directly to results)
   await expect(page.getByText("Round 1")).toBeVisible();
   await expect(page.getByText("End Game")).toBeVisible();
   await page.getByTestId("advance-round").click();

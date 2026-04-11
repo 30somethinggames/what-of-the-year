@@ -1,7 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
-  globalSetup: "./playwright/global-setup.ts",
+  globalSetup: "./playwright/helpers/global-setup.ts",
   testDir: "./playwright",
   testMatch: "*.e2e.ts",
   forbidOnly: !!process.env.CI,

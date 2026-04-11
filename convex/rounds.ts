@@ -44,6 +44,16 @@ export const advanceRound = mutation({
       return await completeRevealLogic(ctx, sessionId, currentRoundNumber, currentRound._id);
     }
 
+    const hasSelections = await ctx.db
+      .query("selections")
+      .withIndex("by_round_uid", (q) => q.eq("roundId", currentRound._id))
+      .first();
+
+    if (!hasSelections) {
+      await ctx.db.patch(currentRound._id, { closedAt: Date.now() });
+      return await completeRevealLogic(ctx, sessionId, currentRoundNumber, currentRound._id);
+    }
+
     const session = await ctx.db.get(sessionId);
     if (!session) throw new Error("Session not found");
 

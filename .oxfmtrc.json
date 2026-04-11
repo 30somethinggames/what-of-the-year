@@ -4,8 +4,8 @@
     "README.md",
     "convex/_generated/**",
     "convex/convex.config.ts",
-    "docs/**",
-    "src/routeTree.gen.ts"
+    "src/routeTree.gen.ts",
+    "docs/**"
   ],
   "experimentalSortImports": {
     "groups": [["builtin"], ["external"], ["internal"], ["parent", "sibling", "index"]],
