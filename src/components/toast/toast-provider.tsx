@@ -42,7 +42,7 @@ export function ToastProvider({ children }: Props) {
   return (
     <ToastContext.Provider value={value}>
       {children}
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-[9999]">
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-9999">
         {toasts.map((toast, index) => (
           <Toast
             key={toast.id}

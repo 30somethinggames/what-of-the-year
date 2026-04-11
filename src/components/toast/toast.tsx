@@ -14,6 +14,8 @@ const ACCENT_COLORS: Record<ToastVariant, string> = {
   error: "var(--color-red-100)",
 };
 
+const initial = { y: -100, opacity: 0 };
+
 interface Props {
   id: string;
   message: string;
@@ -33,16 +35,15 @@ export function Toast({ id, message, variant, index, onRemove }: Props) {
 
   return (
     <motion.div
-      initial={{ y: -100, opacity: 0 }}
-      animate={dismissing ? { y: -100, opacity: 0 } : { y: 0, opacity: 1 }}
+      initial={initial}
+      animate={dismissing ? initial : { y: 0, opacity: 1 }}
       transition={{ type: "spring", damping: 60, stiffness: 400 }}
       onAnimationComplete={() => {
         if (dismissing) onRemove(id);
       }}
-      className="pointer-events-auto absolute left-md right-md flex min-h-14 flex-row items-center rounded-lg bg-white-200 shadow-md"
+      className="pointer-events-auto absolute left-md right-md flex min-h-14 flex-row items-center rounded-lg border-l-4 bg-white-200 shadow-md"
       style={{
         top: targetTop,
-        borderLeftWidth: 4,
         borderLeftColor: ACCENT_COLORS[variant],
       }}
     >

@@ -1,6 +1,5 @@
 ## TODO
 
-1. sentry
 1. deploy
 1. FONTS
 1. results avatar. when you hover over it's the personal name
