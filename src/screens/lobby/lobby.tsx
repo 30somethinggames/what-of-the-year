@@ -6,6 +6,7 @@ import { Container } from "components/container";
 import { PlayerList } from "components/lists/players";
 import { DisplayError } from "components/states/error";
 import { Loading } from "components/states/loading";
+import { useToast } from "components/toast/use-toast";
 import { api } from "convex/_generated/api";
 import { MAX_ROUNDS } from "convex/constants";
 import { useMutation } from "convex/react";
@@ -23,6 +24,7 @@ export function Lobby({ topic, year, sessionId }: LobbyProps) {
     sessionId,
   });
 
+  const toast = useToast();
   const leaveSession = useMutation(api.players.leaveSession);
   const kickFromLobby = useMutation(api.players.kickFromLobby);
   const startSession = useMutation(api.sessions.startSession);
@@ -56,7 +58,10 @@ export function Lobby({ topic, year, sessionId }: LobbyProps) {
     }
   };
 
-  const handleOnShare = () => onShare({ topic, year, sessionId });
+  const handleOnShare = async () => {
+    await onShare({ topic, year, sessionId });
+    toast.show({ message: "Invite link copied!", variant: "success" });
+  };
 
   return (
     <Container>

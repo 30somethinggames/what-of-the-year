@@ -11,15 +11,15 @@ export const Route = createRootRoute({
 function RootLayout() {
   return (
     <div className="flex h-full justify-center">
-      <ToastProvider>
-        <div className="flex h-full w-full max-w-140 flex-col overflow-x-hidden bg-white-100 shadow-md">
+      <div className="relative flex h-full w-full max-w-140 flex-col overflow-x-hidden bg-white-100 shadow-md">
+        <ToastProvider>
           <Sentry.ErrorBoundary
             fallback={<DisplayError onRetry={() => window.location.reload()} />}
           >
             <Outlet />
           </Sentry.ErrorBoundary>
-        </div>
-      </ToastProvider>
+        </ToastProvider>
+      </div>
     </div>
   );
 }
