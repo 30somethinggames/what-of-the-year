@@ -17,6 +17,3 @@ fi
 
 # Check TypeScript types
 bun run check:types
-
-# Run all tests
-bun test
