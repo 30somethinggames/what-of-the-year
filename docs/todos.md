@@ -1,5 +1,6 @@
 ## TODO
 
+1. toast about copying invite link
 1. deploy
 1. FONTS
 1. results avatar. when you hover over it's the personal name

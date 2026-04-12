@@ -70,10 +70,46 @@ export const leaveSession = mutation({
     if (!player) throw new Error("Player not in session");
     if (player.isHost) throw new Error("Host cannot leave session");
 
+    // Delete all selections by the leaving player
+    const selections = await ctx.db
+      .query("selections")
+      .withIndex("by_session", (q) => q.eq("sessionId", sessionId))
+      .filter((q) => q.eq(q.field("uid"), uid))
+      .collect();
+
+    for (const sel of selections) {
+      await ctx.db.delete(sel._id);
+    }
+
     await ctx.db.delete(player._id);
-    await ctx.db.patch(sessionId, {
-      playerCount: session.playerCount - 1,
-    });
+    const newPlayerCount = session.playerCount - 1;
+    await ctx.db.patch(sessionId, { playerCount: newPlayerCount });
+
+    // Recheck the current open round — may need to close if remaining players are done
+    if (session.status === SessionStatus.ACTIVE) {
+      const activeRound = await getRoundByNumber(ctx.db, sessionId, session.activeRoundNumber);
+      if (activeRound && activeRound.state === "open") {
+        const roundSelections = await ctx.db
+          .query("selections")
+          .withIndex("by_round_uid", (q) => q.eq("roundId", activeRound._id))
+          .collect();
+
+        const newSelectionsComplete = roundSelections.length;
+        await ctx.db.patch(activeRound._id, { selectionsComplete: newSelectionsComplete });
+
+        if (newSelectionsComplete > 0 && newSelectionsComplete >= newPlayerCount) {
+          await ctx.db.patch(activeRound._id, { state: "closed", closedAt: Date.now() });
+
+          if (activeRound.number > 1) {
+            const nextRound = await getRoundByNumber(ctx.db, sessionId, activeRound.number - 1);
+            if (nextRound) {
+              await ctx.db.patch(nextRound._id, { state: "open", startedAt: Date.now() });
+              await ctx.db.patch(sessionId, { activeRoundNumber: activeRound.number - 1 });
+            }
+          }
+        }
+      }
+    }
   },
 });
 

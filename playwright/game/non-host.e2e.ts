@@ -74,6 +74,53 @@ test("non-host: lobby UI and round experience", async ({ browser }) => {
   await guestContext.close();
 });
 
+test("non-host: leaving game removes player from host sidebar", async ({ browser }) => {
+  const hostContext = await browser.newContext();
+  const hostPage = await hostContext.newPage();
+
+  await hostPage.goto("/");
+  await hostPage.getByTestId("home-start").click();
+  await hostPage.getByTestId("name-input").pressSequentially("Host");
+  await expect(hostPage.getByTestId("setup-submit")).toBeEnabled();
+  await hostPage.getByTestId("setup-submit").click();
+  await expect(hostPage.getByTestId("invite")).toBeVisible();
+
+  const sessionId = await hostPage.getByTestId("session-id").getAttribute("data-value");
+
+  const guestContext = await browser.newContext();
+  const guestPage = await guestContext.newPage();
+
+  await guestPage.goto(`/games/2026/${sessionId}`);
+  await guestPage.getByTestId("name-input").pressSequentially("Guest");
+  await expect(guestPage.getByTestId("setup-submit")).toBeEnabled();
+  await guestPage.getByTestId("setup-submit").click();
+
+  // Host starts game
+  await hostPage.getByTestId("lobby-start").click();
+  await expect(hostPage.getByText("Round 10")).toBeVisible();
+  await expect(guestPage.getByText("Round 10")).toBeVisible();
+
+  // Host opens sidebar — both players visible
+  await hostPage.getByTestId("settings-button").click();
+  await expect(hostPage.getByText("Guest")).toBeVisible();
+  await expect(hostPage.getByText("Host")).toBeVisible();
+
+  // Guest leaves game via sidebar
+  await guestPage.getByTestId("settings-button").click();
+  await expect(guestPage.getByTestId("leave-game")).toBeVisible();
+  await guestPage.getByTestId("leave-game").click();
+
+  // Guest is redirected to home
+  await expect(guestPage.getByTestId("home-start")).toBeVisible();
+
+  // Host's sidebar updates — Guest is gone
+  await expect(hostPage.getByText("Guest")).not.toBeVisible();
+  await expect(hostPage.getByText("Host")).toBeVisible();
+
+  await hostContext.close();
+  await guestContext.close();
+});
+
 test("non-host: host leaving game shows toast and redirects to home", async ({ browser }) => {
   const hostContext = await browser.newContext();
   const hostPage = await hostContext.newPage();

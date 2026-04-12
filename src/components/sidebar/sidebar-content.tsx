@@ -25,6 +25,7 @@ export function SidebarContent({ sessionId, topic, year, handleClose }: SidebarC
   const { selections } = useSelections(sessionId, activeRound);
   const advanceRound = useMutation(api.rounds.advanceRound);
   const endSession = useMutation(api.sessions.endSession);
+  const leaveSession = useMutation(api.players.leaveSession);
   const kickFromGame = useMutation(api.players.kickFromGame);
 
   if (!session) return <Loading />;
@@ -50,15 +51,23 @@ export function SidebarContent({ sessionId, topic, year, handleClose }: SidebarC
     }
   };
 
-  const onLeaveGame = () => {
-    if (isHost) {
-      endSession({ sessionId }).catch(Sentry.captureException);
+  const onLeaveGame = async () => {
+    try {
+      if (isHost) {
+        await endSession({ sessionId });
+      } else {
+        await leaveSession({ sessionId });
+      }
+    } catch (e) {
+      Sentry.captureException(e);
     }
     navigate({ to: "/", replace: true });
   };
 
   const onKick = (uid: string) => {
-    kickFromGame({ sessionId, uid }).catch(Sentry.captureException);
+    if (isHost) {
+      kickFromGame({ sessionId, uid }).catch(Sentry.captureException);
+    }
   };
 
   return (
@@ -82,7 +91,7 @@ export function SidebarContent({ sessionId, topic, year, handleClose }: SidebarC
         data={players}
         completedUids={completedUids}
         maxPlayerCount={session?.maxPlayers}
-        onKick={isHost ? onKick : undefined}
+        onKick={onKick}
       />
       <div className="mt-auto flex flex-col gap-md pt-lg">
         {isHost && activeRound ? (
