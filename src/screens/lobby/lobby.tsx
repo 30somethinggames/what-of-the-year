@@ -13,7 +13,6 @@ import { useMutation } from "convex/react";
 
 import { Topic } from "../topic";
 import type { LobbyProps } from "./types";
-import { onShare } from "./utils/on-share/on-share";
 import { useLobbyState } from "./utils/use-lobby-state";
 
 export function Lobby({ topic, year, sessionId }: LobbyProps) {
@@ -41,7 +40,12 @@ export function Lobby({ topic, year, sessionId }: LobbyProps) {
       await startSession({ sessionId });
       navigate({
         to: "/$topic/$year/$sessionId/$round",
-        params: { topic: topic.value, year, sessionId, round: String(MAX_ROUNDS) },
+        params: {
+          topic: topic.value,
+          year,
+          sessionId,
+          round: String(MAX_ROUNDS),
+        },
         replace: true,
       });
     } catch (e) {
@@ -59,18 +63,19 @@ export function Lobby({ topic, year, sessionId }: LobbyProps) {
   };
 
   const handleOnShare = async () => {
-    await onShare({ topic, year, sessionId });
+    const url = `${window.location.origin}/${topic.value}/${year}/${sessionId}`;
+    await navigator.clipboard.writeText(url);
     toast.show({ message: "Invite link copied!", variant: "success" });
+  };
+
+  const onKick = (uid: string) => {
+    if (isHost) kickFromLobby({ sessionId, uid });
   };
 
   return (
     <Container>
       <div data-testid="session-id" data-value={sessionId} className="hidden" />
-      <PlayerList
-        data={players}
-        maxPlayerCount={maxPlayerCount}
-        onKick={isHost ? (uid) => kickFromLobby({ sessionId, uid }) : undefined}
-      />
+      <PlayerList data={players} maxPlayerCount={maxPlayerCount} onKick={onKick} />
 
       <div className="mt-auto flex flex-col gap-md">
         {isHost ? (
