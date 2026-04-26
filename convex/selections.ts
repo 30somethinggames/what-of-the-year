@@ -12,7 +12,7 @@ import { getRoundByNumber } from "./utils/rounds";
 export const getSelections = query({
   args: { sessionId: v.id("sessions"), number: v.number() },
   handler: async (ctx, { sessionId, number }) => {
-    await requireSessionMember(ctx, sessionId);
+    if (!(await requireSessionMember(ctx, sessionId))) return [];
 
     const round = await getRoundByNumber(ctx.db, sessionId, number);
     if (!round) return [];
@@ -28,6 +28,7 @@ export const getMySelections = query({
   args: { sessionId: v.id("sessions") },
   handler: async (ctx, { sessionId }) => {
     const identity = await requireSessionMember(ctx, sessionId);
+    if (!identity) return [];
     const uid = identity.subject;
 
     const rounds = await ctx.db
@@ -151,7 +152,7 @@ export const editSelection = mutation({
 export const getResults = query({
   args: { sessionId: v.id("sessions") },
   handler: async (ctx, { sessionId }) => {
-    await requireSessionMember(ctx, sessionId);
+    if (!(await requireSessionMember(ctx, sessionId))) return [];
 
     const [allSelections, players] = await Promise.all([
       ctx.db

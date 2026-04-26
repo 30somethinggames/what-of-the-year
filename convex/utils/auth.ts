@@ -10,7 +10,7 @@ export async function requireSessionMember(ctx: QueryCtx, sessionId: Id<"session
     .withIndex("by_session_uid", (q) => q.eq("sessionId", sessionId).eq("uid", identity.subject))
     .unique();
 
-  if (!player) throw new Error("Not a session member");
+  if (!player) return null;
 
   return identity;
 }

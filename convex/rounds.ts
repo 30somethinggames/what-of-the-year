@@ -10,7 +10,7 @@ import { getRoundByNumber } from "./utils/rounds";
 export const getRound = query({
   args: { sessionId: v.id("sessions"), number: v.number() },
   handler: async (ctx, { sessionId, number }) => {
-    await requireSessionMember(ctx, sessionId);
+    if (!(await requireSessionMember(ctx, sessionId))) return null;
 
     const round = await ctx.db
       .query("rounds")
