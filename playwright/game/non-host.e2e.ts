@@ -102,6 +102,7 @@ test("non-host: leaving game removes player from host sidebar", async ({ browser
 
   // Host opens sidebar — both players visible
   await hostPage.getByTestId("settings-button").click();
+  await expect(hostPage.getByTestId("sidebar-title")).toBeVisible();
   await expect(hostPage.getByText("Melissa")).toBeVisible();
   await expect(hostPage.getByText("Ryan")).toBeVisible();
 
@@ -149,6 +150,7 @@ test("non-host: host leaving game shows toast and redirects to home", async ({ b
   await hostPage.getByTestId("settings-button").click();
   await expect(hostPage.getByTestId("leave-game")).toBeVisible();
   await hostPage.getByTestId("leave-game").click();
+  await expect(hostPage.getByTestId("home-start")).toBeVisible();
 
   // Guest sees error toast and is redirected to home
   await expect(guestPage.getByTestId("toast")).toBeVisible();

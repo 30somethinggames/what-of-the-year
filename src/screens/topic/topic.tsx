@@ -67,12 +67,7 @@ export function Topic({ topic, year, existingSessionId }: Props) {
     <Container className="items-center justify-center gap-lg">
       <div className="flex w-full flex-row items-center justify-between">
         <Avatar source={avatar} size={120} />
-        <Button
-          testID="random-avatar"
-          label="Random"
-          onClick={randomizeAvatar}
-          style={{ width: 120 }}
-        />
+        <Button testID="random-avatar" label="Random" onClick={randomizeAvatar} className="w-30" />
       </div>
       <div className="flex w-full flex-col gap-sm">
         <Input

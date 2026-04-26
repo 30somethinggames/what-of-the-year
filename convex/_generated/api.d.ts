@@ -23,6 +23,7 @@ import type * as sessions from "../sessions.js";
 import type * as test_http from "../test/http.js";
 import type * as test_seed from "../test/seed.js";
 import type * as tmdb from "../tmdb.js";
+import type * as utils_auth from "../utils/auth.js";
 import type * as utils_dates from "../utils/dates.js";
 import type * as utils_pick from "../utils/pick.js";
 import type * as utils_rounds from "../utils/rounds.js";
@@ -50,6 +51,7 @@ declare const fullApi: ApiFromModules<{
   "test/http": typeof test_http;
   "test/seed": typeof test_seed;
   tmdb: typeof tmdb;
+  "utils/auth": typeof utils_auth;
   "utils/dates": typeof utils_dates;
   "utils/pick": typeof utils_pick;
   "utils/rounds": typeof utils_rounds;

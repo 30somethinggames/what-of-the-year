@@ -44,6 +44,7 @@ test("multiplayer: host flow with advance-round", async ({ page }) => {
   await expect(page.getByTestId("submit-pick")).toBeEnabled();
 
   await page.getByTestId("submit-pick").click();
+  await expect(page.getByTestId("submit-pick")).toBeDisabled();
 
   await makeSelection({ sessionId, uid: player2Uid, roundNumber: 10, pickName: "Elden Ring" });
   await makeSelection({ sessionId, uid: player3Uid, roundNumber: 10, pickName: "Elden Ring" });
@@ -56,6 +57,7 @@ test("multiplayer: host flow with advance-round", async ({ page }) => {
   await expect(page.getByTestId("submit-pick")).toBeEnabled();
 
   await page.getByTestId("submit-pick").click();
+  await expect(page.getByTestId("submit-pick")).toBeDisabled();
 
   await makeSelection({ sessionId, uid: player2Uid, roundNumber: 9, pickName: "Zelda" });
   await makeSelection({ sessionId, uid: player3Uid, roundNumber: 9, pickName: "Mario" });
@@ -68,6 +70,7 @@ test("multiplayer: host flow with advance-round", async ({ page }) => {
   await expect(page.getByTestId("submit-pick")).toBeEnabled();
 
   await page.getByTestId("submit-pick").click();
+  await expect(page.getByTestId("submit-pick")).toBeDisabled();
 
   await makeSelection({ sessionId, uid: player2Uid, roundNumber: 8, pickName: "Hades" });
 
