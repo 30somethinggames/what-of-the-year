@@ -6,8 +6,10 @@ import { addPlayer, cleanup, makeSelection } from "./test/http";
 const http = httpRouter();
 auth.addHttpRoutes(http);
 
-http.route({ path: "/test/add-player", method: "POST", handler: addPlayer });
-http.route({ path: "/test/make-selection", method: "POST", handler: makeSelection });
-http.route({ path: "/test/cleanup", method: "POST", handler: cleanup });
+if (process.env.TEST_SECRET) {
+  http.route({ path: "/test/add-player", method: "POST", handler: addPlayer });
+  http.route({ path: "/test/make-selection", method: "POST", handler: makeSelection });
+  http.route({ path: "/test/cleanup", method: "POST", handler: cleanup });
+}
 
 export default http;
