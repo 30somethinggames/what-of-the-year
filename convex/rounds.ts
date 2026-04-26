@@ -4,11 +4,14 @@ import { internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
 import type { MutationCtx } from "./_generated/server";
 import { internalMutation, mutation, query } from "./_generated/server";
+import { requireSessionMember } from "./utils/auth";
 import { getRoundByNumber } from "./utils/rounds";
 
 export const getRound = query({
   args: { sessionId: v.id("sessions"), number: v.number() },
   handler: async (ctx, { sessionId, number }) => {
+    await requireSessionMember(ctx, sessionId);
+
     const round = await ctx.db
       .query("rounds")
       .withIndex("by_session", (q) => q.eq("sessionId", sessionId))

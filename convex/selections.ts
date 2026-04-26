@@ -5,14 +5,14 @@ import type { Doc } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
 import { MAX_ROUNDS } from "./constants";
 import { rateLimiter } from "./ratelimits";
+import { requireSessionMember } from "./utils/auth";
 import { buildPickArg } from "./utils/pick";
 import { getRoundByNumber } from "./utils/rounds";
 
 export const getSelections = query({
   args: { sessionId: v.id("sessions"), number: v.number() },
   handler: async (ctx, { sessionId, number }) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Unauthenticated");
+    await requireSessionMember(ctx, sessionId);
 
     const round = await getRoundByNumber(ctx.db, sessionId, number);
     if (!round) return [];
@@ -27,8 +27,7 @@ export const getSelections = query({
 export const getMySelections = query({
   args: { sessionId: v.id("sessions") },
   handler: async (ctx, { sessionId }) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Unauthenticated");
+    const identity = await requireSessionMember(ctx, sessionId);
     const uid = identity.subject;
 
     const rounds = await ctx.db
@@ -152,8 +151,7 @@ export const editSelection = mutation({
 export const getResults = query({
   args: { sessionId: v.id("sessions") },
   handler: async (ctx, { sessionId }) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Unauthenticated");
+    await requireSessionMember(ctx, sessionId);
 
     const [allSelections, players] = await Promise.all([
       ctx.db
