@@ -95,6 +95,8 @@ test("non-host: leaving game removes player from host sidebar", async ({ browser
   await expect(guestPage.getByTestId("setup-submit")).toBeEnabled();
   await guestPage.getByTestId("setup-submit").click();
 
+  await expect(hostPage.getByText("Melissa")).toBeVisible();
+
   // Host starts game
   await hostPage.getByTestId("lobby-start").click();
   await expect(hostPage.getByText("Round 10")).toBeVisible();
