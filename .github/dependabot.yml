@@ -7,7 +7,12 @@ updates:
       day: "monday"
     open-pull-requests-limit: 10
     groups:
-      minor-and-patch:
+      tanstack:
+        patterns:
+          - "@tanstack/*"
+      everything-else:
+        patterns:
+          - "*"
         update-types:
           - "minor"
           - "patch"
