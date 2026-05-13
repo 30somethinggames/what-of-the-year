@@ -70,6 +70,8 @@ test("reveal: non-host sees reveal but not skip button", async ({ browser }) => 
   await expect(guestPage.getByTestId("setup-submit")).toBeEnabled();
   await guestPage.getByTestId("setup-submit").click();
 
+  await expect(hostPage.getByText("Guest")).toBeVisible();
+
   await hostPage.getByTestId("lobby-start").click();
   await expect(hostPage.getByText("Round 10")).toBeVisible();
   await expect(guestPage.getByText("Round 10")).toBeVisible();
