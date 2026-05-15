@@ -1,7 +1,7 @@
 name: CI
 
 on:
-  pull_request_target:
+  pull_request:
     branches:
       - main
 
@@ -19,8 +19,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -52,6 +50,7 @@ jobs:
   e2e:
     needs: checks
     runs-on: ubuntu-latest
+    if: github.event.pull_request.head.repo.full_name == github.repository
 
     permissions:
       contents: read
@@ -62,8 +61,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
