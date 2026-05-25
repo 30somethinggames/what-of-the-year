@@ -24,7 +24,8 @@
       "types/*": ["src/types/*"],
       "utils/*": ["src/utils/*"],
       "db/*": ["src/db/*"],
-      "screens/*": ["src/screens/*"]
+      "screens/*": ["src/screens/*"],
+      "services/*": ["src/services/*"]
     }
   },
   "include": ["*.ts", "src", "convex", "playwright"]

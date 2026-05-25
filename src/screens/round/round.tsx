@@ -14,6 +14,7 @@ import { useMutation } from "convex/react";
 import type { SessionID } from "db/types";
 import { useTopicData } from "queries/use-topic-data";
 import type { Option } from "types/option";
+import { tryCatch } from "utils/try-catch";
 
 import { Reveal } from "./reveal";
 import { useAvailableOptions } from "./utils/use-available-options";
@@ -60,11 +61,14 @@ export function Round({ sessionId, topic, year }: Props) {
 
   if (isRevealing) {
     const onSkip = async () => {
-      const { hasNextRound } = await advanceRound({
-        sessionId,
-        currentRoundNumber: session.activeRoundNumber,
-      });
-      if (!hasNextRound) {
+      const { data, error } = await tryCatch(
+        advanceRound({ sessionId, currentRoundNumber: session.activeRoundNumber }),
+      );
+      if (error) {
+        Sentry.captureException(error);
+        return;
+      }
+      if (!data.hasNextRound) {
         navigate({
           to: "/$topic/$year/$sessionId/results",
           params: { topic, year: String(year), sessionId },
@@ -89,19 +93,27 @@ export function Round({ sessionId, topic, year }: Props) {
 
   const onEnter = async () => {
     if (isDisabled || !selectedOption) return;
-    try {
-      if (isEditing) {
-        await editSelection({ sessionId, roundNumber: editingRound, option: selectedOption });
-        setEditingRound(null);
-      } else {
-        await saveSelection({
+    if (isEditing) {
+      const { error } = await tryCatch(
+        editSelection({ sessionId, roundNumber: editingRound, option: selectedOption }),
+      );
+      if (error) {
+        Sentry.captureException(error);
+        return;
+      }
+      setEditingRound(null);
+    } else {
+      const { error } = await tryCatch(
+        saveSelection({
           sessionId,
           roundNumber: session.activeRoundNumber,
           option: selectedOption,
-        });
+        }),
+      );
+      if (error) {
+        Sentry.captureException(error);
+        return;
       }
-    } catch (e) {
-      Sentry.captureException(e);
     }
     setInputValue("");
     setSelectedOption(null);

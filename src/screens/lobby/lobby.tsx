@@ -10,6 +10,7 @@ import { useToast } from "components/toast/use-toast";
 import { api } from "convex/_generated/api";
 import { MAX_ROUNDS } from "convex/constants";
 import { useMutation } from "convex/react";
+import { tryCatch } from "utils/try-catch";
 
 import { Topic } from "../topic";
 import type { LobbyProps } from "./types";
@@ -36,30 +37,25 @@ export function Lobby({ topic, year, sessionId }: LobbyProps) {
   }
 
   const onStart = async () => {
-    try {
-      await startSession({ sessionId });
-      navigate({
-        to: "/$topic/$year/$sessionId/$round",
-        params: {
-          topic: topic.value,
-          year,
-          sessionId,
-          round: String(MAX_ROUNDS),
-        },
-        replace: true,
-      });
-    } catch (e) {
-      Sentry.captureException(e);
+    const { error } = await tryCatch(startSession({ sessionId }));
+    if (error) {
+      Sentry.captureException(error);
+      return;
     }
+    navigate({
+      to: "/$topic/$year/$sessionId/$round",
+      params: { topic: topic.value, year, sessionId, round: String(MAX_ROUNDS) },
+      replace: true,
+    });
   };
 
   const onLeave = async () => {
-    try {
-      await leaveSession({ sessionId });
-      navigate({ to: "/", replace: true });
-    } catch (e) {
-      Sentry.captureException(e);
+    const { error } = await tryCatch(leaveSession({ sessionId }));
+    if (error) {
+      Sentry.captureException(error);
+      return;
     }
+    navigate({ to: "/", replace: true });
   };
 
   const handleOnShare = async () => {

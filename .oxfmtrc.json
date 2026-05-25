@@ -7,7 +7,7 @@
     "src/routeTree.gen.ts",
     "docs/**"
   ],
-  "experimentalSortImports": {
+  "sortImports": {
     "groups": [["builtin"], ["external"], ["internal"], ["parent", "sibling", "index"]],
     "newlinesBetween": true,
     "internalPattern": [
@@ -20,7 +20,8 @@
       "utils",
       "db",
       "screens",
-      "convex"
+      "convex",
+      "services"
     ]
   }
 }
