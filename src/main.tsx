@@ -6,7 +6,7 @@ import { createRoot } from "react-dom/client";
 
 import { ConvexReactClient } from "convex/react";
 import { DEFAULT_STALE_TIME } from "queries/constants";
-import { initSentry } from "utils/sentry";
+import { initSentry } from "services/sentry";
 
 import { routeTree } from "./routeTree.gen";
 import "./index.css";

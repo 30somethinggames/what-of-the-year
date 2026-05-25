@@ -10,6 +10,7 @@ import type { SessionID } from "db/types";
 import { usePlayers } from "db/use-players";
 import { useSelections } from "db/use-selections";
 import { useSession } from "db/use-sessions";
+import { tryCatch } from "utils/try-catch";
 
 export interface SidebarContentProps {
   sessionId: SessionID;
@@ -34,40 +35,33 @@ export function SidebarContent({ sessionId, topic, year, handleClose }: SidebarC
 
   const onNextRound = async () => {
     if (!activeRound) return;
-    try {
-      const { hasNextRound } = await advanceRound({
-        sessionId,
-        currentRoundNumber: activeRound,
+    const { data, error } = await tryCatch(
+      advanceRound({ sessionId, currentRoundNumber: activeRound }),
+    );
+    if (error) {
+      Sentry.captureException(error);
+      return;
+    }
+    if (!data.hasNextRound) {
+      navigate({
+        to: "/$topic/$year/$sessionId/results",
+        params: { topic, year, sessionId },
+        replace: true,
       });
-      if (!hasNextRound) {
-        navigate({
-          to: "/$topic/$year/$sessionId/results",
-          params: { topic, year, sessionId },
-          replace: true,
-        });
-      }
-    } catch (e) {
-      Sentry.captureException(e);
     }
   };
 
   const onLeaveGame = async () => {
-    try {
-      if (isHost) {
-        await endSession({ sessionId });
-      } else {
-        await leaveSession({ sessionId });
-      }
-    } catch (e) {
-      Sentry.captureException(e);
-    }
+    const mutation = isHost ? endSession({ sessionId }) : leaveSession({ sessionId });
+    const { error } = await tryCatch(mutation);
+    if (error) Sentry.captureException(error);
     navigate({ to: "/", replace: true });
   };
 
-  const onKick = (uid: string) => {
-    if (isHost) {
-      kickFromGame({ sessionId, uid }).catch(Sentry.captureException);
-    }
+  const onKick = async (uid: string) => {
+    if (!isHost) return;
+    const { error } = await tryCatch(kickFromGame({ sessionId, uid }));
+    if (error) Sentry.captureException(error);
   };
 
   return (

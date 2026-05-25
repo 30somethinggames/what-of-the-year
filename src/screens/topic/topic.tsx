@@ -12,6 +12,7 @@ import { useMutation } from "convex/react";
 import { MAX_NAME_LENGTH, validateName } from "convex/utils/validate";
 import type { SessionID } from "db/types";
 import { useTopicData } from "queries/use-topic-data";
+import { tryCatch } from "utils/try-catch";
 
 interface Props {
   topic: TopicType;
@@ -33,33 +34,26 @@ export function Topic({ topic, year, existingSessionId }: Props) {
   const label = isJoining ? "Join" : "Create";
 
   const onSubmit = async () => {
-    try {
-      if (isJoining) {
-        try {
-          await mutateJoin({
-            sessionId: existingSessionId,
-            name,
-            avatar,
-          });
-        } catch (e: unknown) {
-          const error = e as Error;
-          if (error.message !== "Already joined this session") throw e;
-        }
-      } else {
-        const result = await mutateCreate({
-          topic: topic.value,
-          year: Number(year),
-          name,
-          avatar,
-        });
-        navigate({
-          to: "/$topic/$year/$sessionId",
-          params: { topic: topic.value, year, sessionId: result.sessionId },
-          replace: true,
-        });
+    if (isJoining) {
+      const { error } = await tryCatch(mutateJoin({ sessionId: existingSessionId, name, avatar }));
+      if (error) {
+        if (error.message === "Already joined this session") return;
+        Sentry.captureException(error);
+        return;
       }
-    } catch (e) {
-      Sentry.captureException(e);
+    } else {
+      const { data, error } = await tryCatch(
+        mutateCreate({ topic: topic.value, year: Number(year), name, avatar }),
+      );
+      if (error) {
+        Sentry.captureException(error);
+        return;
+      }
+      navigate({
+        to: "/$topic/$year/$sessionId",
+        params: { topic: topic.value, year, sessionId: data.sessionId },
+        replace: true,
+      });
     }
   };
 
