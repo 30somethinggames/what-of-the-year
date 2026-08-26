@@ -27,3 +27,4 @@ E2E: `bun run test:web` (Playwright, needs `.env.local`).
 - Human work: scope `seery/<topic>`, branches `seery/<topic>`.
 - Agent work: scope `agent/<topic>`, branches `agent/<issue#>-<slug>`.
 - PRs use the `## Summary` / `## Changes` template and merge to `main` via squash or rebase only.
+- Every PR that resolves a ticket carries `Closes #<issue>` in its **description** (not just a commit message — squash/rebase merges make the body keyword the reliable auto-close path). One line per ticket if a PR resolves several.
