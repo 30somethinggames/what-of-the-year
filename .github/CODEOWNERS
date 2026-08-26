@@ -1,7 +1,7 @@
 # Default owner for everything in the repo
 * @ryanseery
 
-# Agent forbidden zone — always require Ryan's review even if the default changes
+# Agent forbidden zone — always require human review even if the default changes
 /.github/ @ryanseery
 /.claude/ @ryanseery
 /CLAUDE.md @ryanseery
