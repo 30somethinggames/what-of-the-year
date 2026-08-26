@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 
 import { action } from "./_generated/server";
+import { fixtureGames } from "./test/fixtures";
 import { currentYear } from "./utils/dates";
 
 async function getAccessToken(): Promise<string> {
@@ -22,6 +23,8 @@ async function getAccessToken(): Promise<string> {
 export const getGames = action({
   args: { year: v.string() },
   handler: async (_, { year }) => {
+    if (process.env.OPTIONS_FIXTURES) return fixtureGames(year);
+
     const { startDate, endDate } = currentYear(year);
     const accessToken = await getAccessToken();
 
