@@ -50,13 +50,9 @@ jobs:
   e2e:
     needs: checks
     runs-on: ubuntu-latest
-    if: github.event.pull_request.head.repo.full_name == github.repository
 
     permissions:
       contents: read
-
-    env:
-      CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
 
     steps:
       - name: Checkout code
@@ -91,38 +87,63 @@ jobs:
       - name: Install Playwright system dependencies
         run: bunx playwright install-deps chromium
 
-      - name: Deploy Convex preview and build
+      # Hermetic backend: a throwaway local Convex instance, ephemeral credentials,
+      # fixture option sources. No cloud, no repo secrets — runs identically for
+      # any actor (humans, Dependabot, forks).
+      - name: Start local Convex backend
         run: |
-          bunx convex deploy \
-            --preview-create "pr-${{ github.event.pull_request.number }}" \
-            --cmd 'echo "$VITE_CONVEX_URL" > /tmp/convex-cloud-url.txt && echo "$VITE_CONVEX_SITE_URL" > /tmp/convex-site-url.txt && bun run build' \
-            --cmd-url-env-var-name VITE_CONVEX_URL
+          INSTANCE_SECRET=$(openssl rand -hex 32)
+          echo "INSTANCE_SECRET=$INSTANCE_SECRET" >> "$GITHUB_ENV"
+          docker run -d --name convex-backend \
+            -p 3210:3210 -p 3211:3211 \
+            -e INSTANCE_NAME=woty-ci \
+            -e INSTANCE_SECRET="$INSTANCE_SECRET" \
+            -e CONVEX_CLOUD_ORIGIN=http://127.0.0.1:3210 \
+            -e CONVEX_SITE_ORIGIN=http://127.0.0.1:3211 \
+            -e DISABLE_BEACON=true \
+            ghcr.io/get-convex/convex-backend@sha256:1f2044e3eac463ac78973b136c0baf72d4ada602611d853d6f99f280e29e0a98
+          for i in $(seq 1 60); do
+            curl -fsS http://127.0.0.1:3210/version >/dev/null 2>&1 && exit 0
+            sleep 1
+          done
+          echo "Convex backend failed to become healthy" >&2
+          docker logs convex-backend >&2
+          exit 1
 
-      - name: Set environment variables on preview
-        env:
-          JWT_PRIVATE_KEY: ${{ secrets.JWT_PRIVATE_KEY }}
+      - name: Generate ephemeral credentials
+        id: creds
         run: |
-          bunx convex env set TEST_SECRET "${{ secrets.TEST_SECRET }}" \
-            --preview-name "pr-${{ github.event.pull_request.number }}"
-          echo "$JWT_PRIVATE_KEY" | bunx convex env set JWT_PRIVATE_KEY \
-            --preview-name "pr-${{ github.event.pull_request.number }}"
-          bunx convex env set JWKS '${{ secrets.JWKS }}' \
-            --preview-name "pr-${{ github.event.pull_request.number }}"
-          bunx convex env set IGDB_CLIENT_ID "${{ secrets.IGDB_CLIENT_ID }}" \
-            --preview-name "pr-${{ github.event.pull_request.number }}"
-          bunx convex env set IGDB_CLIENT_SECRET "${{ secrets.IGDB_CLIENT_SECRET }}" \
-            --preview-name "pr-${{ github.event.pull_request.number }}"
-          bunx convex env set TMDB_API_KEY "${{ secrets.TMDB_API_KEY }}" \
-            --preview-name "pr-${{ github.event.pull_request.number }}"
+          ADMIN_KEY=$(docker exec convex-backend ./generate_admin_key.sh | tail -1)
+          echo "::add-mask::$ADMIN_KEY"
+          echo "admin_key=$ADMIN_KEY" >> "$GITHUB_OUTPUT"
+          echo "test_secret=$(openssl rand -hex 32)" >> "$GITHUB_OUTPUT"
+          bun scripts/generate-test-keys.mjs
+
+      - name: Deploy functions and configure backend
+        env:
+          CONVEX_SELF_HOSTED_URL: http://127.0.0.1:3210
+          CONVEX_SELF_HOSTED_ADMIN_KEY: ${{ steps.creds.outputs.admin_key }}
+        run: |
+          bunx convex deploy --yes
+          bunx convex env set TEST_SECRET "${{ steps.creds.outputs.test_secret }}"
+          bunx convex env set OPTIONS_FIXTURES 1
+          cat /tmp/jwt-private-key.txt | bunx convex env set JWT_PRIVATE_KEY
+          bunx convex env set JWKS "$(cat /tmp/jwks.json)"
+
+      - name: Build frontend
+        run: VITE_CONVEX_URL=http://127.0.0.1:3210 bun run build
 
       - name: Run Playwright tests
         env:
-          TEST_SECRET: ${{ secrets.TEST_SECRET }}
+          TEST_SECRET: ${{ steps.creds.outputs.test_secret }}
+          CONVEX_SITE_URL: http://127.0.0.1:3211
           PLAYWRIGHT_FORCE_TTY: "120"
           FORCE_COLOR: "1"
-        run: |
-          CONVEX_SITE_URL=$(cat /tmp/convex-site-url.txt) \
-          bunx playwright test
+        run: bunx playwright test
+
+      - name: Dump backend logs on failure
+        if: failure()
+        run: docker logs convex-backend
 
       - name: Upload test artifacts
         if: ${{ !cancelled() }}
@@ -133,3 +154,4 @@ jobs:
             playwright-report/
             test-results/
           retention-days: 7
+          if-no-files-found: ignore
