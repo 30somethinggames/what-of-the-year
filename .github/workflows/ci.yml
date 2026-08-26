@@ -127,7 +127,7 @@ jobs:
           bunx convex deploy --yes
           bunx convex env set TEST_SECRET "${{ steps.creds.outputs.test_secret }}"
           bunx convex env set OPTIONS_FIXTURES 1
-          bunx convex env set JWT_PRIVATE_KEY "$(cat /tmp/jwt-private-key.txt)"
+          cat /tmp/jwt-private-key.txt | bunx convex env set JWT_PRIVATE_KEY
           bunx convex env set JWKS "$(cat /tmp/jwks.json)"
 
       - name: Build frontend
