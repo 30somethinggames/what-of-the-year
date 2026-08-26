@@ -12,4 +12,3 @@ const jwks = JSON.stringify({ keys: [{ use: "sig", ...jwk }] });
 
 writeFileSync("/tmp/jwt-private-key.txt", pkcs8);
 writeFileSync("/tmp/jwks.json", jwks);
-console.log("wrote /tmp/jwt-private-key.txt and /tmp/jwks.json");
