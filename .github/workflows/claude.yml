@@ -30,3 +30,7 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           claude_args: |
             --max-turns 60
+
+      - name: Dump execution output on failure
+        if: failure()
+        run: cat /home/runner/work/_temp/claude-execution-output.json || true
