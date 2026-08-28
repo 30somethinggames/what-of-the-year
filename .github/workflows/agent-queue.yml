@@ -1,0 +1,105 @@
+name: Agent Queue
+
+on:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: agent-pipeline
+  cancel-in-progress: false
+
+jobs:
+  next-ticket:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      issue: ${{ steps.pick.outputs.issue }}
+      item: ${{ steps.pick.outputs.item }}
+    steps:
+      - name: Pick oldest Ready ticket and move to In Progress
+        id: pick
+        env:
+          GH_TOKEN: ${{ secrets.PROJECT_PAT }}
+        run: |
+          FIELDS=$(gh api graphql -f query='query{organization(login:"30somethinggames"){projectV2(number:3){id field(name:"Status"){... on ProjectV2SingleSelectField{id options{id name}}}}}}')
+          PROJECT_ID=$(echo "$FIELDS" | jq -r '.data.organization.projectV2.id')
+          FIELD_ID=$(echo "$FIELDS" | jq -r '.data.organization.projectV2.field.id')
+          IN_PROGRESS=$(echo "$FIELDS" | jq -r '.data.organization.projectV2.field.options[] | select(.name=="In Progress") | .id')
+
+          ITEMS=$(gh api graphql -f query='query{organization(login:"30somethinggames"){projectV2(number:3){items(first:100){nodes{id createdAt fieldValueByName(name:"Status"){... on ProjectV2ItemFieldSingleSelectValue{name}} content{... on Issue{number state}}}}}}}')
+          CANDIDATES=$(echo "$ITEMS" | jq -r '[.data.organization.projectV2.items.nodes[] | select(.fieldValueByName.name=="Ready") | select(.content.state=="OPEN")] | sort_by(.createdAt) | .[] | "\(.content.number) \(.id)"')
+
+          ISSUE=""; ITEM=""
+          while read -r num id; do
+            [ -z "$num" ] && continue
+            OPEN_BLOCKERS=$(gh api "repos/${{ github.repository }}/issues/$num/dependencies/blocked_by" --jq '[.[] | select(.state=="open")] | length' 2>/dev/null || echo 0)
+            if [ "$OPEN_BLOCKERS" -gt 0 ]; then
+              echo "Skipping #$num — $OPEN_BLOCKERS open blocker(s)."
+              continue
+            fi
+            ISSUE="$num"; ITEM="$id"; break
+          done <<< "$CANDIDATES"
+
+          if [ -z "$ISSUE" ]; then
+            echo "Queue empty — nothing unblocked in Ready."
+            echo "issue=" >> "$GITHUB_OUTPUT"
+            echo "item=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          gh api graphql -f query='mutation($p:ID!,$i:ID!,$f:ID!,$o:String!){updateProjectV2ItemFieldValue(input:{projectId:$p,itemId:$i,fieldId:$f,value:{singleSelectOptionId:$o}}){projectV2Item{id}}}' \
+            -f p="$PROJECT_ID" -f i="$ITEM" -f f="$FIELD_ID" -f o="$IN_PROGRESS" >/dev/null
+          echo "Picked #$ISSUE"
+          echo "issue=$ISSUE" >> "$GITHUB_OUTPUT"
+          echo "item=$ITEM" >> "$GITHUB_OUTPUT"
+
+  implement:
+    needs: next-ticket
+    if: needs.next-ticket.outputs.issue != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: "/implement-ticket ${{ needs.next-ticket.outputs.issue }}"
+          claude_args: |
+            --model claude-sonnet-5
+            --max-turns 80
+
+  board-update:
+    needs: [next-ticket, implement]
+    if: always() && needs.next-ticket.outputs.issue != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Move to Blocked when no PR was opened
+        env:
+          GH_TOKEN: ${{ secrets.PROJECT_PAT }}
+          GH_REPO_TOKEN: ${{ github.token }}
+        run: |
+          ISSUE="${{ needs.next-ticket.outputs.issue }}"
+          ITEM="${{ needs.next-ticket.outputs.item }}"
+          HAS_PR=$(GH_TOKEN="$GH_REPO_TOKEN" gh pr list -R "${{ github.repository }}" --state open --json headRefName \
+            --jq "[.[] | select(.headRefName | startswith(\"agent/$ISSUE-\"))] | length")
+          if [ "$HAS_PR" -gt 0 ]; then
+            echo "PR exists for #$ISSUE — leaving In Progress."
+            exit 0
+          fi
+          echo "No PR for #$ISSUE — moving to Blocked."
+          FIELDS=$(gh api graphql -f query='query{organization(login:"30somethinggames"){projectV2(number:3){id field(name:"Status"){... on ProjectV2SingleSelectField{id options{id name}}}}}}')
+          PROJECT_ID=$(echo "$FIELDS" | jq -r '.data.organization.projectV2.id')
+          FIELD_ID=$(echo "$FIELDS" | jq -r '.data.organization.projectV2.field.id')
+          BLOCKED=$(echo "$FIELDS" | jq -r '.data.organization.projectV2.field.options[] | select(.name=="Blocked") | .id')
+          gh api graphql -f query='mutation($p:ID!,$i:ID!,$f:ID!,$o:String!){updateProjectV2ItemFieldValue(input:{projectId:$p,itemId:$i,fieldId:$f,value:{singleSelectOptionId:$o}}){projectV2Item{id}}}' \
+            -f p="$PROJECT_ID" -f i="$ITEM" -f f="$FIELD_ID" -f o="$BLOCKED" >/dev/null
