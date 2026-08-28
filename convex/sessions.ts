@@ -1,12 +1,9 @@
 import { v } from "convex/values";
 
 import { mutation, query } from "./_generated/server";
-import { SessionStatus } from "./constants";
+import { MAX_PLAYERS, MAX_ROUNDS, SessionStatus } from "./constants";
 import { rateLimiter } from "./ratelimits";
 import { validateAvatar, validateName } from "./utils/validate";
-
-const MAX_ROUNDS = 10;
-const MAX_PLAYERS = 10;
 
 export const getSession = query({
   args: { sessionId: v.id("sessions") },
