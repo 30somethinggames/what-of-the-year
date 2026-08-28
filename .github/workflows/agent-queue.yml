@@ -83,7 +83,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Move to Blocked when no PR was opened
+      - name: Move to Ready for Review (PR up) or Blocked (no PR)
         env:
           GH_TOKEN: ${{ secrets.PROJECT_PAT }}
           GH_REPO_TOKEN: ${{ github.token }}
@@ -93,13 +93,14 @@ jobs:
           HAS_PR=$(GH_TOKEN="$GH_REPO_TOKEN" gh pr list -R "${{ github.repository }}" --state open --json headRefName \
             --jq "[.[] | select(.headRefName | startswith(\"agent/$ISSUE-\"))] | length")
           if [ "$HAS_PR" -gt 0 ]; then
-            echo "PR exists for #$ISSUE — leaving In Progress."
-            exit 0
+            TARGET="Ready for Review"
+          else
+            TARGET="Blocked"
           fi
-          echo "No PR for #$ISSUE — moving to Blocked."
+          echo "#$ISSUE → $TARGET"
           FIELDS=$(gh api graphql -f query='query{organization(login:"30somethinggames"){projectV2(number:3){id field(name:"Status"){... on ProjectV2SingleSelectField{id options{id name}}}}}}')
           PROJECT_ID=$(echo "$FIELDS" | jq -r '.data.organization.projectV2.id')
           FIELD_ID=$(echo "$FIELDS" | jq -r '.data.organization.projectV2.field.id')
-          BLOCKED=$(echo "$FIELDS" | jq -r '.data.organization.projectV2.field.options[] | select(.name=="Blocked") | .id')
+          OID=$(echo "$FIELDS" | jq -r --arg t "$TARGET" '.data.organization.projectV2.field.options[] | select(.name==$t) | .id')
           gh api graphql -f query='mutation($p:ID!,$i:ID!,$f:ID!,$o:String!){updateProjectV2ItemFieldValue(input:{projectId:$p,itemId:$i,fieldId:$f,value:{singleSelectOptionId:$o}}){projectV2Item{id}}}' \
-            -f p="$PROJECT_ID" -f i="$ITEM" -f f="$FIELD_ID" -f o="$BLOCKED" >/dev/null
+            -f p="$PROJECT_ID" -f i="$ITEM" -f f="$FIELD_ID" -f o="$OID" >/dev/null
