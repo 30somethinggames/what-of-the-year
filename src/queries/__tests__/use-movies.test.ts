@@ -44,7 +44,7 @@ describe("formMovieOptions", () => {
     expect(result.name).toBe("Test Movie");
     expect(result.cover).toBe("https://image.tmdb.org/t/p/w500/test.jpg");
     expect(result.rating).toBe(85);
-    expect(result.first_release_date).toBe(new Date("2024-01-15").getTime() / 1000);
+    expect(result.first_release_date).toBe(1705276800); // 2024-01-15T00:00:00Z
     expect(result.summary).toBe("Test summary");
   });
 
