@@ -10,8 +10,9 @@ jobs:
   claude:
     # Interactive @claude — the resolve loop. Human actors only (default):
     # Ryan comments "@claude fix the review comments" on a PR and the
-    # implementer picks the findings up on that branch.
-    if: contains(github.event.comment.body, '@claude')
+    # implementer picks the findings up on that branch. "@claude review" is
+    # the reviewer's manual trigger (claude-review.yml), not ours.
+    if: contains(github.event.comment.body, '@claude') && !contains(github.event.comment.body, '@claude review')
     runs-on: ubuntu-latest
     timeout-minutes: 45
     permissions:
