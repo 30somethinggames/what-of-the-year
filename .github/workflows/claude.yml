@@ -29,6 +29,7 @@ jobs:
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           claude_args: |
+            --model claude-sonnet-5
             --max-turns 60
 
       - name: Dump execution output on failure
