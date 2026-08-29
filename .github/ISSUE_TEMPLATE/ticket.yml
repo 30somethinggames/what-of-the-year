@@ -1,0 +1,29 @@
+name: Ticket
+description: Any piece of work — bug, feature, chore. Labels and milestone are set during refinement, not here.
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What and why, in a paragraph. Link the source (bug report, tweet, PR comment) if there is one.
+    validations:
+      required: true
+  - type: textarea
+    id: change
+    attributes:
+      label: Change
+      description: What is different when this is done. Concrete enough that a diff can be checked against it.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance
+      description: How we know it is done — behaviour to observe, checks that must pass, tests that must exist.
+    validations:
+      required: true
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Out of scope
+      description: Adjacent things this ticket deliberately does not touch.

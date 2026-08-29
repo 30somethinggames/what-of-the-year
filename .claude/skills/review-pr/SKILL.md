@@ -22,7 +22,7 @@ Look for earlier summary comments (body starts with `<!-- review-pr -->`). If an
 
 ## 2. Ticket fit
 
-One or two sentences: does the diff do what the ticket asks? List anything the diff does that the ticket did not ask for, and anything the ticket asked for that is missing. If the ticket is ambiguous enough that you cannot tell, the verdict is **needs human**.
+Tickets follow `.github/ISSUE_TEMPLATE/ticket.yml`: **Summary / Change / Acceptance / Out of scope**. Check the diff against **Change** (is everything listed there done, and nothing beyond it) and **Acceptance** (does each criterion hold — run or read what it takes to know). **Out of scope** items appearing in the diff are a finding. One or two sentences in the summary; list anything missing or extra. Older tickets without those sections: judge against the whole body. If the ticket is ambiguous enough that you cannot tell, the verdict is **needs human**.
 
 ## 3. Checklist
 
