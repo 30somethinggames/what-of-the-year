@@ -12,7 +12,7 @@ You are the pipeline's reviewer. The argument is a PR number in this repository.
 
 `gh pr view <n> --json state,isDraft,headRefName,body,title,comments`. Stop silently if the PR is closed or a draft.
 
-Find an existing summary comment (body starts with `<!-- review-pr -->`). If one exists this is a **re-run**: keep its comment id for editing, and `gh api repos/{owner}/{repo}/pulls/<n>/comments` to list existing inline comments so you never post a duplicate (same path + line + same rule/issue).
+Look for earlier summary comments (body starts with `<!-- review-pr -->`). If any exist this is a **re-run** — the reviewer runs on every push. Collect the **prior findings**: every item in those summaries plus every inline comment from `gh api repos/{owner}/{repo}/pulls/<n>/comments?per_page=100` (path, line, body). In step 6 you report only what is new against this set; a finding already on the PR is never restated.
 
 ## 1. Gather
 
@@ -53,11 +53,11 @@ For **each** finding, launch a separate **opus** validator subagent with the PR 
 
 ## 6. Post
 
-**Summary comment** — create with `gh pr comment <n> --body-file`, or on a re-run edit the existing one in place with `gh api -X PATCH repos/{owner}/{repo}/issues/comments/<id> -f body=@file`. Exact shape:
+**Summary comment** — one new comment per run with `gh pr comment <n> --body-file`; never edit an earlier one, they are the history. Exact shape:
 
 ```
 <!-- review-pr -->
-## Review — <approve | request changes | needs human>
+## Review — <approve | request changes | needs human>[ (<k> open from earlier)]
 
 **Ticket fit:** <one or two sentences; out-of-scope items if any>
 
@@ -71,12 +71,25 @@ For **each** finding, launch a separate **opus** validator subagent with the PR 
 - …
 
 ### Checklist
-CLAUDE.md ✅ 4/4 · convex.md ❌ 6/7 · react.md ✅ 3/3 · routing.md n/a · styling.md n/a · testing.md ✅ 2/2
+- CLAUDE.md ✅ 4/4
+- convex.md ❌ 6/7 — guard ladder: `startRound` skips rate limit without a comment
+- react.md ✅ 3/3
+- routing.md n/a
+- styling.md n/a
+- testing.md ✅ 2/2
 ```
 
-Omit empty sections. Blocking = anything that drove **request changes**; Should fix = other rule fails; Nits = judgement calls that do not block.
+Omit empty sections. Blocking = anything that drove **request changes**; Should fix = other rule fails; Nits = judgement calls that do not block. Checklist is one bullet per rules file, status and count first, then any note — never joined on one line.
 
-**Inline comments** — for every Blocking and Should fix item with a concrete `path:line`, post one comment with `mcp__github_inline_comment__create_inline_comment`. Include a committable suggestion block only when applying it fixes the issue entirely. On a re-run, skip any finding that already has an inline comment.
+**On a re-run**, compare each finding against the prior findings — same issue = same rule or bug at the same place, line numbers may have shifted:
+
+- **Already on the PR and still present** — not mentioned. Its inline thread is the record. It still counts toward the verdict; say so in the heading: `(2 open from earlier)`.
+- **Already on the PR and now fixed** — not mentioned. GitHub marks the inline thread outdated.
+- **New** — full entry in Blocking / Should fix / Nits plus an inline comment.
+
+The verdict always reflects the current state of the whole PR, not just this push. A re-run summary with a `request changes` verdict and no listed findings is correct when everything open was raised earlier.
+
+**Inline comments** — for every new Blocking and Should fix item with a concrete `path:line`, post one comment with `mcp__github_inline_comment__create_inline_comment`. Include a committable suggestion block only when applying it fixes the issue entirely. Never post a second inline comment for an issue that already has one.
 
 ## Do not
 
