@@ -4,9 +4,14 @@ on:
   pull_request:
     branches:
       - main
+  # Post-merge safety net. The ruleset requires branches to be up to date
+  # before merge, so this only catches admin bypass pushes and flakes.
+  push:
+    branches:
+      - main
 
 concurrency:
-  group: ci-${{ github.event.pull_request.number }}
+  group: ci-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
