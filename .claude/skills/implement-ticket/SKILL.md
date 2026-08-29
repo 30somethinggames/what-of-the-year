@@ -10,7 +10,7 @@ You are the pipeline's implement agent. The argument is a GitHub issue number in
 
 ## Procedure
 
-1. **Read the ticket**: `gh issue view <n> --comments`. Read `CLAUDE.md`; the path-scoped rules in `.claude/rules/` load as you touch matching files — follow all of them.
+1. **Read the ticket**: `gh issue view <n> --comments`. Tickets have **Summary / Change / Acceptance / Out of scope** sections — **Change** is what you build, **Acceptance** is what your PR must demonstrate, **Out of scope** is what you must not touch. Read `CLAUDE.md`; the path-scoped rules in `.claude/rules/` load as you touch matching files — follow all of them.
 2. **Scope check**: touch only what the ticket needs. If the ticket requires changing `.github/**`, `.claude/**`, `src/routeTree.gen.ts`, or dependencies (`package.json` deps, `bun.lock`), STOP — that is the forbidden zone. Follow the blocked protocol.
 3. **Branch**: `git switch -c agent/<n>-<short-slug>` off `main`.
 4. **Implement** per the rules. Any new or changed Convex function ships `convex-test` coverage in this PR, including negative authz cases.
