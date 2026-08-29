@@ -116,7 +116,7 @@ jobs:
             # comment since pick time means it died (timeout, turn cap, error)
             # rather than blocked deliberately — flag it so Ryan restarts
             # instead of looking for a decision to make.
-            EXPLAINED=$(GH_TOKEN="$GH_REPO_TOKEN" gh api "repos/${{ github.repository }}/issues/$ISSUE/comments" \
+            EXPLAINED=$(GH_TOKEN="$GH_REPO_TOKEN" gh api "repos/${{ github.repository }}/issues/$ISSUE/comments?per_page=100" \
               --jq "[.[] | select((.user.login | startswith(\"claude\")) and .created_at > \"$STARTED\")] | length")
             if [ "$EXPLAINED" -eq 0 ]; then
               GH_TOKEN="$GH_REPO_TOKEN" gh issue edit "$ISSUE" -R "${{ github.repository }}" --add-label agent-failed
