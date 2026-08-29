@@ -71,15 +71,8 @@ For **each** finding, launch a separate **opus** validator subagent with the PR 
 - …
 
 ### Checklist
-- CLAUDE.md ✅ 4/4
-- convex.md ❌ 6/7 — guard ladder: `startRound` skips rate limit without a comment
-- react.md ✅ 3/3
-- routing.md n/a
-- styling.md n/a
-- testing.md ✅ 2/2
+CLAUDE.md ✅ 4/4 · convex.md ❌ 6/7 · react.md ✅ 3/3 · routing.md n/a · styling.md n/a · testing.md ✅ 2/2
 ```
-
-One bullet per rules file, status and count first, then any note. Never join them on one line.
 
 Omit empty sections. Blocking = anything that drove **request changes**; Should fix = other rule fails; Nits = judgement calls that do not block.
 
