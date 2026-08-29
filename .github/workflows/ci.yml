@@ -12,7 +12,8 @@ on:
 
 concurrency:
   group: ci-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  # Only PRs supersede themselves; a post-merge run on main must finish.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   checks:
