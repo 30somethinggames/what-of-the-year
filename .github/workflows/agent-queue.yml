@@ -75,18 +75,37 @@ jobs:
       issues: write
       id-token: write
       actions: read
+    outputs:
+      stats: ${{ steps.stats.outputs.stats }}
     steps:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - uses: anthropics/claude-code-action@v1
+        id: claude
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           prompt: "/implement-ticket ${{ needs.next-ticket.outputs.issue }}"
           claude_args: |
             --model claude-sonnet-5
             --max-turns 80
+
+      # Turns / wall-clock / cost for the run — step summary now, issue comment
+      # via board-update, so per-ticket cost is queryable later.
+      - name: Run stats
+        id: stats
+        if: always()
+        run: |
+          F="${{ steps.claude.outputs.execution_file }}"
+          if [ -n "$F" ] && [ -f "$F" ]; then
+            STATS=$(jq -r '[.[] | select(.type == "result")] | last
+              | "\(.num_turns) turns · \((.duration_ms / 60000) | round)m · $\((.total_cost_usd * 100 | round) / 100)"' "$F" 2>/dev/null || echo "stats unavailable")
+          else
+            STATS="stats unavailable"
+          fi
+          echo "Implement: $STATS" >> "$GITHUB_STEP_SUMMARY"
+          echo "stats=$STATS" >> "$GITHUB_OUTPUT"
 
   board-update:
     needs: [next-ticket, implement]
@@ -108,23 +127,26 @@ jobs:
           RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           HAS_PR=$(GH_TOKEN="$GH_REPO_TOKEN" gh pr list -R "${{ github.repository }}" --state open --json headRefName \
             --jq "[.[] | select(.headRefName | startswith(\"agent/$ISSUE-\"))] | length")
+          STATS="${{ needs.implement.outputs.stats }}"
+          NOTE=""
           if [ "$HAS_PR" -gt 0 ]; then
             TARGET="Ready for Review"
           else
             TARGET="Blocked"
             # Blocked protocol says the agent comments before exiting. No agent
             # comment since pick time means it died (timeout, turn cap, error)
-            # rather than blocked deliberately — flag it so Ryan restarts
+            # rather than blocked deliberately — say so, so Ryan restarts
             # instead of looking for a decision to make.
             EXPLAINED=$(GH_TOKEN="$GH_REPO_TOKEN" gh api "repos/${{ github.repository }}/issues/$ISSUE/comments?per_page=100" \
               --jq "[.[] | select((.user.login | startswith(\"claude\")) and .created_at > \"$STARTED\")] | length")
             if [ "$EXPLAINED" -eq 0 ]; then
-              GH_TOKEN="$GH_REPO_TOKEN" gh issue comment "$ISSUE" -R "${{ github.repository }}" \
-                --body "⚠️ Blocked — the agent exited without a PR or an explanation (implement job: \`${{ needs.implement.result }}\`). See the [run]($RUN_URL). Move back to Ready to retry."
+              NOTE=" ⚠️ The agent exited without a PR or an explanation (implement job: \`${{ needs.implement.result }}\`). Move back to Ready to retry."
             fi
           fi
+          GH_TOKEN="$GH_REPO_TOKEN" gh issue comment "$ISSUE" -R "${{ github.repository }}" \
+            --body "🏁 Agent run finished → **$TARGET** · $STATS · [run]($RUN_URL).$NOTE"
           echo "#$ISSUE → $TARGET"
-          echo "#$ISSUE → $TARGET (implement job: ${{ needs.implement.result }})" >> "$GITHUB_STEP_SUMMARY"
+          echo "#$ISSUE → $TARGET (implement job: ${{ needs.implement.result }}, $STATS)" >> "$GITHUB_STEP_SUMMARY"
           FIELDS=$(gh api graphql -f query='query{organization(login:"30somethinggames"){projectV2(number:3){id field(name:"Status"){... on ProjectV2SingleSelectField{id options{id name}}}}}}')
           PROJECT_ID=$(echo "$FIELDS" | jq -r '.data.organization.projectV2.id')
           FIELD_ID=$(echo "$FIELDS" | jq -r '.data.organization.projectV2.field.id')
