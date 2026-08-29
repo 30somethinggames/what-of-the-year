@@ -120,7 +120,7 @@ jobs:
               --jq "[.[] | select((.user.login | startswith(\"claude\")) and .created_at > \"$STARTED\")] | length")
             if [ "$EXPLAINED" -eq 0 ]; then
               GH_TOKEN="$GH_REPO_TOKEN" gh issue comment "$ISSUE" -R "${{ github.repository }}" \
-                --body "⚠️ Blocked — the agent exited without a PR or an explanation (implement job: \`${{ needs.implement.result }}\`). See the [run]($RUN_URL). Remove \`agent-failed\` and move back to Ready to retry."
+                --body "⚠️ Blocked — the agent exited without a PR or an explanation (implement job: \`${{ needs.implement.result }}\`). See the [run]($RUN_URL). Move back to Ready to retry."
             fi
           fi
           echo "#$ISSUE → $TARGET"
