@@ -2,17 +2,23 @@ name: Claude Review
 
 on:
   pull_request:
-    types: [opened, ready_for_review]
+    types: [opened, ready_for_review, synchronize]
   issue_comment:
     types: [created]
 
+# A new push supersedes an in-flight review of the same PR.
+concurrency:
+  group: review-${{ github.event.pull_request.number || github.event.issue.number }}
+  cancel-in-progress: true
+
 jobs:
   review:
-    # One review per PR on open/ready, plus manual re-runs via an
-    # "@claude review" comment on the PR. allowed_bots lets the reviewer run
-    # on agent-authored PRs; it can only post comments, and the interactive
-    # workflow rejects bot actors and skips "@claude review", so no
-    # agent-on-agent loop is possible.
+    # Reviews every push to a PR (the skill diffs against its own earlier
+    # findings, so re-runs update rather than repeat), plus manual re-runs via
+    # an "@claude review" comment. allowed_bots lets the reviewer run on
+    # agent-authored PRs and agent fix-pushes; it can only post comments, and
+    # the interactive workflow rejects bot actors and skips "@claude review",
+    # so no agent-on-agent loop is possible.
     if: >-
       (github.event_name == 'pull_request' && !github.event.pull_request.draft) ||
       (github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '@claude review'))

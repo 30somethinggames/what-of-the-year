@@ -12,7 +12,7 @@ You are the pipeline's reviewer. The argument is a PR number in this repository.
 
 `gh pr view <n> --json state,isDraft,headRefName,body,title,comments`. Stop silently if the PR is closed or a draft.
 
-Find an existing summary comment (body starts with `<!-- review-pr -->`). If one exists this is a **re-run**: keep its comment id for editing, and `gh api repos/{owner}/{repo}/pulls/<n>/comments` to list existing inline comments so you never post a duplicate (same path + line + same rule/issue).
+Find an existing summary comment (body starts with `<!-- review-pr -->`). If one exists this is a **re-run** — the reviewer runs on every push. Keep the comment id for editing, parse its Blocking / Should fix / Nits / Still open items as the **prior findings**, and `gh api repos/{owner}/{repo}/pulls/<n>/comments?per_page=100` to list existing inline comments (path, line, body). You will diff the new review against these in step 6, never restate them.
 
 ## 1. Gather
 
@@ -70,13 +70,29 @@ For **each** finding, launch a separate **opus** validator subagent with the PR 
 ### Nits
 - …
 
+### Still open
+- <finding raised in an earlier run, unchanged> — `path:line`
+
 ### Checklist
-CLAUDE.md ✅ 4/4 · convex.md ❌ 6/7 · react.md ✅ 3/3 · routing.md n/a · styling.md n/a · testing.md ✅ 2/2
+- CLAUDE.md ✅ 4/4
+- convex.md ❌ 6/7 — guard ladder: `startRound` skips rate limit without a comment
+- react.md ✅ 3/3
+- routing.md n/a
+- styling.md n/a
+- testing.md ✅ 2/2
 ```
 
-Omit empty sections. Blocking = anything that drove **request changes**; Should fix = other rule fails; Nits = judgement calls that do not block.
+Omit empty sections. Blocking = anything that drove **request changes**; Should fix = other rule fails; Nits = judgement calls that do not block. Checklist is one bullet per rules file, status and count first, then any note — never joined on one line.
 
-**Inline comments** — for every Blocking and Should fix item with a concrete `path:line`, post one comment with `mcp__github_inline_comment__create_inline_comment`. Include a committable suggestion block only when applying it fixes the issue entirely. On a re-run, skip any finding that already has an inline comment.
+**On a re-run**, every finding is one of three things — decide by comparing against the prior findings and the current diff, same issue = same rule or bug at the same place (line numbers may have shifted):
+
+- **Fixed** — the code no longer has it. Drop it entirely.
+- **Still open** — prior finding, code unchanged. Move it to `### Still open` as a one-liner; do not re-explain it, do not post a new inline comment.
+- **New** — not in the prior findings. Goes in Blocking / Should fix / Nits with a fresh inline comment.
+
+The verdict reflects the current state (fixed Blocking items no longer block). Edit the existing summary in place; never post a second summary.
+
+**Inline comments** — for every Blocking and Should fix item with a concrete `path:line`, post one comment with `mcp__github_inline_comment__create_inline_comment`. Include a committable suggestion block only when applying it fixes the issue entirely. Never post one for a Still open item — its original inline comment is still on the PR.
 
 ## Do not
 
