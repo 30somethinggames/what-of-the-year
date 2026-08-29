@@ -147,6 +147,29 @@ jobs:
           FORCE_COLOR: "1"
         run: bunx playwright test
 
+      # Failed and flaky specs on the check's Details page, so nobody has to
+      # download the report to learn which test broke.
+      - name: Summarize e2e results
+        if: ${{ !cancelled() }}
+        run: |
+          F=test-results/results.json
+          if [ ! -f "$F" ]; then
+            echo "## e2e — no results file (run aborted before Playwright wrote one)" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          jq -r '
+            def strip: gsub("\u001b\\[[0-9;]*m"; "");
+            def specs(status): [.. | objects | select(has("specs")) | .specs[]
+              | select(any(.tests[]; .status == status))];
+            def firstError: [.tests[0].results[] | .error.message // empty] | first // "";
+            def render: .[] | "- **\(.title)** — `\(.file):\(.line)`"
+              + (firstError | strip | split("\n")[0]
+                 | if . == "" then "" else "\n  `" + . + "`" end);
+            (specs("unexpected") | if length > 0 then "## e2e failed (\(length))\n" + ([render] | join("\n")) + "\n" else empty end),
+            (specs("flaky") | if length > 0 then "## e2e flaky — passed on retry (\(length))\n" + ([render] | join("\n")) + "\n" else empty end),
+            (if (specs("unexpected") | length) == 0 and (specs("flaky") | length) == 0 then "## e2e — all passed, no retries" else empty end)
+          ' "$F" >> "$GITHUB_STEP_SUMMARY"
+
       - name: Dump backend logs on failure
         if: failure()
         run: docker logs convex-backend

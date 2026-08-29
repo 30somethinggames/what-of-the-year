@@ -7,7 +7,9 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   workers: process.env.CI ? 4 : 1,
   retries: 1,
-  reporter: process.env.CI ? [["list"], ["github"]] : "list",
+  reporter: process.env.CI
+    ? [["list"], ["github"], ["json", { outputFile: "test-results/results.json" }]]
+    : "list",
   timeout: 30_000,
   expect: {
     timeout: 15_000,
