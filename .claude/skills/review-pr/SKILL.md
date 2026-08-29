@@ -89,6 +89,8 @@ Omit empty sections. Blocking = anything that drove **request changes**; Should 
 
 The verdict always reflects the current state of the whole PR, not just this push. A re-run summary with a `request changes` verdict and no listed findings is correct when everything open was raised earlier.
 
+**Nothing changed → post nothing.** If the verdict is the same as the latest earlier summary and there are no new findings, do not post a summary or any inline comment. The green check on the new commit is the evidence the review ran. This is the normal outcome of an "update branch" rebase or a push that only touches what was already fine.
+
 **Inline comments** — for every new Blocking and Should fix item with a concrete `path:line`, post one comment with `mcp__github_inline_comment__create_inline_comment`. Include a committable suggestion block only when applying it fixes the issue entirely. Never post a second inline comment for an issue that already has one.
 
 ## Do not
