@@ -1,10 +1,13 @@
 import { internal } from "../_generated/api";
 import { httpAction } from "../_generated/server";
+import { timingSafeEqual } from "../utils/env";
 
 const UNAUTHORIZED = new Response("Unauthorized", { status: 401 });
 
 function guardTest(request: Request) {
-  if (request.headers.get("x-test-secret") !== process.env.TEST_SECRET) return UNAUTHORIZED;
+  const secret = process.env.TEST_SECRET;
+  const provided = request.headers.get("x-test-secret");
+  if (!secret || !provided || !timingSafeEqual(provided, secret)) return UNAUTHORIZED;
   return null;
 }
 
