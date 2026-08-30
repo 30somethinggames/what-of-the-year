@@ -1,9 +1,10 @@
 import type { Id } from "../_generated/dataModel";
 import type { QueryCtx } from "../_generated/server";
+import { appError } from "./errors";
 
 export async function requireSessionMember(ctx: QueryCtx, sessionId: Id<"sessions">) {
   const identity = await ctx.auth.getUserIdentity();
-  if (!identity) throw new Error("Unauthenticated");
+  if (!identity) throw appError("UNAUTHENTICATED", "Unauthenticated");
 
   const player = await ctx.db
     .query("players")

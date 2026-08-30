@@ -6,6 +6,7 @@ import { mutation, query } from "./_generated/server";
 import { MAX_ROUNDS } from "./constants";
 import { rateLimiter } from "./ratelimits";
 import { requireSessionMember } from "./utils/auth";
+import { appError } from "./utils/errors";
 import { buildPickArg } from "./utils/pick";
 import { getRoundByNumber } from "./utils/rounds";
 
@@ -68,21 +69,21 @@ export const saveSelection = mutation({
   },
   handler: async (ctx, { sessionId, roundNumber, option }) => {
     const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Unauthenticated");
+    if (!identity) throw appError("UNAUTHENTICATED", "Unauthenticated");
     const uid = identity.subject;
 
     await rateLimiter.limit(ctx, "saveSelection", { key: uid, throws: true });
 
     const round = await getRoundByNumber(ctx.db, sessionId, roundNumber);
-    if (!round) throw new Error("Round not found");
-    if (round.state !== "open") throw new Error("Round is not open");
+    if (!round) throw appError("NOT_FOUND", "Round not found");
+    if (round.state !== "open") throw appError("WRONG_STATE", "Round is not open");
 
     const existing = await ctx.db
       .query("selections")
       .withIndex("by_round_uid", (q) => q.eq("roundId", round._id).eq("uid", uid))
       .unique();
 
-    if (existing) throw new Error("Selection already exists for this round");
+    if (existing) throw appError("ALREADY_SELECTED", "Selection already exists for this round");
 
     await ctx.db.insert("selections", {
       sessionId,
@@ -98,7 +99,7 @@ export const saveSelection = mutation({
     await ctx.db.patch(round._id, { selectionsComplete });
 
     const session = await ctx.db.get(sessionId);
-    if (!session) throw new Error("Session not found");
+    if (!session) throw appError("NOT_FOUND", "Session not found");
 
     const allComplete = selectionsComplete > 0 && selectionsComplete >= session.playerCount;
 
@@ -129,18 +130,18 @@ export const editSelection = mutation({
   },
   handler: async (ctx, { sessionId, roundNumber, option }) => {
     const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Unauthenticated");
+    if (!identity) throw appError("UNAUTHENTICATED", "Unauthenticated");
     const uid = identity.subject;
 
     const round = await getRoundByNumber(ctx.db, sessionId, roundNumber);
-    if (!round) throw new Error("Round not found");
+    if (!round) throw appError("NOT_FOUND", "Round not found");
 
     const existing = await ctx.db
       .query("selections")
       .withIndex("by_round_uid", (q) => q.eq("roundId", round._id).eq("uid", uid))
       .unique();
 
-    if (!existing) throw new Error("Selection not found");
+    if (!existing) throw appError("NOT_FOUND", "Selection not found");
 
     await ctx.db.patch(existing._id, {
       pick: buildPickArg(option),

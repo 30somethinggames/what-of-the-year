@@ -10,6 +10,7 @@ import { useToast } from "components/toast/use-toast";
 import { api } from "convex/_generated/api";
 import { MAX_ROUNDS } from "convex/constants";
 import { useMutation } from "convex/react";
+import { getAppError } from "utils/app-error";
 import { tryCatch } from "utils/try-catch";
 
 import { Topic } from "../topic";
@@ -40,6 +41,7 @@ export function Lobby({ topic, year, sessionId }: LobbyProps) {
     const { error } = await tryCatch(startSession({ sessionId }));
     if (error) {
       Sentry.captureException(error);
+      toast.show({ message: getAppError(error).message, variant: "error" });
       return;
     }
     navigate({
@@ -53,6 +55,7 @@ export function Lobby({ topic, year, sessionId }: LobbyProps) {
     const { error } = await tryCatch(leaveSession({ sessionId }));
     if (error) {
       Sentry.captureException(error);
+      toast.show({ message: getAppError(error).message, variant: "error" });
       return;
     }
     navigate({ to: "/", replace: true });

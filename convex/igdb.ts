@@ -16,6 +16,7 @@ async function getAccessToken(): Promise<string> {
     }),
   });
 
+  // internal: plain Error — nothing user-actionable; UI shows its generic load failure
   if (!response.ok) throw new Error(`Twitch OAuth error: ${response.status}`);
   const data = (await response.json()) as { access_token: string };
   return data.access_token;
@@ -45,6 +46,7 @@ export const getGames = action({
       `,
     });
 
+    // internal: plain Error — nothing user-actionable; UI shows its generic load failure
     if (!response.ok) throw new Error(`IGDB error: ${response.status}`);
     return response.json();
   },

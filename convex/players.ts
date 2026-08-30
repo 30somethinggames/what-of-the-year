@@ -3,6 +3,7 @@ import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { SessionStatus } from "./constants";
 import { rateLimiter } from "./ratelimits";
+import { appError } from "./utils/errors";
 import { getRoundByNumber } from "./utils/rounds";
 import { validateAvatar, validateName } from "./utils/validate";
 
@@ -14,27 +15,29 @@ export const joinSession = mutation({
   },
   handler: async (ctx, { sessionId, name, avatar }) => {
     const nameError = validateName(name);
-    if (nameError) throw new Error(nameError);
+    if (nameError) throw appError("VALIDATION", nameError);
     const avatarError = validateAvatar(avatar);
-    if (avatarError) throw new Error(avatarError);
+    if (avatarError) throw appError("VALIDATION", avatarError);
 
     const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Unauthenticated");
+    if (!identity) throw appError("UNAUTHENTICATED", "Unauthenticated");
     const uid = identity.subject;
 
     await rateLimiter.limit(ctx, "joinSession", { key: uid, throws: true });
 
     const session = await ctx.db.get(sessionId);
-    if (!session) throw new Error("Session not found");
-    if (session.status !== SessionStatus.LOBBY) throw new Error("Session is closed");
-    if (session.playerCount >= session.maxPlayers) throw new Error("Session is full");
+    if (!session) throw appError("NOT_FOUND", "Session not found");
+    if (session.status !== SessionStatus.LOBBY)
+      throw appError("SESSION_CLOSED", "Session is closed");
+    if (session.playerCount >= session.maxPlayers)
+      throw appError("SESSION_FULL", "Session is full");
 
     // Check if already joined
     const existing = await ctx.db
       .query("players")
       .withIndex("by_session_uid", (q) => q.eq("sessionId", sessionId).eq("uid", uid))
       .unique();
-    if (existing) throw new Error("Already joined this session");
+    if (existing) throw appError("ALREADY_JOINED", "Already joined this session");
 
     await ctx.db.insert("players", {
       sessionId,
@@ -56,19 +59,19 @@ export const leaveSession = mutation({
   },
   handler: async (ctx, { sessionId }) => {
     const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Unauthenticated");
+    if (!identity) throw appError("UNAUTHENTICATED", "Unauthenticated");
     const uid = identity.subject;
 
     const session = await ctx.db.get(sessionId);
-    if (!session) throw new Error("Session not found");
+    if (!session) throw appError("NOT_FOUND", "Session not found");
 
     const player = await ctx.db
       .query("players")
       .withIndex("by_session_uid", (q) => q.eq("sessionId", sessionId).eq("uid", uid))
       .unique();
 
-    if (!player) throw new Error("Player not in session");
-    if (player.isHost) throw new Error("Host cannot leave session");
+    if (!player) throw appError("NOT_MEMBER", "Player not in session");
+    if (player.isHost) throw appError("HOST_CANNOT_LEAVE", "Host cannot leave session");
 
     // Delete all selections by the leaving player
     const selections = await ctx.db
@@ -120,25 +123,25 @@ export const kickFromLobby = mutation({
   },
   handler: async (ctx, { sessionId, uid }) => {
     const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Unauthenticated");
+    if (!identity) throw appError("UNAUTHENTICATED", "Unauthenticated");
 
     const host = await ctx.db
       .query("players")
       .withIndex("by_session_uid", (q) => q.eq("sessionId", sessionId).eq("uid", identity.subject))
       .unique();
-    if (!host?.isHost) throw new Error("Only the host can kick players");
+    if (!host?.isHost) throw appError("NOT_HOST", "Only the host can kick players");
 
     const player = await ctx.db
       .query("players")
       .withIndex("by_session_uid", (q) => q.eq("sessionId", sessionId).eq("uid", uid))
       .unique();
-    if (!player) throw new Error("Player not found");
-    if (player.isHost) throw new Error("Cannot kick the host");
+    if (!player) throw appError("NOT_FOUND", "Player not found");
+    if (player.isHost) throw appError("CANNOT_KICK_HOST", "Cannot kick the host");
 
     const session = await ctx.db.get(sessionId);
-    if (!session) throw new Error("Session not found");
+    if (!session) throw appError("NOT_FOUND", "Session not found");
     if (session.status !== SessionStatus.LOBBY)
-      throw new Error("Cannot kick from lobby after game has started");
+      throw appError("WRONG_STATE", "Cannot kick from lobby after game has started");
 
     await ctx.db.delete(player._id);
     await ctx.db.patch(sessionId, {
@@ -154,23 +157,23 @@ export const kickFromGame = mutation({
   },
   handler: async (ctx, { sessionId, uid }) => {
     const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Unauthenticated");
+    if (!identity) throw appError("UNAUTHENTICATED", "Unauthenticated");
 
     const host = await ctx.db
       .query("players")
       .withIndex("by_session_uid", (q) => q.eq("sessionId", sessionId).eq("uid", identity.subject))
       .unique();
-    if (!host?.isHost) throw new Error("Only the host can kick players");
+    if (!host?.isHost) throw appError("NOT_HOST", "Only the host can kick players");
 
     const player = await ctx.db
       .query("players")
       .withIndex("by_session_uid", (q) => q.eq("sessionId", sessionId).eq("uid", uid))
       .unique();
-    if (!player) throw new Error("Player not found");
-    if (player.isHost) throw new Error("Cannot kick the host");
+    if (!player) throw appError("NOT_FOUND", "Player not found");
+    if (player.isHost) throw appError("CANNOT_KICK_HOST", "Cannot kick the host");
 
     const session = await ctx.db.get(sessionId);
-    if (!session) throw new Error("Session not found");
+    if (!session) throw appError("NOT_FOUND", "Session not found");
 
     // Delete all selections by the kicked player
     const selections = await ctx.db
@@ -219,7 +222,7 @@ export const getPlayers = query({
   args: { sessionId: v.id("sessions") },
   handler: async (ctx, { sessionId }) => {
     const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Unauthenticated");
+    if (!identity) throw appError("UNAUTHENTICATED", "Unauthenticated");
 
     return await ctx.db
       .query("players")
