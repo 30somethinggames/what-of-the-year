@@ -22,9 +22,9 @@ export const ERROR_CODES = {
 
 export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES];
 
-export type AppErrorData = { code: ErrorCode; message: string };
+export type ApiErrorData = { code: ErrorCode; message: string };
 
-/** Build a client-visible error: `throw appError("NOT_HOST", "Only the host can kick players")`. */
-export function appError(code: ErrorCode, message: string): ConvexError<AppErrorData> {
+/** Build a client-visible error: `throw apiError("NOT_HOST", "Only the host can kick players")`. */
+export function apiError(code: ErrorCode, message: string): ConvexError<ApiErrorData> {
   return new ConvexError({ code, message });
 }

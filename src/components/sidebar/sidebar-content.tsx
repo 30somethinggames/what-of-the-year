@@ -11,7 +11,7 @@ import type { SessionID } from "db/types";
 import { usePlayers } from "db/use-players";
 import { useSelections } from "db/use-selections";
 import { useSession } from "db/use-sessions";
-import { getAppError } from "utils/app-error";
+import { getApiError } from "utils/api-error";
 import { tryCatch } from "utils/try-catch";
 
 export interface SidebarContentProps {
@@ -43,7 +43,7 @@ export function SidebarContent({ sessionId, topic, year, handleClose }: SidebarC
     );
     if (error) {
       Sentry.captureException(error);
-      toast.show({ message: getAppError(error).message, variant: "error" });
+      toast.show({ message: getApiError(error).message, variant: "error" });
       return;
     }
     if (!data.hasNextRound) {
@@ -61,7 +61,7 @@ export function SidebarContent({ sessionId, topic, year, handleClose }: SidebarC
     if (error) {
       // Leave the room regardless — the player is done here either way.
       Sentry.captureException(error);
-      toast.show({ message: getAppError(error).message, variant: "error" });
+      toast.show({ message: getApiError(error).message, variant: "error" });
     }
     navigate({ to: "/", replace: true });
   };
@@ -71,7 +71,7 @@ export function SidebarContent({ sessionId, topic, year, handleClose }: SidebarC
     const { error } = await tryCatch(kickFromGame({ sessionId, uid }));
     if (error) {
       Sentry.captureException(error);
-      toast.show({ message: getAppError(error).message, variant: "error" });
+      toast.show({ message: getApiError(error).message, variant: "error" });
     }
   };
 

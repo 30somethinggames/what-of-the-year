@@ -15,7 +15,7 @@ import { useMutation } from "convex/react";
 import type { SessionID } from "db/types";
 import { useTopicData } from "queries/use-topic-data";
 import type { Option } from "types/option";
-import { getAppError } from "utils/app-error";
+import { getApiError } from "utils/api-error";
 import { tryCatch } from "utils/try-catch";
 
 import { Reveal } from "./reveal";
@@ -69,7 +69,7 @@ export function Round({ sessionId, topic, year }: Props) {
       );
       if (error) {
         Sentry.captureException(error);
-        toast.show({ message: getAppError(error).message, variant: "error" });
+        toast.show({ message: getApiError(error).message, variant: "error" });
         return;
       }
       if (!data.hasNextRound) {
@@ -103,7 +103,7 @@ export function Round({ sessionId, topic, year }: Props) {
       );
       if (error) {
         Sentry.captureException(error);
-        toast.show({ message: getAppError(error).message, variant: "error" });
+        toast.show({ message: getApiError(error).message, variant: "error" });
         return;
       }
       setEditingRound(null);
@@ -117,7 +117,7 @@ export function Round({ sessionId, topic, year }: Props) {
       );
       if (error) {
         Sentry.captureException(error);
-        toast.show({ message: getAppError(error).message, variant: "error" });
+        toast.show({ message: getApiError(error).message, variant: "error" });
         return;
       }
     }

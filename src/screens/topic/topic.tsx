@@ -13,7 +13,7 @@ import { useMutation } from "convex/react";
 import { MAX_NAME_LENGTH, validateName } from "convex/utils/validate";
 import type { SessionID } from "db/types";
 import { useTopicData } from "queries/use-topic-data";
-import { getAppError } from "utils/app-error";
+import { getApiError } from "utils/api-error";
 import { tryCatch } from "utils/try-catch";
 
 interface Props {
@@ -41,9 +41,9 @@ export function Topic({ topic, year, existingSessionId }: Props) {
       const { error } = await tryCatch(mutateJoin({ sessionId: existingSessionId, name, avatar }));
       if (error) {
         // Expected when the player is already in: fall through to the lobby, no toast.
-        if (getAppError(error).code === "ALREADY_JOINED") return;
+        if (getApiError(error).code === "ALREADY_JOINED") return;
         Sentry.captureException(error);
-        toast.show({ message: getAppError(error).message, variant: "error" });
+        toast.show({ message: getApiError(error).message, variant: "error" });
         return;
       }
     } else {
@@ -52,7 +52,7 @@ export function Topic({ topic, year, existingSessionId }: Props) {
       );
       if (error) {
         Sentry.captureException(error);
-        toast.show({ message: getAppError(error).message, variant: "error" });
+        toast.show({ message: getApiError(error).message, variant: "error" });
         return;
       }
       navigate({

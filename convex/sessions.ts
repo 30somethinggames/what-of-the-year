@@ -3,14 +3,14 @@ import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { MAX_PLAYERS, MAX_ROUNDS, SessionStatus } from "./constants";
 import { rateLimiter } from "./ratelimits";
-import { appError } from "./utils/errors";
+import { apiError } from "./utils/errors";
 import { validateAvatar, validateName } from "./utils/validate";
 
 export const getSession = query({
   args: { sessionId: v.id("sessions") },
   handler: async (ctx, { sessionId }) => {
     const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw appError("UNAUTHENTICATED", "Unauthenticated");
+    if (!identity) throw apiError("UNAUTHENTICATED", "Unauthenticated");
 
     return await ctx.db.get(sessionId);
   },
@@ -25,12 +25,12 @@ export const createSession = mutation({
   },
   handler: async (ctx, { topic, year, name, avatar }) => {
     const nameError = validateName(name);
-    if (nameError) throw appError("VALIDATION", nameError);
+    if (nameError) throw apiError("VALIDATION", nameError);
     const avatarError = validateAvatar(avatar);
-    if (avatarError) throw appError("VALIDATION", avatarError);
+    if (avatarError) throw apiError("VALIDATION", avatarError);
 
     const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw appError("UNAUTHENTICATED", "Unauthenticated");
+    if (!identity) throw apiError("UNAUTHENTICATED", "Unauthenticated");
     const uid = identity.subject;
 
     await rateLimiter.limit(ctx, "createSession", { key: uid, throws: true });
@@ -79,17 +79,17 @@ export const endSession = mutation({
   },
   handler: async (ctx, { sessionId }) => {
     const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw appError("UNAUTHENTICATED", "Unauthenticated");
+    if (!identity) throw apiError("UNAUTHENTICATED", "Unauthenticated");
 
     const host = await ctx.db
       .query("players")
       .withIndex("by_session_uid", (q) => q.eq("sessionId", sessionId).eq("uid", identity.subject))
       .unique();
 
-    if (!host?.isHost) throw appError("NOT_HOST", "Only the host can end the session");
+    if (!host?.isHost) throw apiError("NOT_HOST", "Only the host can end the session");
 
     const session = await ctx.db.get(sessionId);
-    if (!session) throw appError("NOT_FOUND", "Session not found");
+    if (!session) throw apiError("NOT_FOUND", "Session not found");
 
     await ctx.db.patch(sessionId, { status: SessionStatus.ENDED });
   },
@@ -101,17 +101,17 @@ export const startSession = mutation({
   },
   handler: async (ctx, { sessionId }) => {
     const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw appError("UNAUTHENTICATED", "Unauthenticated");
+    if (!identity) throw apiError("UNAUTHENTICATED", "Unauthenticated");
 
     const session = await ctx.db.get(sessionId);
-    if (!session) throw appError("NOT_FOUND", "Session not found");
+    if (!session) throw apiError("NOT_FOUND", "Session not found");
 
     const host = await ctx.db
       .query("players")
       .withIndex("by_session_uid", (q) => q.eq("sessionId", sessionId).eq("uid", identity.subject))
       .unique();
 
-    if (!host?.isHost) throw appError("NOT_HOST", "Only the host can start the session");
+    if (!host?.isHost) throw apiError("NOT_HOST", "Only the host can start the session");
 
     const round = await ctx.db
       .query("rounds")
@@ -119,7 +119,7 @@ export const startSession = mutation({
       .filter((q) => q.eq(q.field("number"), MAX_ROUNDS))
       .unique();
 
-    if (!round) throw appError("NOT_FOUND", "Round not found");
+    if (!round) throw apiError("NOT_FOUND", "Round not found");
 
     await ctx.db.patch(sessionId, {
       activeRoundNumber: MAX_ROUNDS,
