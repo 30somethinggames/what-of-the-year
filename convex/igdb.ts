@@ -3,6 +3,7 @@ import { v } from "convex/values";
 import { action } from "./_generated/server";
 import { fixtureGames } from "./test/fixtures";
 import { currentYear } from "./utils/dates";
+import { useFixtures } from "./utils/env";
 
 async function getAccessToken(): Promise<string> {
   const response = await fetch("https://id.twitch.tv/oauth2/token", {
@@ -23,7 +24,7 @@ async function getAccessToken(): Promise<string> {
 export const getGames = action({
   args: { year: v.string() },
   handler: async (_, { year }) => {
-    if (process.env.OPTIONS_FIXTURES) return fixtureGames(year);
+    if (useFixtures()) return fixtureGames(year);
 
     const { startDate, endDate } = currentYear(year);
     const accessToken = await getAccessToken();

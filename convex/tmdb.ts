@@ -2,6 +2,7 @@ import { v } from "convex/values";
 
 import { action } from "./_generated/server";
 import { fixtureMovies } from "./test/fixtures";
+import { useFixtures } from "./utils/env";
 
 interface Movie {
   id: number;
@@ -21,7 +22,7 @@ interface TMDBResponse {
 export const getMovies = action({
   args: { year: v.string() },
   handler: async (_, { year }) => {
-    if (process.env.OPTIONS_FIXTURES) return fixtureMovies(year);
+    if (useFixtures()) return fixtureMovies(year);
 
     const startDate = `${year}-01-01`;
     const endDate = `${year}-12-31`;
