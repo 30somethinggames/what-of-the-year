@@ -8,12 +8,14 @@ import { Container } from "components/container";
 import { Picks } from "components/lists/picks";
 import { DisplayError } from "components/states/error";
 import { Loading } from "components/states/loading";
+import { useToast } from "components/toast/use-toast";
 import type { TOPIC_KEY } from "constants/topics";
 import { api } from "convex/_generated/api";
 import { useMutation } from "convex/react";
 import type { SessionID } from "db/types";
 import { useTopicData } from "queries/use-topic-data";
 import type { Option } from "types/option";
+import { getApiError } from "utils/api-error";
 import { tryCatch } from "utils/try-catch";
 
 import { Reveal } from "./reveal";
@@ -28,6 +30,7 @@ interface Props {
 
 export function Round({ sessionId, topic, year }: Props) {
   const navigate = useNavigate();
+  const toast = useToast();
   const {
     isLoading,
     session,
@@ -66,6 +69,7 @@ export function Round({ sessionId, topic, year }: Props) {
       );
       if (error) {
         Sentry.captureException(error);
+        toast.show({ message: getApiError(error).message, variant: "error" });
         return;
       }
       if (!data.hasNextRound) {
@@ -99,6 +103,7 @@ export function Round({ sessionId, topic, year }: Props) {
       );
       if (error) {
         Sentry.captureException(error);
+        toast.show({ message: getApiError(error).message, variant: "error" });
         return;
       }
       setEditingRound(null);
@@ -112,6 +117,7 @@ export function Round({ sessionId, topic, year }: Props) {
       );
       if (error) {
         Sentry.captureException(error);
+        toast.show({ message: getApiError(error).message, variant: "error" });
         return;
       }
     }

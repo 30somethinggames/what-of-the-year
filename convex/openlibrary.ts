@@ -28,6 +28,7 @@ export const getBooks = action({
       { headers: { "User-Agent": "WhatOfTheYear/1.0" } },
     );
 
+    // internal: plain Error — nothing user-actionable; UI shows its generic load failure
     if (!response.ok) throw new Error(`Open Library error: ${response.status}`);
 
     const data: OpenLibraryResponse = await response.json();

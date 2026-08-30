@@ -4,12 +4,14 @@ import { useNavigate } from "@tanstack/react-router";
 import { Button } from "components/button";
 import { PlayerList } from "components/lists/players";
 import { Loading } from "components/states/loading";
+import { useToast } from "components/toast/use-toast";
 import { api } from "convex/_generated/api";
 import { useMutation } from "convex/react";
 import type { SessionID } from "db/types";
 import { usePlayers } from "db/use-players";
 import { useSelections } from "db/use-selections";
 import { useSession } from "db/use-sessions";
+import { getApiError } from "utils/api-error";
 import { tryCatch } from "utils/try-catch";
 
 export interface SidebarContentProps {
@@ -21,6 +23,7 @@ export interface SidebarContentProps {
 
 export function SidebarContent({ sessionId, topic, year, handleClose }: SidebarContentProps) {
   const navigate = useNavigate();
+  const toast = useToast();
   const { session, activeRound } = useSession(sessionId);
   const { players, isHost } = usePlayers(sessionId);
   const { selections } = useSelections(sessionId, activeRound);
@@ -40,6 +43,7 @@ export function SidebarContent({ sessionId, topic, year, handleClose }: SidebarC
     );
     if (error) {
       Sentry.captureException(error);
+      toast.show({ message: getApiError(error).message, variant: "error" });
       return;
     }
     if (!data.hasNextRound) {
@@ -54,14 +58,21 @@ export function SidebarContent({ sessionId, topic, year, handleClose }: SidebarC
   const onLeaveGame = async () => {
     const mutation = isHost ? endSession({ sessionId }) : leaveSession({ sessionId });
     const { error } = await tryCatch(mutation);
-    if (error) Sentry.captureException(error);
+    if (error) {
+      // Leave the room regardless — the player is done here either way.
+      Sentry.captureException(error);
+      toast.show({ message: getApiError(error).message, variant: "error" });
+    }
     navigate({ to: "/", replace: true });
   };
 
   const onKick = async (uid: string) => {
     if (!isHost) return;
     const { error } = await tryCatch(kickFromGame({ sessionId, uid }));
-    if (error) Sentry.captureException(error);
+    if (error) {
+      Sentry.captureException(error);
+      toast.show({ message: getApiError(error).message, variant: "error" });
+    }
   };
 
   return (

@@ -36,6 +36,7 @@ export const getMovies = action({
         `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.TMDB_API_KEY}&primary_release_date.gte=${startDate}&primary_release_date.lte=${endDate}&sort_by=popularity.desc&language=en-US&page=${page}`,
       );
 
+      // internal: plain Error — nothing user-actionable; UI shows its generic load failure
       if (!response.ok) throw new Error(`TMDB error: ${response.status}`);
 
       const data: TMDBResponse = await response.json();

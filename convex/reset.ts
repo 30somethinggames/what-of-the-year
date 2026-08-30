@@ -4,6 +4,7 @@ import { isProd } from "./utils/env";
 export const clearAll = internalMutation({
   handler: async (ctx) => {
     // Runtime guard, independent of cron registration: also blocks a manual dashboard run.
+    // internal: plain Error — internalMutation, never reaches a client.
     if (isProd()) throw new Error("Refusing to clear data on a prod deployment");
 
     const tables = [

@@ -5,6 +5,7 @@ import type { Id } from "./_generated/dataModel";
 import type { MutationCtx } from "./_generated/server";
 import { internalMutation, mutation, query } from "./_generated/server";
 import { requireSessionMember } from "./utils/auth";
+import { apiError } from "./utils/errors";
 import { getRoundByNumber } from "./utils/rounds";
 
 export const getRound = query({
@@ -29,7 +30,7 @@ export const advanceRound = mutation({
   },
   handler: async (ctx, { sessionId, currentRoundNumber }) => {
     const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Unauthenticated");
+    if (!identity) throw apiError("UNAUTHENTICATED", "Unauthenticated");
 
     const currentRound = await ctx.db
       .query("rounds")
@@ -37,7 +38,7 @@ export const advanceRound = mutation({
       .filter((q) => q.eq(q.field("number"), currentRoundNumber))
       .unique();
 
-    if (!currentRound) throw new Error("Round not found");
+    if (!currentRound) throw apiError("NOT_FOUND", "Round not found");
 
     if (currentRound.state === "revealing") {
       if (currentRound.revealJobId) {
@@ -58,7 +59,7 @@ export const advanceRound = mutation({
     }
 
     const session = await ctx.db.get(sessionId);
-    if (!session) throw new Error("Session not found");
+    if (!session) throw apiError("NOT_FOUND", "Session not found");
 
     const revealDurationMs = session.playerCount * 4_000 + 5_000;
     const revealEndsAt = Date.now() + revealDurationMs;
@@ -86,7 +87,7 @@ export const completeReveal = internalMutation({
   },
   handler: async (ctx, { sessionId, roundNumber }) => {
     const round = await getRoundByNumber(ctx.db, sessionId, roundNumber);
-    if (!round) throw new Error("Round not found");
+    if (!round) throw apiError("NOT_FOUND", "Round not found");
     if (round.state !== "revealing") return;
 
     return await completeRevealLogic(ctx, sessionId, roundNumber, round._id);
@@ -111,7 +112,7 @@ async function completeRevealLogic(
     const nextRoundNumber = roundNumber - 1;
 
     const nextRound = await getRoundByNumber(ctx.db, sessionId, nextRoundNumber);
-    if (!nextRound) throw new Error("Next round not found");
+    if (!nextRound) throw apiError("NOT_FOUND", "Next round not found");
 
     await ctx.db.patch(nextRound._id, {
       state: "open",

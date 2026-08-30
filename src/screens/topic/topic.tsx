@@ -6,12 +6,14 @@ import { Avatar, useRandomAvatar } from "components/avatar";
 import { Button } from "components/button";
 import { Container } from "components/container";
 import { Input } from "components/input";
+import { useToast } from "components/toast/use-toast";
 import type { TopicType } from "constants/topics";
 import { api } from "convex/_generated/api";
 import { useMutation } from "convex/react";
 import { MAX_NAME_LENGTH, validateName } from "convex/utils/validate";
 import type { SessionID } from "db/types";
 import { useTopicData } from "queries/use-topic-data";
+import { getApiError } from "utils/api-error";
 import { tryCatch } from "utils/try-catch";
 
 interface Props {
@@ -22,6 +24,7 @@ interface Props {
 
 export function Topic({ topic, year, existingSessionId }: Props) {
   const navigate = useNavigate();
+  const toast = useToast();
   const { isLoading } = useTopicData({ key: topic.value, year });
   const mutateJoin = useMutation(api.players.joinSession);
   const mutateCreate = useMutation(api.sessions.createSession);
@@ -37,8 +40,10 @@ export function Topic({ topic, year, existingSessionId }: Props) {
     if (isJoining) {
       const { error } = await tryCatch(mutateJoin({ sessionId: existingSessionId, name, avatar }));
       if (error) {
-        if (error.message === "Already joined this session") return;
+        // Expected when the player is already in: fall through to the lobby, no toast.
+        if (getApiError(error).code === "ALREADY_JOINED") return;
         Sentry.captureException(error);
+        toast.show({ message: getApiError(error).message, variant: "error" });
         return;
       }
     } else {
@@ -47,6 +52,7 @@ export function Topic({ topic, year, existingSessionId }: Props) {
       );
       if (error) {
         Sentry.captureException(error);
+        toast.show({ message: getApiError(error).message, variant: "error" });
         return;
       }
       navigate({
