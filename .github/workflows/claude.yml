@@ -8,11 +8,11 @@ on:
 
 jobs:
   claude:
-    # Interactive @claude — the resolve loop. Human actors only (default):
-    # Ryan comments "@claude fix the review comments" on a PR and the
-    # implementer picks the findings up on that branch. "@claude review" is
-    # the reviewer's manual trigger (claude-review.yml), not ours.
-    if: contains(github.event.comment.body, '@claude') && !contains(github.event.comment.body, '@claude review')
+    # "@claude review" belongs to claude-review.yml; members only — public repo.
+    if: >-
+      contains(github.event.comment.body, '@claude') &&
+      !contains(github.event.comment.body, '@claude review') &&
+      contains(fromJSON('["OWNER", "MEMBER"]'), github.event.comment.author_association)
     runs-on: ubuntu-latest
     timeout-minutes: 45
     permissions:
@@ -22,16 +22,17 @@ jobs:
       id-token: write
       actions: read
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 0
 
-      - uses: anthropics/claude-code-action@v1
+      - uses: anthropics/claude-code-action@8251c103ac8c1d761882c86aba1412c7f583c844 # v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           claude_args: |
             --model claude-sonnet-5
             --max-turns 60
+            --allowedTools "Bash(git:*),Bash(gh:*),Bash(bun:*),Bash(bunx:*),Read,Edit,Write,Glob,Grep,Agent"
 
       - name: Dump execution output on failure
         if: failure()
