@@ -11,7 +11,7 @@ interface Book {
 
 export function formBookOptions(books: Book[]): Option[] {
   return books.map((book) => ({
-    id: book.cover_i ?? (parseInt(book.key.replace(/\D/g, ""), 10) || 0),
+    id: parseInt(book.key.replace(/\D/g, ""), 10) || 0,
     name: book.title,
     cover: book.cover_i ? `https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg` : undefined,
     rating: book.ratings_average ? book.ratings_average * 20 : 0,
