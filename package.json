@@ -45,7 +45,7 @@
     "oxfmt": "0.65.0",
     "oxlint": "1.80.0",
     "tailwindcss": "4.3.3",
-    "typescript": "6.0.3",
+    "typescript": "7.0.2",
     "vite": "8.2.2"
   },
   "engines": {
