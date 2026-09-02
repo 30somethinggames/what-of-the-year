@@ -1,6 +1,6 @@
 import * as Sentry from "@sentry/react";
 import { useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { Autocomplete } from "components/autocomplete";
 import { Button } from "components/button";
@@ -57,14 +57,12 @@ export function Round({ sessionId, topic, year }: Props) {
   const [editingRound, setEditingRound] = useState<number | null>(null);
   const [selectedOption, setSelectedOption] = useState<Option | null>(null);
 
-  const availableOptions = useAvailableOptions(options, mySelections, editingRound);
+  // The screen stays mounted across rounds, so an edit begun in a round that has
+  // since closed is not cleared — it just stops counting as an edit.
+  const isEditing = editingRound === session?.activeRoundNumber && round?.state === "open";
+  const liveEditingRound = isEditing ? editingRound : null;
 
-  // Editing only survives while its round is open, so drop it when the round advances.
-  useEffect(() => {
-    setEditingRound(null);
-    setInputValue("");
-    setSelectedOption(null);
-  }, [session?.activeRoundNumber]);
+  const availableOptions = useAvailableOptions(options, mySelections, liveEditingRound);
 
   if (isLoading) return <Loading />;
   if (!session) return <DisplayError />;
@@ -99,14 +97,13 @@ export function Round({ sessionId, topic, year }: Props) {
     );
   }
 
-  const isEditing = editingRound !== null;
   const isDisabled = !selectedOption || (!isEditing && hasPickedThisRound);
 
   const onEnter = async () => {
     if (isDisabled || !selectedOption) return;
-    if (isEditing) {
+    if (liveEditingRound !== null) {
       const { error } = await tryCatch(
-        editSelection({ sessionId, roundNumber: editingRound, option: selectedOption }),
+        editSelection({ sessionId, roundNumber: liveEditingRound, option: selectedOption }),
       );
       if (error) {
         Sentry.captureException(error);
