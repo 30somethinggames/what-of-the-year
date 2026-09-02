@@ -1,14 +1,16 @@
 #!/bin/sh
 
-# Get staged TypeScript files
-STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(tsx?|ts|json)$' || true)
+# Get staged TypeScript/JSON files (oxfmt) and the TypeScript subset (oxlint —
+# it exits 1 with "No files found to lint" when handed only json)
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(tsx?|json)$' || true)
+LINT_FILES=$(echo "$STAGED_FILES" | grep -E '\.tsx?$' || true)
 
 if [ -n "$STAGED_FILES" ]; then
 
 # Format and lint staged files
 
 bunx oxfmt --no-error-on-unmatched-pattern $STAGED_FILES
-bunx oxlint --fix $STAGED_FILES
+[ -n "$LINT_FILES" ] && bunx oxlint --fix $LINT_FILES
 
 # Re-add formatted files
 
