@@ -63,16 +63,22 @@ interface Props {
   data: PickItem[];
   testID?: string;
   onEdit?: (item: MySelection) => void;
+  /** Only this round's pick gets an Edit button — closed rounds are locked server-side. */
+  editableRoundNumber?: number;
 }
 
-export function Picks({ data, testID, onEdit }: Props) {
+export function Picks({ data, testID, onEdit, editableRoundNumber }: Props) {
   return (
     <div data-testid={testID} className="flex flex-1 flex-col gap-sm">
       {data.map((item, index) =>
         "totalPoints" in item ? (
           <RankedRow key={item.pick.id} item={item} rank={index + 1} />
         ) : (
-          <SelectionRow key={item.pick.id} item={item} onEdit={onEdit} />
+          <SelectionRow
+            key={item.pick.id}
+            item={item}
+            onEdit={item.roundNumber === editableRoundNumber ? onEdit : undefined}
+          />
         ),
       )}
     </div>

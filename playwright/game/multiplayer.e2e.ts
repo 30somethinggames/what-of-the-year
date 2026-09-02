@@ -46,6 +46,14 @@ test("multiplayer: host flow with advance-round", async ({ page }) => {
   await page.getByTestId("submit-pick").click();
   await expect(page.getByTestId("submit-pick")).toBeDisabled();
 
+  // Round 10 is still open (others have not picked) — the pick can be edited
+  await page.getByTestId("edit-pick").click();
+  await expect(page.getByTestId("cancel-edit")).toBeVisible();
+  await expect(page.getByTestId("submit-pick")).toBeEnabled();
+  await page.getByTestId("submit-pick").click();
+  await expect(page.getByTestId("cancel-edit")).toHaveCount(0);
+  await expect(page.getByTestId("submit-pick")).toContainText("Enter");
+
   await makeSelection({ sessionId, uid: player2Uid, roundNumber: 10, pickName: "Elden Ring" });
   await makeSelection({ sessionId, uid: player3Uid, roundNumber: 10, pickName: "Elden Ring" });
 

@@ -57,7 +57,12 @@ export function Round({ sessionId, topic, year }: Props) {
   const [editingRound, setEditingRound] = useState<number | null>(null);
   const [selectedOption, setSelectedOption] = useState<Option | null>(null);
 
-  const availableOptions = useAvailableOptions(options, mySelections, editingRound);
+  // The screen stays mounted across rounds, so an edit begun in a round that has
+  // since closed is not cleared — it just stops counting as an edit.
+  const isEditing = editingRound === session?.activeRoundNumber && round?.state === "open";
+  const liveEditingRound = isEditing ? editingRound : null;
+
+  const availableOptions = useAvailableOptions(options, mySelections, liveEditingRound);
 
   if (isLoading) return <Loading />;
   if (!session) return <DisplayError />;
@@ -92,14 +97,13 @@ export function Round({ sessionId, topic, year }: Props) {
     );
   }
 
-  const isEditing = editingRound !== null;
   const isDisabled = !selectedOption || (!isEditing && hasPickedThisRound);
 
   const onEnter = async () => {
     if (isDisabled || !selectedOption) return;
-    if (isEditing) {
+    if (liveEditingRound !== null) {
       const { error } = await tryCatch(
-        editSelection({ sessionId, roundNumber: editingRound, option: selectedOption }),
+        editSelection({ sessionId, roundNumber: liveEditingRound, option: selectedOption }),
       );
       if (error) {
         Sentry.captureException(error);
@@ -153,7 +157,12 @@ export function Round({ sessionId, topic, year }: Props) {
 
   return (
     <Container>
-      <Picks testID="round-list" data={mySelections} onEdit={onEdit} />
+      <Picks
+        testID="round-list"
+        data={mySelections}
+        onEdit={onEdit}
+        editableRoundNumber={round?.state === "open" ? session.activeRoundNumber : undefined}
+      />
       <div className="mt-auto flex flex-col gap-md pt-md">
         <Autocomplete
           testID="pick-input"

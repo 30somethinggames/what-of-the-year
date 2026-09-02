@@ -56,6 +56,11 @@ export function SidebarContent({ sessionId, topic, year, handleClose }: SidebarC
   };
 
   const onLeaveGame = async () => {
+    // Navigate first: leaving deletes our player row, and the game screen's
+    // queries throw NOT_MEMBER the moment it does — which the root
+    // ErrorBoundary would turn into DisplayError instead of home.
+    await navigate({ to: "/", replace: true });
+
     const mutation = isHost ? endSession({ sessionId }) : leaveSession({ sessionId });
     const { error } = await tryCatch(mutation);
     if (error) {
@@ -63,7 +68,6 @@ export function SidebarContent({ sessionId, topic, year, handleClose }: SidebarC
       Sentry.captureException(error);
       toast.show({ message: getApiError(error).message, variant: "error" });
     }
-    navigate({ to: "/", replace: true });
   };
 
   const onKick = async (uid: string) => {
