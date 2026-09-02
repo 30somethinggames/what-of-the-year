@@ -13,7 +13,7 @@ import { getRoundByNumber } from "./utils/rounds";
 export const getSelections = query({
   args: { sessionId: v.id("sessions"), number: v.number() },
   handler: async (ctx, { sessionId, number }) => {
-    if (!(await requireSessionMember(ctx, sessionId))) return [];
+    await requireSessionMember(ctx, sessionId);
 
     const round = await getRoundByNumber(ctx.db, sessionId, number);
     if (!round) return [];
@@ -29,7 +29,6 @@ export const getMySelections = query({
   args: { sessionId: v.id("sessions") },
   handler: async (ctx, { sessionId }) => {
     const identity = await requireSessionMember(ctx, sessionId);
-    if (!identity) return [];
     const uid = identity.subject;
 
     const rounds = await ctx.db
@@ -68,8 +67,7 @@ export const saveSelection = mutation({
     option: optionArg,
   },
   handler: async (ctx, { sessionId, roundNumber, option }) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw apiError("UNAUTHENTICATED", "Unauthenticated");
+    const identity = await requireSessionMember(ctx, sessionId);
     const uid = identity.subject;
 
     await rateLimiter.limit(ctx, "saveSelection", { key: uid, throws: true });
@@ -129,12 +127,14 @@ export const editSelection = mutation({
     option: optionArg,
   },
   handler: async (ctx, { sessionId, roundNumber, option }) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw apiError("UNAUTHENTICATED", "Unauthenticated");
+    const identity = await requireSessionMember(ctx, sessionId);
     const uid = identity.subject;
+
+    await rateLimiter.limit(ctx, "editSelection", { key: uid, throws: true });
 
     const round = await getRoundByNumber(ctx.db, sessionId, roundNumber);
     if (!round) throw apiError("NOT_FOUND", "Round not found");
+    if (round.state !== "open") throw apiError("WRONG_STATE", "Round is not open");
 
     const existing = await ctx.db
       .query("selections")
@@ -153,7 +153,7 @@ export const editSelection = mutation({
 export const getResults = query({
   args: { sessionId: v.id("sessions") },
   handler: async (ctx, { sessionId }) => {
-    if (!(await requireSessionMember(ctx, sessionId))) return [];
+    await requireSessionMember(ctx, sessionId);
 
     const [allSelections, players] = await Promise.all([
       ctx.db

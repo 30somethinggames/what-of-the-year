@@ -37,12 +37,10 @@ test("single-player: full game", async ({ page }) => {
   await expect(page.getByTestId("reveal-skip")).toBeVisible();
   await page.getByTestId("reveal-skip").click();
 
-  // Edit pick after reveal
-  await page.getByTestId("edit-pick").click();
-  await expect(page.getByTestId("cancel-edit")).toBeVisible();
-  await expect(page.getByTestId("submit-pick")).toBeEnabled();
-  await page.getByTestId("submit-pick").click();
-  await expect(page.getByTestId("submit-pick")).toContainText("Enter");
+  // Round 10 is closed — its pick is locked, so no Edit affordance
+  await expect(page.getByText("Round 9")).toBeVisible();
+  await expect(page.getByTestId("round-list")).toBeVisible();
+  await expect(page.getByTestId("edit-pick")).toHaveCount(0);
 
   // Rounds 9–1
   const letters = ["c", "d", "e", "f", "g", "h", "m", "p", "s"];

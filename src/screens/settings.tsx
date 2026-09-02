@@ -1,9 +1,11 @@
+import * as Sentry from "@sentry/react";
 import { useNavigate } from "@tanstack/react-router";
 
 import { Button } from "components/button";
 import { Container } from "components/container";
 import { PlayerList } from "components/lists/players";
 import { Loading } from "components/states/loading";
+import { useToast } from "components/toast/use-toast";
 import { api } from "convex/_generated/api";
 import { useMutation } from "convex/react";
 import type { SessionID } from "db/types";
@@ -11,6 +13,8 @@ import { usePlayers } from "db/use-players";
 import { useSelections } from "db/use-selections";
 import { useSession } from "db/use-sessions";
 import { useGameOver } from "hooks/use-game-over";
+import { getApiError } from "utils/api-error";
+import { tryCatch } from "utils/try-catch";
 
 interface Props {
   sessionId: SessionID;
@@ -19,6 +23,7 @@ interface Props {
 
 export function Settings({ sessionId, round }: Props) {
   const navigate = useNavigate();
+  const toast = useToast();
   const { isLoading: isSessionLoading, session } = useSession(sessionId);
   const { isLoading: isPlayersLoading, players, isHost } = usePlayers(sessionId);
   const { isLoading: isSelectionsLoading, selections } = useSelections(sessionId, round);
@@ -35,10 +40,12 @@ export function Settings({ sessionId, round }: Props) {
   const completedUids = new Set(selections.map((s) => s.uid));
 
   const onNextRound = async () => {
-    await advanceRound({
-      sessionId,
-      currentRoundNumber: round,
-    });
+    const { error } = await tryCatch(advanceRound({ sessionId, currentRoundNumber: round }));
+    if (error) {
+      Sentry.captureException(error);
+      toast.show({ message: getApiError(error).message, variant: "error" });
+      return;
+    }
     window.history.back();
   };
 

@@ -4,6 +4,7 @@ import { internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
 import type { MutationCtx } from "./_generated/server";
 import { internalMutation, mutation, query } from "./_generated/server";
+import { rateLimiter } from "./ratelimits";
 import { requireSessionMember } from "./utils/auth";
 import { apiError } from "./utils/errors";
 import { getRoundByNumber } from "./utils/rounds";
@@ -11,7 +12,7 @@ import { getRoundByNumber } from "./utils/rounds";
 export const getRound = query({
   args: { sessionId: v.id("sessions"), number: v.number() },
   handler: async (ctx, { sessionId, number }) => {
-    if (!(await requireSessionMember(ctx, sessionId))) return null;
+    await requireSessionMember(ctx, sessionId);
 
     const round = await ctx.db
       .query("rounds")
@@ -29,8 +30,17 @@ export const advanceRound = mutation({
     currentRoundNumber: v.number(),
   },
   handler: async (ctx, { sessionId, currentRoundNumber }) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw apiError("UNAUTHENTICATED", "Unauthenticated");
+    const identity = await requireSessionMember(ctx, sessionId);
+    const uid = identity.subject;
+
+    const host = await ctx.db
+      .query("players")
+      .withIndex("by_session_uid", (q) => q.eq("sessionId", sessionId).eq("uid", uid))
+      .unique();
+
+    if (!host?.isHost) throw apiError("NOT_HOST", "Only the host can advance the round");
+
+    await rateLimiter.limit(ctx, "advanceRound", { key: uid, throws: true });
 
     const currentRound = await ctx.db
       .query("rounds")
@@ -39,6 +49,9 @@ export const advanceRound = mutation({
       .unique();
 
     if (!currentRound) throw apiError("NOT_FOUND", "Round not found");
+    if (currentRound.state !== "open" && currentRound.state !== "revealing") {
+      throw apiError("WRONG_STATE", "Round is not in play");
+    }
 
     if (currentRound.state === "revealing") {
       if (currentRound.revealJobId) {

@@ -1,6 +1,6 @@
 import * as Sentry from "@sentry/react";
 import { useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Autocomplete } from "components/autocomplete";
 import { Button } from "components/button";
@@ -58,6 +58,13 @@ export function Round({ sessionId, topic, year }: Props) {
   const [selectedOption, setSelectedOption] = useState<Option | null>(null);
 
   const availableOptions = useAvailableOptions(options, mySelections, editingRound);
+
+  // Editing only survives while its round is open, so drop it when the round advances.
+  useEffect(() => {
+    setEditingRound(null);
+    setInputValue("");
+    setSelectedOption(null);
+  }, [session?.activeRoundNumber]);
 
   if (isLoading) return <Loading />;
   if (!session) return <DisplayError />;
@@ -153,7 +160,12 @@ export function Round({ sessionId, topic, year }: Props) {
 
   return (
     <Container>
-      <Picks testID="round-list" data={mySelections} onEdit={onEdit} />
+      <Picks
+        testID="round-list"
+        data={mySelections}
+        onEdit={onEdit}
+        editableRoundNumber={round?.state === "open" ? session.activeRoundNumber : undefined}
+      />
       <div className="mt-auto flex flex-col gap-md pt-md">
         <Autocomplete
           testID="pick-input"
