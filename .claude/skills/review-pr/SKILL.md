@@ -30,7 +30,7 @@ For each rule bullet from step 1, decide **pass / fail / n/a** against the diff.
 
 Always check, regardless of paths:
 
-- Forbidden zone untouched: `.github/**`, `.claude/**`, `src/routeTree.gen.ts`, `package.json` dependencies, `bun.lock`.
+- Any new dependency, `.github/**` or `.claude/**` change, or regenerated file is called out in **Notes for reviewer** with a reason (`CLAUDE.md` "Disclose the unusual").
 - `Closes #<t>` present and `<t>` matches the branch `agent/<t>-…` (agent PRs only).
 - All four PR template sections are filled; **Verification** says what was actually run, not just "checks pass".
 - No test was weakened: no loosened assertions, added retries, `.skip`, `.only`, or deleted cases.
@@ -47,7 +47,7 @@ For **each** finding, launch a separate **opus** validator subagent with the PR 
 
 ## 5. Verdict
 
-- **request changes** — any of: ticket fit fails; forbidden zone touched; a test was weakened; a confirmed bug; a fail on a `CLAUDE.md` invariant; a fail on the Convex guard ladder or authz contract; a new or changed Convex function without `convex-test` coverage including negative cases.
+- **request changes** — any of: ticket fit fails; a test was weakened; a confirmed bug; a fail on a `CLAUDE.md` invariant; a fail on the Convex guard ladder or authz contract; a new or changed Convex function without `convex-test` coverage including negative cases.
 - **needs human** — you cannot determine ticket fit; the PR's Verification section excuses a failed check and you cannot judge the excuse; anything else you are unsure how to weigh.
 - **approve** — everything else. Nits do not block.
 

@@ -16,7 +16,7 @@ E2E: `bun run test:web` (Playwright, needs `.env.local`).
 
 ## Invariants
 
-- **Never modify without a human dev explicitly asking**: `.github/**`, `.claude/**`, `src/routeTree.gen.ts` (generated), or dependencies (`package.json` deps, `bun.lock`). Blocked work goes in the PR/ticket as a question instead.
+- **Disclose the unusual**: a new dependency, a CI or `.claude/` rules change, or a regenerated file gets its own line in the PR's **Notes for reviewer** saying why. A human reads every PR; make the surprising parts easy to find.
 - **Error handling in UI**: wrap every awaited Convex mutation/action call in `tryCatch` from `utils/try-catch`; on error, `Sentry.captureException(error)`, surface `error.message` via `useToast`, then early-return. Navigate/update state only on success. Never bare try/catch, never fire-and-forget mutations.
 - Import Sentry as a namespace (`import * as Sentry from "@sentry/react"`); it is initialized only in `services/sentry`.
 - Server-side authz **throws** — see `.claude/rules/convex.md` for the contract and the single exception.
