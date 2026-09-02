@@ -23,9 +23,8 @@ E2E: `bun run test:web` (Playwright, needs `.env.local`).
 
 ## Git
 
-- Conventional Commits: `type(scope): summary`, type ∈ `feat|fix|chore|ci`.
-- Human work: scope `seery/<topic>`, branches `seery/<topic>`.
-- Agent work: scope `agent/<topic>`, branches `agent/<issue#>-<slug>`.
+- Conventional Commits: `type(scope): summary`, type ∈ `feat|fix|chore|ci`. The scope is the area touched (`convex`, `lobby`, `round`, `ci`, `deps`, `rules`), never the author or the issue number. PR titles follow the same format.
+- Branches: human work `seery/<topic>`, agent work `agent/<issue#>-<slug>`. Provenance lives in the branch name and the `Co-Authored-By` trailer, not the commit scope.
 - Rebase onto the PR's base before pushing for review. `git log --oneline <base>..HEAD` shows only this PR's commits.
 - PRs fill every section of `.github/pull_request_template.md` (Summary / Changes / Verification / Notes for reviewer) and merge to `main` via squash or rebase only.
 - Never add a `Claude-Session` trailer to commits or a session link to PR bodies.

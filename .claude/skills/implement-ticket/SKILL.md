@@ -15,7 +15,7 @@ You are the pipeline's implement agent. The argument is a GitHub issue number in
 3. **Branch**: `git switch -c agent/<n>-<short-slug>` off `main`.
 4. **Implement** per the rules. Any new or changed Convex function ships `convex-test` coverage in this PR, including negative authz cases.
 5. **Verify**: `bun run check:format && bun run check:lint && bun run check:types && bun test`. Fix what fails. Never weaken a failing test to make it pass — if a test looks wrong, say so in the PR instead.
-6. **Commit**: `type(agent/<topic>): summary` (Conventional Commits; type ∈ feat|fix|chore|ci). The scope is a short descriptive TOPIC — e.g. `fix(agent/constants)`, `feat(agent/lobby)` — NEVER the issue number. Issue numbers belong only in the branch name and the `Closes #<n>` line. The PR title follows the same commit format.
+6. **Commit**: `type(scope): summary` (Conventional Commits; type ∈ feat|fix|chore|ci). The scope is the area touched — e.g. `fix(convex)`, `feat(lobby)` — NEVER the author and NEVER the issue number. Issue numbers belong only in the branch name and the `Closes #<n>` line. The PR title follows the same commit format.
 7. **Push and open the PR**: `gh pr create` filling every section of `.github/pull_request_template.md`: `## Summary` (MUST include `Closes #<n>` on its own line), `## Changes`, `## Verification` (say exactly what you ran and what you could not verify — no checkbox theatre), `## Notes for reviewer` (what to look at first, tradeoffs, anything you were unsure about).
 
 ## Blocked protocol
