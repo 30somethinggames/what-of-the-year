@@ -66,8 +66,9 @@ export default defineSchema({
     .index("by_session", ["sessionId"]),
 
   // Third-party responses (option lists per topic/year, the IGDB access token),
-  // keyed by `utils/cache` key builders. One row per key — writes overwrite,
-  // so the table stays bounded and needs no sweeper.
+  // keyed by `utils/cache` key builders. One row per key — writes overwrite, and
+  // the year in a key is parsed and range-checked first, so the table stays
+  // bounded (topics x offered years, plus the token) and needs no sweeper.
   apiCache: defineTable({
     key: v.string(),
     value: v.any(),

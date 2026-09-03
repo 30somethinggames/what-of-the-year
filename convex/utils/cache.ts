@@ -8,7 +8,8 @@ export const OPTIONS_TTL_MS = 24 * 60 * 60 * 1000;
 /** Refresh the IGDB token this far before it actually expires. */
 export const TOKEN_TTL_SKEW_MS = 5 * 60 * 1000;
 
-export function optionsKey(topic: TopicKey, year: string) {
+/** `year` is the parsed number, so `2025` and `02025` share one row. */
+export function optionsKey(topic: TopicKey, year: number) {
   return `options:${topic}:${year}`;
 }
 
@@ -27,8 +28,13 @@ const MAX_CACHED_BYTES = 900_000;
  * or an oversized payload is skipped rather than failing the caller's fetch.
  */
 export async function writeCache(ctx: ActionCtx, key: string, value: unknown, ttlMs: number) {
-  if (ttlMs <= 0) return;
-  if (JSON.stringify(value).length > MAX_CACHED_BYTES) return;
+  // Negated so a NaN ttl (a third-party response missing its expiry) is skipped
+  // too — it would otherwise store an `expiresAt` no comparison ever expires.
+  if (!(ttlMs > 0)) return;
+
+  const serialized = JSON.stringify(value);
+  if (serialized === undefined) return;
+  if (new TextEncoder().encode(serialized).length > MAX_CACHED_BYTES) return;
 
   await ctx.runMutation(internal.cache.write, { key, value, expiresAt: Date.now() + ttlMs });
 }

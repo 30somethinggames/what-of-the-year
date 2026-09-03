@@ -1,7 +1,7 @@
 import { afterAll, beforeEach, describe, expect, it } from "bun:test";
 
 import { api } from "../_generated/api";
-import { optionsKey } from "../utils/cache";
+import { IGDB_TOKEN_KEY, optionsKey } from "../utils/cache";
 import { MEMBER_UID, OUTSIDER_UID, setupTest } from "./harness.setup";
 
 // The actions must take the real third-party path, not the fixture shortcut.
@@ -33,12 +33,18 @@ const mockBook = {
   description: "A year in a dying town.",
 };
 
+/** A cached token IGDB no longer honours. */
+const STALE_TOKEN = "stale-token";
+
 const realFetch = globalThis.fetch;
 
 let requests: string[] = [];
 
 /** Set by the oversized-payload test; the IGDB mock serves this when present. */
 let oversizedGames: (typeof mockGame)[] | null = null;
+
+/** Cleared by the malformed-token test, so the Twitch mock omits its expiry. */
+let tokenExpiresIn: number | null = 5_000_000;
 
 function json(body: unknown) {
   return new Response(JSON.stringify(body), {
@@ -47,15 +53,26 @@ function json(body: unknown) {
   });
 }
 
-function mockFetch(input: string | URL | Request) {
+function mockFetch(input: string | URL | Request, init?: RequestInit) {
   const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
   requests.push(url);
 
   if (url.includes("api.themoviedb.org"))
     return Promise.resolve(json({ page: 1, total_pages: 1, results: [mockMovie] }));
   if (url.includes("id.twitch.tv"))
-    return Promise.resolve(json({ access_token: "twitch-token", expires_in: 5_000_000 }));
-  if (url.includes("api.igdb.com")) return Promise.resolve(json(oversizedGames ?? [mockGame]));
+    return Promise.resolve(
+      json({
+        access_token: "twitch-token",
+        ...(tokenExpiresIn === null ? {} : { expires_in: tokenExpiresIn }),
+      }),
+    );
+  if (url.includes("api.igdb.com")) {
+    // IGDB rejects a revoked token, as it would after the secret was rotated.
+    const auth = (init?.headers as Record<string, string> | undefined)?.Authorization;
+    if (auth === `Bearer ${STALE_TOKEN}`) return Promise.resolve(new Response("", { status: 401 }));
+
+    return Promise.resolve(json(oversizedGames ?? [mockGame]));
+  }
   if (url.includes("openlibrary.org"))
     return Promise.resolve(json({ numFound: 1, docs: [mockBook] }));
 
@@ -70,6 +87,7 @@ function hits(host: string) {
 beforeEach(() => {
   requests = [];
   oversizedGames = null;
+  tokenExpiresIn = 5_000_000;
   globalThis.fetch = mockFetch as unknown as typeof fetch;
 });
 
@@ -109,6 +127,22 @@ describe("option actions", () => {
       }),
     ).toEqual([mockBook]);
   });
+
+  it("reject a year outside the picker's range and call no third-party API", async () => {
+    const t = await setupTest();
+    const asMember = t.withIdentity({ subject: MEMBER_UID });
+
+    for (const year of ["1900", "9999", "not-a-year"]) {
+      await expect(asMember.action(api.tmdb.getMovies, { year })).rejects.toThrow(/Invalid year/);
+      await expect(asMember.action(api.igdb.getGames, { year })).rejects.toThrow(/Invalid year/);
+      await expect(asMember.action(api.openlibrary.getBooks, { year })).rejects.toThrow(
+        /Invalid year/,
+      );
+    }
+
+    expect(requests).toEqual([]);
+    expect(await t.run(async (ctx) => await ctx.db.query("apiCache").collect())).toEqual([]);
+  });
 });
 
 describe("option caching", () => {
@@ -138,6 +172,17 @@ describe("option caching", () => {
     expect(hits("openlibrary.org")).toBe(1);
   });
 
+  it("shares one cache row across spellings of the same year", async () => {
+    const t = await setupTest();
+    const asMember = t.withIdentity({ subject: MEMBER_UID });
+
+    await asMember.action(api.tmdb.getMovies, { year: "2025" });
+    expect(await asMember.action(api.tmdb.getMovies, { year: "02025" })).toEqual([mockMovie]);
+
+    expect(hits("api.themoviedb.org")).toBe(1);
+    expect(await t.run(async (ctx) => await ctx.db.query("apiCache").collect())).toHaveLength(1);
+  });
+
   it("reuses the Twitch token across IGDB fetches for different years", async () => {
     const t = await setupTest();
     const asMember = t.withIdentity({ subject: MEMBER_UID });
@@ -148,6 +193,55 @@ describe("option caching", () => {
 
     expect(hits("api.igdb.com")).toBe(2);
     expect(hits("id.twitch.tv")).toBe(1);
+  });
+
+  it("mints a fresh Twitch token and retries when IGDB rejects the cached one", async () => {
+    const t = await setupTest();
+    const asMember = t.withIdentity({ subject: MEMBER_UID });
+
+    await t.run(async (ctx) => {
+      await ctx.db.insert("apiCache", {
+        key: IGDB_TOKEN_KEY,
+        value: STALE_TOKEN,
+        expiresAt: Date.now() + 60_000,
+      });
+    });
+
+    expect(await asMember.action(api.igdb.getGames, { year: "2025" })).toEqual([mockGame]);
+
+    // The 401 with the stale token, then the retry with the freshly minted one.
+    expect(hits("api.igdb.com")).toBe(2);
+    expect(hits("id.twitch.tv")).toBe(1);
+
+    // The stale token is gone, so the next call starts from the working one.
+    expect(
+      await t.run(async (ctx) =>
+        ctx.db
+          .query("apiCache")
+          .withIndex("by_key", (q) => q.eq("key", IGDB_TOKEN_KEY))
+          .unique(),
+      ),
+    ).toMatchObject({ value: "twitch-token" });
+  });
+
+  it("does not cache a Twitch token whose response carries no expiry", async () => {
+    const t = await setupTest();
+    const asMember = t.withIdentity({ subject: MEMBER_UID });
+    tokenExpiresIn = null;
+
+    await asMember.action(api.igdb.getGames, { year: "2025" });
+    await asMember.action(api.igdb.getGames, { year: "2024" });
+
+    // A NaN TTL must be skipped, not stored as an expiry that never lapses.
+    expect(hits("id.twitch.tv")).toBe(2);
+    expect(
+      await t.run(async (ctx) =>
+        ctx.db
+          .query("apiCache")
+          .withIndex("by_key", (q) => q.eq("key", IGDB_TOKEN_KEY))
+          .unique(),
+      ),
+    ).toBeNull();
   });
 
   it("serves but does not cache a payload too large for a Convex document", async () => {
@@ -176,7 +270,7 @@ describe("option caching", () => {
     await t.run(async (ctx) => {
       const entry = await ctx.db
         .query("apiCache")
-        .withIndex("by_key", (q) => q.eq("key", optionsKey("movies", "2025")))
+        .withIndex("by_key", (q) => q.eq("key", optionsKey("movies", 2025)))
         .unique();
       await ctx.db.patch(entry!._id, { expiresAt: Date.now() - 1 });
     });
