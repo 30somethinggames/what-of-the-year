@@ -61,3 +61,23 @@ test("lobby: player leaves and host sees update", async ({ browser }) => {
   await hostContext.close();
   await guestContext.close();
 });
+
+test("lobby: host reopening the lobby URL mid-game lands on the active round", async ({ page }) => {
+  await page.goto("/");
+  await page.getByTestId("home-start").click();
+  await page.getByTestId("name-input").pressSequentially("Host");
+  await page.getByTestId("setup-submit").click();
+
+  await expect(page.getByTestId("lobby-start")).toBeVisible();
+  const sessionId = await page.getByTestId("session-id").getAttribute("data-value");
+
+  await page.getByTestId("lobby-start").click();
+  await expect(page.getByTestId("pick-input")).toBeVisible();
+
+  // Host reloads the lobby URL while the game is active
+  await page.goto(`/games/2026/${sessionId}`);
+
+  await expect(page).toHaveURL(`/games/2026/${sessionId}/10`);
+  await expect(page.getByTestId("pick-input")).toBeVisible();
+  await expect(page.getByTestId("lobby-start")).toHaveCount(0);
+});
