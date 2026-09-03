@@ -4,6 +4,7 @@ import { api } from "../_generated/api";
 import type { Id } from "../_generated/dataModel";
 import { MAX_ROUNDS } from "../constants";
 import {
+  HOST_UID,
   MEMBER_UID,
   OPTION,
   OUTSIDER_UID,
@@ -209,6 +210,7 @@ describe("selection queries", () => {
     const t = await setupTest();
     const game = await seedActiveGame(t);
     await seedSelection(t, game, MEMBER_UID);
+    await setRoundState(t, game.roundIds[MAX_ROUNDS - 1], "closed");
 
     const asMember = t.withIdentity({ subject: MEMBER_UID });
     const { sessionId } = game;
@@ -222,6 +224,108 @@ describe("selection queries", () => {
         pick: { id: String(OPTION.id), name: OPTION.name },
         totalPoints: 1,
         votes: [{ playerName: "Member", playerAvatar: "🦊", points: 1 }],
+      },
+    ]);
+  });
+});
+
+describe("getSelections pre-reveal", () => {
+  it("withholds every pick while the round is open", async () => {
+    const t = await setupTest();
+    const game = await seedActiveGame(t);
+    await seedSelection(t, game, HOST_UID);
+    await seedSelection(t, game, MEMBER_UID);
+
+    const selections = await t
+      .withIdentity({ subject: MEMBER_UID })
+      .query(api.selections.getSelections, { sessionId: game.sessionId, number: MAX_ROUNDS });
+
+    expect(selections.map((s) => s.uid).sort()).toEqual([HOST_UID, MEMBER_UID].sort());
+    expect(selections.map((s) => s.pick)).toEqual([null, null]);
+    expect(JSON.stringify(selections)).not.toContain(OPTION.name);
+  });
+
+  it("withholds picks on a pending round", async () => {
+    const t = await setupTest();
+    const game = await seedActiveGame(t);
+    await seedSelection(t, game, MEMBER_UID);
+    await setRoundState(t, game.roundIds[MAX_ROUNDS - 1], "pending");
+
+    const selections = await t
+      .withIdentity({ subject: MEMBER_UID })
+      .query(api.selections.getSelections, { sessionId: game.sessionId, number: MAX_ROUNDS });
+
+    expect(selections.map((s) => s.pick)).toEqual([null]);
+  });
+
+  it("returns the picks once the round is revealing", async () => {
+    const t = await setupTest();
+    const game = await seedActiveGame(t);
+    await seedSelection(t, game, MEMBER_UID);
+    await setRoundState(t, game.roundIds[MAX_ROUNDS - 1], "revealing");
+
+    const selections = await t
+      .withIdentity({ subject: MEMBER_UID })
+      .query(api.selections.getSelections, { sessionId: game.sessionId, number: MAX_ROUNDS });
+
+    expect(selections.map((s) => s.pick?.name)).toEqual([OPTION.name]);
+  });
+
+  it("returns the picks once the round is closed", async () => {
+    const t = await setupTest();
+    const game = await seedActiveGame(t);
+    await seedSelection(t, game, MEMBER_UID);
+    await setRoundState(t, game.roundIds[MAX_ROUNDS - 1], "closed");
+
+    const selections = await t
+      .withIdentity({ subject: MEMBER_UID })
+      .query(api.selections.getSelections, { sessionId: game.sessionId, number: MAX_ROUNDS });
+
+    expect(selections.map((s) => s.pick?.name)).toEqual([OPTION.name]);
+  });
+});
+
+describe("getResults pre-reveal", () => {
+  it("omits an unrevealed round from the tally", async () => {
+    const t = await setupTest();
+    const game = await seedActiveGame(t);
+    await seedSelection(t, game, MEMBER_UID);
+
+    expect(
+      await t
+        .withIdentity({ subject: MEMBER_UID })
+        .query(api.selections.getResults, { sessionId: game.sessionId }),
+    ).toEqual([]);
+  });
+
+  it("tallies only the rounds that have revealed", async () => {
+    const t = await setupTest();
+    const game = await seedActiveGame(t);
+
+    // Round MAX_ROUNDS - 1 has closed; the active round is still open.
+    await seedSelection(t, game, MEMBER_UID);
+    await t.run(async (ctx) => {
+      await ctx.db.insert("selections", {
+        sessionId: game.sessionId,
+        roundId: game.roundIds[MAX_ROUNDS - 2],
+        uid: MEMBER_UID,
+        pick: { id: "999", name: "Revealed Pick" },
+        points: 2,
+        roundNumber: MAX_ROUNDS - 1,
+        savedAt: Date.now(),
+      });
+    });
+    await setRoundState(t, game.roundIds[MAX_ROUNDS - 2], "closed");
+
+    expect(
+      await t
+        .withIdentity({ subject: MEMBER_UID })
+        .query(api.selections.getResults, { sessionId: game.sessionId }),
+    ).toEqual([
+      {
+        pick: { id: "999", name: "Revealed Pick" },
+        totalPoints: 2,
+        votes: [{ playerName: "Member", playerAvatar: "🦊", points: 2 }],
       },
     ]);
   });
