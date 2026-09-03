@@ -49,9 +49,14 @@ export function Settings({ sessionId, round }: Props) {
     window.history.back();
   };
 
-  const onLeaveGame = () => {
+  const onLeaveGame = async () => {
     if (isHost) {
-      endSession({ sessionId });
+      const { error } = await tryCatch(endSession({ sessionId }));
+      if (error) {
+        // Leave the room regardless — the host is done here either way.
+        Sentry.captureException(error);
+        toast.show({ message: getApiError(error).message, variant: "error" });
+      }
     }
     navigate({ to: "/", replace: true });
   };

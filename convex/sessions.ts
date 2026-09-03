@@ -88,8 +88,26 @@ export const endSession = mutation({
 
     if (!host?.isHost) throw apiError("NOT_HOST", "Only the host can end the session");
 
+    // No rate limit: a one-shot lifecycle transition — the ENDED assert below
+    // rejects every repeat, so there is nothing to throttle.
     const session = await ctx.db.get(sessionId);
     if (!session) throw apiError("NOT_FOUND", "Session not found");
+    if (session.status === SessionStatus.ENDED) {
+      throw apiError("SESSION_CLOSED", "Session has already ended");
+    }
+
+    // A reveal job scheduled by the round in play would fire after the session
+    // ends and re-open the next round — cancel it and clear its round fields.
+    const rounds = await ctx.db
+      .query("rounds")
+      .withIndex("by_session", (q) => q.eq("sessionId", sessionId))
+      .collect();
+
+    for (const round of rounds) {
+      if (!round.revealJobId) continue;
+      await ctx.scheduler.cancel(round.revealJobId);
+      await ctx.db.patch(round._id, { revealJobId: undefined, revealEndsAt: undefined });
+    }
 
     await ctx.db.patch(sessionId, { status: SessionStatus.ENDED });
   },
@@ -112,6 +130,12 @@ export const startSession = mutation({
       .unique();
 
     if (!host?.isHost) throw apiError("NOT_HOST", "Only the host can start the session");
+
+    // No rate limit: a one-shot lifecycle transition — the LOBBY assert below
+    // rejects every repeat, so there is nothing to throttle.
+    if (session.status !== SessionStatus.LOBBY) {
+      throw apiError("WRONG_STATE", "Session has already started");
+    }
 
     const round = await ctx.db
       .query("rounds")

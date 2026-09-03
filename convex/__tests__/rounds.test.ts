@@ -1,8 +1,15 @@
 import { describe, expect, it } from "bun:test";
 
-import { api } from "../_generated/api";
-import { MAX_ROUNDS } from "../constants";
-import { HOST_UID, MEMBER_UID, OUTSIDER_UID, seedActiveGame, setupTest } from "./harness.setup";
+import { api, internal } from "../_generated/api";
+import { MAX_ROUNDS, SessionStatus } from "../constants";
+import {
+  HOST_UID,
+  MEMBER_UID,
+  OUTSIDER_UID,
+  seedActiveGame,
+  seedSelection,
+  setupTest,
+} from "./harness.setup";
 
 describe("getRound", () => {
   it("throws for a non-member", async () => {
@@ -119,5 +126,74 @@ describe("advanceRound", () => {
         .withIdentity({ subject: HOST_UID })
         .mutation(api.rounds.advanceRound, { sessionId, currentRoundNumber: 1 }),
     ).rejects.toThrow(/WRONG_STATE/);
+  });
+
+  it("throws once the session has ended and leaves the rounds untouched", async () => {
+    const t = await setupTest();
+    const { sessionId, roundIds } = await seedActiveGame(t);
+    const host = t.withIdentity({ subject: HOST_UID });
+
+    await host.mutation(api.sessions.endSession, { sessionId });
+
+    await expect(
+      host.mutation(api.rounds.advanceRound, { sessionId, currentRoundNumber: MAX_ROUNDS }),
+    ).rejects.toThrow(/WRONG_STATE/);
+
+    const { current, next } = await t.run(async (ctx) => ({
+      current: await ctx.db.get(roundIds[MAX_ROUNDS - 1]),
+      next: await ctx.db.get(roundIds[MAX_ROUNDS - 2]),
+    }));
+
+    expect(current?.state).toBe("open");
+    expect(next?.state).toBe("pending");
+  });
+});
+
+describe("completeReveal", () => {
+  it("closes the revealing round and opens the next one", async () => {
+    const t = await setupTest();
+    const game = await seedActiveGame(t);
+    await seedSelection(t, game, MEMBER_UID);
+    const { sessionId, roundIds } = game;
+
+    await t
+      .withIdentity({ subject: HOST_UID })
+      .mutation(api.rounds.advanceRound, { sessionId, currentRoundNumber: MAX_ROUNDS });
+
+    await t.mutation(internal.rounds.completeReveal, { sessionId, roundNumber: MAX_ROUNDS });
+
+    const { session, current, next } = await t.run(async (ctx) => ({
+      session: await ctx.db.get(sessionId),
+      current: await ctx.db.get(roundIds[MAX_ROUNDS - 1]),
+      next: await ctx.db.get(roundIds[MAX_ROUNDS - 2]),
+    }));
+
+    expect(session?.activeRoundNumber).toBe(MAX_ROUNDS - 1);
+    expect(current?.state).toBe("closed");
+    expect(next?.state).toBe("open");
+  });
+
+  it("does nothing once the session has ended", async () => {
+    const t = await setupTest();
+    const game = await seedActiveGame(t);
+    await seedSelection(t, game, MEMBER_UID);
+    const host = t.withIdentity({ subject: HOST_UID });
+    const { sessionId, roundIds } = game;
+
+    await host.mutation(api.rounds.advanceRound, { sessionId, currentRoundNumber: MAX_ROUNDS });
+    await host.mutation(api.sessions.endSession, { sessionId });
+
+    await t.mutation(internal.rounds.completeReveal, { sessionId, roundNumber: MAX_ROUNDS });
+
+    const { session, current, next } = await t.run(async (ctx) => ({
+      session: await ctx.db.get(sessionId),
+      current: await ctx.db.get(roundIds[MAX_ROUNDS - 1]),
+      next: await ctx.db.get(roundIds[MAX_ROUNDS - 2]),
+    }));
+
+    expect(session?.status).toBe(SessionStatus.ENDED);
+    expect(session?.activeRoundNumber).toBe(MAX_ROUNDS);
+    expect(current?.state).toBe("revealing");
+    expect(next?.state).toBe("pending");
   });
 });
