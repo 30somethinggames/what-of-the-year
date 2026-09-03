@@ -8,7 +8,7 @@ import { rateLimiter } from "./ratelimits";
 import { requireSessionMember } from "./utils/auth";
 import { apiError } from "./utils/errors";
 import { buildPickArg } from "./utils/pick";
-import { getRoundByNumber } from "./utils/rounds";
+import { getRoundByNumber, isRoundRevealed } from "./utils/rounds";
 
 export const getSelections = query({
   args: { sessionId: v.id("sessions"), number: v.number() },
@@ -18,10 +18,21 @@ export const getSelections = query({
     const round = await getRoundByNumber(ctx.db, sessionId, number);
     if (!round) return [];
 
-    return await ctx.db
+    const selections = await ctx.db
       .query("selections")
       .withIndex("by_round_uid", (q) => q.eq("roundId", round._id))
       .collect();
+
+    // Clients subscribe to this live while the round is open, so a pick sent
+    // pre-reveal sits in every opponent's memory. Until the round reveals, send
+    // only the uids the who-has-picked indicator needs.
+    const revealed = isRoundRevealed(round);
+
+    return selections.map((sel) => ({
+      _id: sel._id,
+      uid: sel.uid,
+      pick: revealed ? sel.pick : null,
+    }));
   },
 });
 
@@ -155,7 +166,7 @@ export const getResults = query({
   handler: async (ctx, { sessionId }) => {
     await requireSessionMember(ctx, sessionId);
 
-    const [allSelections, players] = await Promise.all([
+    const [allSelections, players, rounds] = await Promise.all([
       ctx.db
         .query("selections")
         .withIndex("by_session", (q) => q.eq("sessionId", sessionId))
@@ -164,7 +175,15 @@ export const getResults = query({
         .query("players")
         .withIndex("by_session_uid", (q) => q.eq("sessionId", sessionId))
         .collect(),
+      ctx.db
+        .query("rounds")
+        .withIndex("by_session", (q) => q.eq("sessionId", sessionId))
+        .collect(),
     ]);
+
+    // Any member can run this mid-game, so a still-secret round must not be
+    // tallied here either.
+    const revealedRoundIds = new Set(rounds.filter(isRoundRevealed).map((r) => r._id));
 
     const playerMap = new Map(players.map((p) => [p.uid, p]));
     const pickMap = new Map<
@@ -177,6 +196,8 @@ export const getResults = query({
     >();
 
     for (const sel of allSelections) {
+      if (!revealedRoundIds.has(sel.roundId)) continue;
+
       const key = sel.pick.id;
       const player = playerMap.get(sel.uid);
       const vote = {

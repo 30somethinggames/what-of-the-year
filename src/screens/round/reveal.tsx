@@ -31,8 +31,9 @@ export function Reveal({ selections, players, revealEndsAt, isHost, onSkip }: Pr
     return () => clearTimeout(timer);
   }, [activeIndex, selections.length]);
 
+  // `pick` is null until the server reveals the round, so there is nothing to show.
   const current = selections[activeIndex];
-  if (!current) return null;
+  if (!current?.pick) return null;
 
   const player = playerMap.get(current.uid);
 

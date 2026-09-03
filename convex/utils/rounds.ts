@@ -1,5 +1,13 @@
-import type { Id } from "../_generated/dataModel";
+import type { Doc, Id } from "../_generated/dataModel";
 import type { DatabaseReader } from "../_generated/server";
+
+/**
+ * Whether a round's picks may leave the server. Until the round starts
+ * revealing, every pick is secret — clients only learn who has picked.
+ */
+export function isRoundRevealed(round: Doc<"rounds">) {
+  return round.state === "revealing" || round.state === "closed";
+}
 
 export async function getRoundByNumber(
   db: DatabaseReader,
