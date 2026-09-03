@@ -1,7 +1,10 @@
 import { v } from "convex/values";
 
 import { action } from "./_generated/server";
+import { Topic } from "./constants";
 import { fixtureMovies } from "./test/fixtures";
+import { requireOptionsAccess } from "./utils/auth";
+import { OPTIONS_TTL_MS, optionsKey, readCache, writeCache } from "./utils/cache";
 import { useFixtures } from "./utils/env";
 
 interface Movie {
@@ -21,8 +24,14 @@ interface TMDBResponse {
 
 export const getMovies = action({
   args: { year: v.string() },
-  handler: async (_, { year }) => {
+  handler: async (ctx, { year }) => {
+    await requireOptionsAccess(ctx, "getMovies");
+
     if (useFixtures()) return fixtureMovies(year);
+
+    const key = optionsKey(Topic.MOVIES, year);
+    const cached = await readCache<Movie[]>(ctx, key);
+    if (cached) return cached;
 
     const startDate = `${year}-01-01`;
     const endDate = `${year}-12-31`;
@@ -44,6 +53,8 @@ export const getMovies = action({
       totalPages = data.total_pages;
       page++;
     }
+
+    await writeCache(ctx, key, allMovies, OPTIONS_TTL_MS);
 
     return allMovies;
   },

@@ -12,6 +12,7 @@ export const clearAll = internalMutation({
       "players",
       "rounds",
       "selections",
+      "apiCache",
       "authAccounts",
       "authSessions",
       "authVerificationCodes",
