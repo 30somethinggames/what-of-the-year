@@ -1,0 +1,30 @@
+name: Upstream health
+
+# Weekly probe of the third-party APIs (TMDB, IGDB/Twitch, Open Library) through
+# the dev deployment's own keys. PR CI runs on fixtures and never touches them,
+# so this is the only automated signal that a key was revoked or a response
+# shape drifted. A failed run shows red here and GitHub emails the repo owner.
+on:
+  schedule:
+    - cron: "0 13 * * 1" # Mondays 13:00 UTC
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Probe upstreams through the dev deployment
+        env:
+          HEALTH_URL: https://rosy-anteater-532.convex.site/health/upstreams
+        run: |
+          response=$(curl -sS -w '\n%{http_code}' "$HEALTH_URL")
+          status=${response##*$'\n'}
+          body=${response%$'\n'*}
+          echo "$body"
+          if [ "$status" != "200" ]; then
+            echo "::error::Upstream health check failed with HTTP $status"
+            exit 1
+          fi
