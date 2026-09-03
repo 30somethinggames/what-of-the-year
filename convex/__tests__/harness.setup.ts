@@ -100,6 +100,24 @@ export async function seedActiveGame(t: TestConvex): Promise<SeededGame> {
   });
 }
 
+/**
+ * A LOBBY session with a host, one other member, and `MAX_ROUNDS` `pending`
+ * rounds (matching `createSession`).
+ */
+export async function seedLobbyGame(t: TestConvex): Promise<SeededGame> {
+  const game = await seedActiveGame(t);
+
+  await t.run(async (ctx) => {
+    await ctx.db.patch(game.sessionId, {
+      status: SessionStatus.LOBBY,
+      activeRoundNumber: 1,
+    });
+    await ctx.db.patch(game.roundIds[MAX_ROUNDS - 1], { state: "pending", startedAt: null });
+  });
+
+  return game;
+}
+
 export const OPTION = {
   id: 1234,
   name: "Blue Prince",
@@ -108,3 +126,18 @@ export const OPTION = {
   first_release_date: 1_744_000_000,
   summary: "A house of many doors.",
 };
+
+/** A saved `OPTION` pick by `uid` on the highest-numbered round. */
+export async function seedSelection(t: TestConvex, game: SeededGame, uid: string) {
+  await t.run(async (ctx) => {
+    await ctx.db.insert("selections", {
+      sessionId: game.sessionId,
+      roundId: game.roundIds[MAX_ROUNDS - 1],
+      uid,
+      pick: { id: String(OPTION.id), name: OPTION.name },
+      points: 1,
+      roundNumber: MAX_ROUNDS,
+      savedAt: Date.now(),
+    });
+  });
+}

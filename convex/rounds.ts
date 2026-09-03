@@ -4,6 +4,7 @@ import { internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
 import type { MutationCtx } from "./_generated/server";
 import { internalMutation, mutation, query } from "./_generated/server";
+import { SessionStatus } from "./constants";
 import { rateLimiter } from "./ratelimits";
 import { requireSessionMember } from "./utils/auth";
 import { apiError } from "./utils/errors";
@@ -42,6 +43,12 @@ export const advanceRound = mutation({
 
     await rateLimiter.limit(ctx, "advanceRound", { key: uid, throws: true });
 
+    const session = await ctx.db.get(sessionId);
+    if (!session) throw apiError("NOT_FOUND", "Session not found");
+    if (session.status !== SessionStatus.ACTIVE) {
+      throw apiError("WRONG_STATE", "Session is not in play");
+    }
+
     const currentRound = await ctx.db
       .query("rounds")
       .withIndex("by_session", (q) => q.eq("sessionId", sessionId))
@@ -71,9 +78,6 @@ export const advanceRound = mutation({
       return await completeRevealLogic(ctx, sessionId, currentRoundNumber, currentRound._id);
     }
 
-    const session = await ctx.db.get(sessionId);
-    if (!session) throw apiError("NOT_FOUND", "Session not found");
-
     const revealDurationMs = session.playerCount * 4_000 + 5_000;
     const revealEndsAt = Date.now() + revealDurationMs;
 
@@ -99,6 +103,12 @@ export const completeReveal = internalMutation({
     roundNumber: v.number(),
   },
   handler: async (ctx, { sessionId, roundNumber }) => {
+    // Internal: no auth or rate limit — only the scheduler reaches this, running
+    // jobs queued by `advanceRound` and `saveSelection`.
+    const session = await ctx.db.get(sessionId);
+    if (!session) throw apiError("NOT_FOUND", "Session not found");
+    if (session.status === SessionStatus.ENDED) return;
+
     const round = await getRoundByNumber(ctx.db, sessionId, roundNumber);
     if (!round) throw apiError("NOT_FOUND", "Round not found");
     if (round.state !== "revealing") return;

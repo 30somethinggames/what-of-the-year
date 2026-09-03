@@ -9,25 +9,11 @@ import {
   OPTION,
   OUTSIDER_UID,
   seedActiveGame,
+  seedSelection,
   setupTest,
-  type SeededGame,
 } from "./harness.setup";
 
 type TestConvex = Awaited<ReturnType<typeof setupTest>>;
-
-async function seedSelection(t: TestConvex, game: SeededGame, uid: string) {
-  await t.run(async (ctx) => {
-    await ctx.db.insert("selections", {
-      sessionId: game.sessionId,
-      roundId: game.roundIds[MAX_ROUNDS - 1],
-      uid,
-      pick: { id: String(OPTION.id), name: OPTION.name },
-      points: 1,
-      roundNumber: MAX_ROUNDS,
-      savedAt: Date.now(),
-    });
-  });
-}
 
 async function setRoundState(
   t: TestConvex,
