@@ -64,6 +64,29 @@ async function getAccessToken(ctx: ActionCtx, refresh = false): Promise<string> 
   return data.access_token;
 }
 
+/**
+ * Run an IGDB query with the cached Twitch token. A 401 means the cached token
+ * is dead (secret rotated, token revoked) well before its TTL — mint a fresh
+ * one and retry once rather than stay wedged.
+ */
+export async function igdbQuery(ctx: ActionCtx, body: string): Promise<Response> {
+  const query = (accessToken: string) =>
+    fetch("https://api.igdb.com/v4/games", {
+      method: "POST",
+      headers: {
+        "Client-ID": process.env.IGDB_CLIENT_ID!,
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "text/plain",
+      },
+      body,
+    });
+
+  const response = await query(await getAccessToken(ctx));
+  if (response.status !== 401) return response;
+
+  return query(await getAccessToken(ctx, true));
+}
+
 export const getGames = action({
   args: { year: v.string() },
   handler: async (ctx, { year }) => {
@@ -76,28 +99,16 @@ export const getGames = action({
     const cached = await readCache<Game[]>(ctx, key);
     if (cached) return cached;
 
-    const fetchGames = (accessToken: string) =>
-      fetch("https://api.igdb.com/v4/games", {
-        method: "POST",
-        headers: {
-          "Client-ID": process.env.IGDB_CLIENT_ID!,
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "text/plain",
-        },
-        body: `
+    const response = await igdbQuery(
+      ctx,
+      `
           fields name, cover.url, rating, aggregated_rating, total_rating, total_rating_count, first_release_date, summary;
           where first_release_date >= ${startDate} & first_release_date < ${endDate}
             & total_rating != null;
           sort total_rating desc;
           limit 500;
         `,
-      });
-
-    let response = await fetchGames(await getAccessToken(ctx));
-
-    // A 401 means the cached token is dead (secret rotated, token revoked) well
-    // before its TTL — mint a fresh one and retry once rather than stay wedged.
-    if (response.status === 401) response = await fetchGames(await getAccessToken(ctx, true));
+    );
 
     // internal: plain Error — nothing user-actionable; UI shows its generic load failure
     if (!response.ok) throw new Error(`IGDB error: ${response.status}`);
