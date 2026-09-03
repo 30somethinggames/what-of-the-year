@@ -9,6 +9,7 @@
  */
 
 import type * as auth from "../auth.js";
+import type * as cache from "../cache.js";
 import type * as constants from "../constants.js";
 import type * as crons from "../crons.js";
 import type * as http from "../http.js";
@@ -24,6 +25,7 @@ import type * as test_http from "../test/http.js";
 import type * as test_seed from "../test/seed.js";
 import type * as tmdb from "../tmdb.js";
 import type * as utils_auth from "../utils/auth.js";
+import type * as utils_cache from "../utils/cache.js";
 import type * as utils_dates from "../utils/dates.js";
 import type * as utils_pick from "../utils/pick.js";
 import type * as utils_rounds from "../utils/rounds.js";
@@ -37,6 +39,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
+  cache: typeof cache;
   constants: typeof constants;
   crons: typeof crons;
   http: typeof http;
@@ -52,6 +55,7 @@ declare const fullApi: ApiFromModules<{
   "test/seed": typeof test_seed;
   tmdb: typeof tmdb;
   "utils/auth": typeof utils_auth;
+  "utils/cache": typeof utils_cache;
   "utils/dates": typeof utils_dates;
   "utils/pick": typeof utils_pick;
   "utils/rounds": typeof utils_rounds;

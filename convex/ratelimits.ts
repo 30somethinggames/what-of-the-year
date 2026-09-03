@@ -8,4 +8,8 @@ export const rateLimiter = new RateLimiter(components.rateLimiter, {
   saveSelection: { kind: "token bucket", rate: 20, period: MINUTE },
   editSelection: { kind: "token bucket", rate: 20, period: MINUTE },
   advanceRound: { kind: "token bucket", rate: 30, period: MINUTE },
+  // Option actions: one fetch per topic/year, cached server-side afterwards.
+  getMovies: { kind: "token bucket", rate: 10, period: MINUTE },
+  getGames: { kind: "token bucket", rate: 10, period: MINUTE },
+  getBooks: { kind: "token bucket", rate: 10, period: MINUTE },
 });
