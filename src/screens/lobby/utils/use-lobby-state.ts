@@ -19,7 +19,7 @@ export function useLobbyState({ sessionId, topic, year }: LobbyProps) {
   useGameOver({ isHost, session });
 
   useEffect(() => {
-    if (!isLoading && session && session.status === SessionStatus.ACTIVE && !isHost) {
+    if (!isLoading && session && session.status === SessionStatus.ACTIVE) {
       navigate({
         to: "/$topic/$year/$sessionId/$round",
         params: {
@@ -31,7 +31,7 @@ export function useLobbyState({ sessionId, topic, year }: LobbyProps) {
         replace: true,
       });
     }
-  }, [isLoading, session?.status, isHost, topic.value, year, sessionId]);
+  }, [isLoading, session?.status, topic.value, year, sessionId]);
 
   return {
     isLoading,
