@@ -10,11 +10,14 @@ interface Props {
 
 export function DisplayError({ message = "Something went wrong", onRetry }: Props) {
   return (
-    <div className="flex flex-1 flex-row items-center justify-center gap-lg px-lg">
+    <div
+      data-testid="error-state"
+      className="flex flex-1 flex-row items-center justify-center gap-lg px-lg"
+    >
       <Avatar source={SAD_ROBOT} size={80} />
       <div className="flex shrink flex-col gap-md">
         <p className="font-medium text-lg text-black-100">{message}</p>
-        {onRetry ? <Button label="Retry" onClick={onRetry} /> : null}
+        {onRetry ? <Button testID="error-retry" label="Retry" onClick={onRetry} /> : null}
       </div>
     </div>
   );
