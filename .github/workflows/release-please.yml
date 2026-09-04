@@ -1,0 +1,49 @@
+name: Release
+
+# Conventional Commits landing on main feed a standing release PR. Merging that
+# PR bumps package.json, writes CHANGELOG.md, tags `v<version>` and cuts a
+# GitHub release — so a deploy has something to point at and a rollback has a
+# name. Nothing here publishes to a registry; the package stays private.
+#
+# How the release PR gets validated: it is opened by the default GITHUB_TOKEN,
+# and GitHub does not fire `pull_request` events for those, so neither ci.yml
+# nor pr-title.yml runs on the PR itself. The `Protect main branch` ruleset
+# requires a merge queue, and ci.yml triggers on `merge_group` — so `checks`
+# and `e2e` do run against the queue's temp branch before the PR can land.
+# Validation is deferred to the queue, not skipped. Swapping in a PAT or app
+# token here would move it back onto the PR; that is a repo-secret decision,
+# not a code one. This also needs Settings > Actions > General > "Allow GitHub
+# Actions to create and approve pull requests" enabled, or the token cannot
+# open the PR at all.
+on:
+  push:
+    branches:
+      - main
+
+# One release run at a time — concurrent pushes would race the release PR.
+# Never cancel: a half-finished run can tag without creating the release.
+concurrency:
+  group: release-please
+  cancel-in-progress: false
+
+permissions: {}
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write # push the release branch, tag, create the GitHub release
+      pull-requests: write # open and groom the release PR
+
+    steps:
+      # `bootstrap-sha` in release-please-config.json anchors the changelog at
+      # main's tip as of adoption. There is no `v0.0.1` tag to anchor on, so
+      # without it the first release PR would replay ~150 commits of history.
+      # The trade-off is deliberate: the first CHANGELOG entry starts here, and
+      # pre-adoption feat/fix commits are not backfilled.
+      - name: Run release-please
+        uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
