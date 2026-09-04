@@ -61,9 +61,12 @@ export function Settings({ sessionId, round }: Props) {
     navigate({ to: "/", replace: true });
   };
 
-  const onKick = (uid: string) => {
-    if (isHost) {
-      kickFromGame({ sessionId, uid });
+  const onKick = async (uid: string) => {
+    if (!isHost) return;
+    const { error } = await tryCatch(kickFromGame({ sessionId, uid }));
+    if (error) {
+      Sentry.captureException(error);
+      toast.show({ message: getApiError(error).message, variant: "error" });
     }
   };
 

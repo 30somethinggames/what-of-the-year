@@ -67,8 +67,13 @@ export function Lobby({ topic, year, sessionId }: LobbyProps) {
     toast.show({ message: "Invite link copied!", variant: "success" });
   };
 
-  const onKick = (uid: string) => {
-    if (isHost) kickFromLobby({ sessionId, uid });
+  const onKick = async (uid: string) => {
+    if (!isHost) return;
+    const { error } = await tryCatch(kickFromLobby({ sessionId, uid }));
+    if (error) {
+      Sentry.captureException(error);
+      toast.show({ message: getApiError(error).message, variant: "error" });
+    }
   };
 
   return (
