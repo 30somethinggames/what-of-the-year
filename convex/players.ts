@@ -3,6 +3,7 @@ import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { SessionStatus } from "./constants";
 import { rateLimiter } from "./ratelimits";
+import { requireSessionMember } from "./utils/auth";
 import { apiError } from "./utils/errors";
 import { getRoundByNumber } from "./utils/rounds";
 import { validateAvatar, validateName } from "./utils/validate";
@@ -221,8 +222,7 @@ export const kickFromGame = mutation({
 export const getPlayers = query({
   args: { sessionId: v.id("sessions") },
   handler: async (ctx, { sessionId }) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw apiError("UNAUTHENTICATED", "Unauthenticated");
+    await requireSessionMember(ctx, sessionId);
 
     return await ctx.db
       .query("players")
@@ -235,8 +235,11 @@ export const getMyPlayer = query({
   args: { sessionId: v.id("sessions") },
   handler: async (ctx, { sessionId }) => {
     const identity = await ctx.auth.getUserIdentity();
-    if (!identity) return null;
+    if (!identity) throw apiError("UNAUTHENTICATED", "Unauthenticated");
 
+    // No membership step — this *is* the membership probe. It reads only the
+    // caller's own row, and the invite screen needs `null` rather than a throw
+    // to know the caller has yet to join.
     return await ctx.db
       .query("players")
       .withIndex("by_session_uid", (q) => q.eq("sessionId", sessionId).eq("uid", identity.subject))

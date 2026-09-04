@@ -16,3 +16,13 @@ export const topics: TopicType[] = [
 ];
 
 export const getTopic = (topic?: TOPIC_KEY) => topics.find((t) => t.value === topic);
+
+/**
+ * Route-level lookup for the `:topic` URL segment. Throws so an unknown topic
+ * reaches the root ErrorBoundary — a dead URL is an error screen, not a blank one.
+ */
+export const requireTopic = (topic?: TOPIC_KEY) => {
+  const found = getTopic(topic);
+  if (!found) throw new Error("Unknown topic");
+  return found;
+};

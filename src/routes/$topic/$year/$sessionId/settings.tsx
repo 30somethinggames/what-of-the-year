@@ -11,11 +11,12 @@ export const Route = createFileRoute("/$topic/$year/$sessionId/settings")({
 
 function SettingsRoute() {
   const { sessionId } = Route.useParams();
-  const { isLoading, activeRound } = useSession(sessionId as SessionID);
+  const { isLoading, session, activeRound } = useSession(sessionId as SessionID);
 
-  if (isLoading || !activeRound) {
-    return <Loading />;
-  }
+  if (isLoading) return <Loading />;
+  // A session that resolved to nothing left this on a spinner forever; send it
+  // to the boundary instead.
+  if (!session || !activeRound) throw new Error("Session not found");
 
   return <Settings sessionId={sessionId as SessionID} round={activeRound} />;
 }

@@ -28,6 +28,28 @@ async function jobState(t: TestConvex, jobId: Id<"_scheduled_functions">) {
   return await t.run(async (ctx) => (await ctx.db.system.get(jobId))?.state.kind);
 }
 
+describe("getSession", () => {
+  it("throws when unauthenticated", async () => {
+    const t = await setupTest();
+    const { sessionId } = await seedLobbyGame(t);
+
+    await expect(t.query(api.sessions.getSession, { sessionId })).rejects.toThrow(
+      /UNAUTHENTICATED/,
+    );
+  });
+
+  it("stays auth-only: a non-member reads the session so the invite link works", async () => {
+    const t = await setupTest();
+    const { sessionId } = await seedLobbyGame(t);
+
+    const session = await t
+      .withIdentity({ subject: OUTSIDER_UID })
+      .query(api.sessions.getSession, { sessionId });
+
+    expect(session?.status).toBe(SessionStatus.LOBBY);
+  });
+});
+
 describe("startSession", () => {
   it("throws when unauthenticated", async () => {
     const t = await setupTest();

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Header } from "components/header";
 import { SettingsButton } from "components/settings-button";
 import { Sidebar } from "components/sidebar";
-import { type TOPIC_KEY, getTopic } from "constants/topics";
+import { type TOPIC_KEY, requireTopic } from "constants/topics";
 import type { SessionID } from "db/types";
 import { Results } from "screens/results";
 
@@ -14,10 +14,8 @@ export const Route = createFileRoute("/$topic/$year/$sessionId/results")({
 
 function ResultsRoute() {
   const { topic: topicKey, year, sessionId } = Route.useParams();
-  const topic = getTopic(topicKey as TOPIC_KEY);
+  const topic = requireTopic(topicKey as TOPIC_KEY);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  if (!topic) return null;
 
   return (
     <>
