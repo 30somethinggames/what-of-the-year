@@ -30,8 +30,12 @@ export function useRoundState({ sessionId, topic, year }: Props) {
 
   useEffect(() => {
     if (!activeRound) return;
-    window.history.replaceState(null, "", `/${topic}/${year}/${sessionId}/${activeRound}`);
-  }, [activeRound, sessionId, topic, year]);
+    navigate({
+      to: "/$topic/$year/$sessionId/$round",
+      params: { topic, year, sessionId, round: String(activeRound) },
+      replace: true,
+    });
+  }, [activeRound, navigate, sessionId, topic, year]);
 
   useEffect(() => {
     if (activeRound === 1 && round?.state === "closed") {
