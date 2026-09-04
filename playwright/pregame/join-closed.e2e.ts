@@ -21,6 +21,12 @@ test("join: a newcomer opening an active session lands on the error state", asyn
   await expect(guestPage.getByTestId("name-input")).toHaveCount(0);
   await expect(guestPage.getByTestId("pick-input")).toHaveCount(0);
 
+  // Retry would only throw again for someone who is not a member — the home link
+  // is the way out of the boundary.
+  await guestPage.getByTestId("error-home").click();
+  await expect(guestPage).toHaveURL("/");
+  await expect(guestPage.getByTestId("home-start")).toBeVisible();
+
   await hostContext.close();
   await guestContext.close();
 });

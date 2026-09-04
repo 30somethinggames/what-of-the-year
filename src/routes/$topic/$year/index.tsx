@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { type TOPIC_KEY, getTopic } from "constants/topics";
+import { type TOPIC_KEY, requireTopic } from "constants/topics";
 import { Topic } from "screens/topic";
 
 export const Route = createFileRoute("/$topic/$year/")({
@@ -9,9 +9,7 @@ export const Route = createFileRoute("/$topic/$year/")({
 
 function TopicRoute() {
   const { topic: topicKey, year } = Route.useParams();
-  const topic = getTopic(topicKey as TOPIC_KEY);
-
-  if (!topic) return null;
+  const topic = requireTopic(topicKey as TOPIC_KEY);
 
   return (
     <>

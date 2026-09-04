@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { type TOPIC_KEY, getTopic } from "constants/topics";
+import { type TOPIC_KEY, requireTopic } from "constants/topics";
 import type { SessionID } from "db/types";
 import { Lobby } from "screens/lobby";
 
@@ -10,9 +10,7 @@ export const Route = createFileRoute("/$topic/$year/$sessionId/")({
 
 function LobbyRoute() {
   const { topic: topicKey, year, sessionId } = Route.useParams();
-  const topic = getTopic(topicKey as TOPIC_KEY);
-
-  if (!topic) return null;
+  const topic = requireTopic(topicKey as TOPIC_KEY);
 
   return (
     <>
