@@ -2,6 +2,7 @@
   "ignorePatterns": [
     ".github/**",
     "README.md",
+    "CHANGELOG.md",
     "convex/_generated/**",
     "convex/convex.config.ts",
     "src/routeTree.gen.ts",
