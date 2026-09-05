@@ -2,22 +2,15 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { type TOPIC_KEY, requireTopic } from "constants/topics";
 import type { SessionID } from "db/types";
-import { Lobby } from "screens/lobby";
+import { Session } from "screens/session";
 
 export const Route = createFileRoute("/$topic/$year/$sessionId/")({
-  component: LobbyRoute,
+  component: SessionRoute,
 });
 
-function LobbyRoute() {
+function SessionRoute() {
   const { topic: topicKey, year, sessionId } = Route.useParams();
   const topic = requireTopic(topicKey as TOPIC_KEY);
 
-  return (
-    <>
-      <div className="flex items-center justify-center py-md">
-        <span className="font-semibold text-lg">{`Lobby ${topic.label} of ${year}`}</span>
-      </div>
-      <Lobby topic={topic} year={year} sessionId={sessionId as SessionID} />
-    </>
-  );
+  return <Session topic={topic} year={year} sessionId={sessionId as SessionID} />;
 }

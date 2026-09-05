@@ -8,6 +8,7 @@ import {
   MEMBER_UID,
   OUTSIDER_UID,
   seedActiveGame,
+  seedCompleteGame,
   seedLobbyGame,
   seedSelection,
   setupTest,
@@ -127,23 +128,23 @@ describe("startSession", () => {
     const game = await seedActiveGame(t);
     const host = t.withIdentity({ subject: HOST_UID });
 
-    await host.mutation(api.sessions.endSession, { sessionId: game.sessionId });
+    await host.mutation(api.sessions.forfeitSession, { sessionId: game.sessionId });
 
     await expect(
       host.mutation(api.sessions.startSession, { sessionId: game.sessionId }),
     ).rejects.toThrow(/WRONG_STATE/);
 
     const { session } = await readGame(t, game);
-    expect(session?.status).toBe(SessionStatus.ENDED);
+    expect(session?.status).toBe(SessionStatus.FORFEIT);
   });
 });
 
-describe("endSession", () => {
+describe("forfeitSession", () => {
   it("throws when unauthenticated", async () => {
     const t = await setupTest();
     const { sessionId } = await seedActiveGame(t);
 
-    await expect(t.mutation(api.sessions.endSession, { sessionId })).rejects.toThrow(
+    await expect(t.mutation(api.sessions.forfeitSession, { sessionId })).rejects.toThrow(
       /UNAUTHENTICATED/,
     );
   });
@@ -155,7 +156,7 @@ describe("endSession", () => {
     await expect(
       t
         .withIdentity({ subject: OUTSIDER_UID })
-        .mutation(api.sessions.endSession, { sessionId: game.sessionId }),
+        .mutation(api.sessions.forfeitSession, { sessionId: game.sessionId }),
     ).rejects.toThrow(/NOT_HOST/);
 
     const { session } = await readGame(t, game);
@@ -169,7 +170,7 @@ describe("endSession", () => {
     await expect(
       t
         .withIdentity({ subject: MEMBER_UID })
-        .mutation(api.sessions.endSession, { sessionId: game.sessionId }),
+        .mutation(api.sessions.forfeitSession, { sessionId: game.sessionId }),
     ).rejects.toThrow(/NOT_HOST/);
 
     const { session } = await readGame(t, game);
@@ -182,10 +183,22 @@ describe("endSession", () => {
 
     await t
       .withIdentity({ subject: HOST_UID })
-      .mutation(api.sessions.endSession, { sessionId: game.sessionId });
+      .mutation(api.sessions.forfeitSession, { sessionId: game.sessionId });
 
     const { session } = await readGame(t, game);
-    expect(session?.status).toBe(SessionStatus.ENDED);
+    expect(session?.status).toBe(SessionStatus.FORFEIT);
+  });
+
+  it("ends a complete session for the host leaving the results", async () => {
+    const t = await setupTest();
+    const game = await seedCompleteGame(t);
+
+    await t
+      .withIdentity({ subject: HOST_UID })
+      .mutation(api.sessions.forfeitSession, { sessionId: game.sessionId });
+
+    const { session } = await readGame(t, game);
+    expect(session?.status).toBe(SessionStatus.FORFEIT);
   });
 
   it("throws when the session has already ended", async () => {
@@ -193,10 +206,10 @@ describe("endSession", () => {
     const game = await seedActiveGame(t);
     const host = t.withIdentity({ subject: HOST_UID });
 
-    await host.mutation(api.sessions.endSession, { sessionId: game.sessionId });
+    await host.mutation(api.sessions.forfeitSession, { sessionId: game.sessionId });
 
     await expect(
-      host.mutation(api.sessions.endSession, { sessionId: game.sessionId }),
+      host.mutation(api.sessions.forfeitSession, { sessionId: game.sessionId }),
     ).rejects.toThrow(/SESSION_CLOSED/);
   });
 
@@ -214,7 +227,7 @@ describe("endSession", () => {
     if (!jobId) throw new Error("Expected advanceRound to schedule a reveal job");
     expect(await jobState(t, jobId)).toBe("pending");
 
-    await host.mutation(api.sessions.endSession, { sessionId });
+    await host.mutation(api.sessions.forfeitSession, { sessionId });
 
     expect(await jobState(t, jobId)).toBe("canceled");
 

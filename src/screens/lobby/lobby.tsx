@@ -8,7 +8,6 @@ import { DisplayError } from "components/states/error";
 import { Loading } from "components/states/loading";
 import { useToast } from "components/toast/use-toast";
 import { api } from "convex/_generated/api";
-import { MAX_ROUNDS } from "convex/constants";
 import { useMutation } from "convex/react";
 import { getApiError } from "utils/api-error";
 import { tryCatch } from "utils/try-catch";
@@ -20,8 +19,6 @@ import { useLobbyState } from "./utils/use-lobby-state";
 export function Lobby({ topic, year, sessionId }: LobbyProps) {
   const navigate = useNavigate();
   const { isLoading, session, players, currentUser, isHost, maxPlayerCount } = useLobbyState({
-    topic,
-    year,
     sessionId,
   });
 
@@ -37,6 +34,8 @@ export function Lobby({ topic, year, sessionId }: LobbyProps) {
     return <Topic topic={topic} year={year} existingSessionId={sessionId} />;
   }
 
+  // Starting flips the session to ACTIVE, which the session screen turns into
+  // the round view for everyone — nothing to navigate to here.
   const onStart = async () => {
     const { error } = await tryCatch(startSession({ sessionId }));
     if (error) {
@@ -44,11 +43,6 @@ export function Lobby({ topic, year, sessionId }: LobbyProps) {
       toast.show({ message: getApiError(error).message, variant: "error" });
       return;
     }
-    navigate({
-      to: "/$topic/$year/$sessionId/$round",
-      params: { topic: topic.value, year, sessionId, round: String(MAX_ROUNDS) },
-      replace: true,
-    });
   };
 
   const onLeave = async () => {

@@ -14,9 +14,8 @@ test("join: a newcomer opening an active session lands on the error state", asyn
   const guestPage = await guestContext.newPage();
   await guestPage.goto(`/games/2026/${sessionId}`);
 
-  // The lobby redirects anyone opening an active session to the round in play,
-  // where the member-only round queries throw for a non-member.
-  await expect(guestPage).toHaveURL(`/games/2026/${sessionId}/10`);
+  // An active session renders the round in play for whoever opens it, where the
+  // member-only round queries throw for a non-member.
   await expect(guestPage.getByTestId("error-state")).toBeVisible();
   await expect(guestPage.getByTestId("name-input")).toHaveCount(0);
   await expect(guestPage.getByTestId("pick-input")).toHaveCount(0);
@@ -48,7 +47,7 @@ test("join: a newcomer opening an ended session is sent home", async ({ browser 
   const guestPage = await guestContext.newPage();
   await guestPage.goto(`/games/2026/${sessionId}`);
 
-  await expect(guestPage.getByTestId("toast")).toContainText("The host ended the game.");
+  await expect(guestPage.getByTestId("toast")).toContainText("The host forfeited the game.");
   await expect(guestPage).toHaveURL("/");
   await expect(guestPage.getByTestId("home-start")).toBeVisible();
   await expect(guestPage.getByTestId("name-input")).toHaveCount(0);

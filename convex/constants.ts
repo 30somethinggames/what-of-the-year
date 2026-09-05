@@ -10,8 +10,14 @@ export const Topic = {
 
 export type TopicKey = (typeof Topic)[keyof typeof Topic];
 
+/**
+ * Session lifecycle. `COMPLETE` is a game played through to its last round;
+ * `FORFEIT` is one the host ended early. Both render results — only `FORFEIT`
+ * sends the other players home.
+ */
 export const SessionStatus = {
   LOBBY: "lobby",
   ACTIVE: "active",
-  ENDED: "ended",
+  COMPLETE: "complete",
+  FORFEIT: "forfeit",
 } as const;

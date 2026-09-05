@@ -13,8 +13,6 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as TopicRouteRouteImport } from './routes/$topic/route'
 import { Route as TopicYearIndexRouteImport } from './routes/$topic/$year/index'
 import { Route as TopicYearSessionIdIndexRouteImport } from './routes/$topic/$year/$sessionId/index'
-import { Route as TopicYearSessionIdRoundRouteImport } from './routes/$topic/$year/$sessionId/$round'
-import { Route as TopicYearSessionIdResultsRouteImport } from './routes/$topic/$year/$sessionId/results'
 import { Route as TopicYearSessionIdSettingsRouteImport } from './routes/$topic/$year/$sessionId/settings'
 
 const IndexRoute = IndexRouteImport.update({
@@ -37,17 +35,6 @@ const TopicYearSessionIdIndexRoute = TopicYearSessionIdIndexRouteImport.update({
   path: '/$year/$sessionId/',
   getParentRoute: () => TopicRouteRoute,
 } as any)
-const TopicYearSessionIdRoundRoute = TopicYearSessionIdRoundRouteImport.update({
-  id: '/$year/$sessionId/$round',
-  path: '/$year/$sessionId/$round',
-  getParentRoute: () => TopicRouteRoute,
-} as any)
-const TopicYearSessionIdResultsRoute =
-  TopicYearSessionIdResultsRouteImport.update({
-    id: '/$year/$sessionId/results',
-    path: '/$year/$sessionId/results',
-    getParentRoute: () => TopicRouteRoute,
-  } as any)
 const TopicYearSessionIdSettingsRoute =
   TopicYearSessionIdSettingsRouteImport.update({
     id: '/$year/$sessionId/settings',
@@ -59,8 +46,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$topic': typeof TopicRouteRouteWithChildren
   '/$topic/$year/': typeof TopicYearIndexRoute
-  '/$topic/$year/$sessionId/$round': typeof TopicYearSessionIdRoundRoute
-  '/$topic/$year/$sessionId/results': typeof TopicYearSessionIdResultsRoute
   '/$topic/$year/$sessionId/settings': typeof TopicYearSessionIdSettingsRoute
   '/$topic/$year/$sessionId/': typeof TopicYearSessionIdIndexRoute
 }
@@ -68,8 +53,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$topic': typeof TopicRouteRouteWithChildren
   '/$topic/$year': typeof TopicYearIndexRoute
-  '/$topic/$year/$sessionId/$round': typeof TopicYearSessionIdRoundRoute
-  '/$topic/$year/$sessionId/results': typeof TopicYearSessionIdResultsRoute
   '/$topic/$year/$sessionId/settings': typeof TopicYearSessionIdSettingsRoute
   '/$topic/$year/$sessionId': typeof TopicYearSessionIdIndexRoute
 }
@@ -78,8 +61,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/$topic': typeof TopicRouteRouteWithChildren
   '/$topic/$year/': typeof TopicYearIndexRoute
-  '/$topic/$year/$sessionId/$round': typeof TopicYearSessionIdRoundRoute
-  '/$topic/$year/$sessionId/results': typeof TopicYearSessionIdResultsRoute
   '/$topic/$year/$sessionId/settings': typeof TopicYearSessionIdSettingsRoute
   '/$topic/$year/$sessionId/': typeof TopicYearSessionIdIndexRoute
 }
@@ -89,8 +70,6 @@ export interface FileRouteTypes {
     | '/'
     | '/$topic'
     | '/$topic/$year/'
-    | '/$topic/$year/$sessionId/$round'
-    | '/$topic/$year/$sessionId/results'
     | '/$topic/$year/$sessionId/settings'
     | '/$topic/$year/$sessionId/'
   fileRoutesByTo: FileRoutesByTo
@@ -98,8 +77,6 @@ export interface FileRouteTypes {
     | '/'
     | '/$topic'
     | '/$topic/$year'
-    | '/$topic/$year/$sessionId/$round'
-    | '/$topic/$year/$sessionId/results'
     | '/$topic/$year/$sessionId/settings'
     | '/$topic/$year/$sessionId'
   id:
@@ -107,8 +84,6 @@ export interface FileRouteTypes {
     | '/'
     | '/$topic'
     | '/$topic/$year/'
-    | '/$topic/$year/$sessionId/$round'
-    | '/$topic/$year/$sessionId/results'
     | '/$topic/$year/$sessionId/settings'
     | '/$topic/$year/$sessionId/'
   fileRoutesById: FileRoutesById
@@ -148,20 +123,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TopicYearSessionIdIndexRouteImport
       parentRoute: typeof TopicRouteRoute
     }
-    '/$topic/$year/$sessionId/$round': {
-      id: '/$topic/$year/$sessionId/$round'
-      path: '/$year/$sessionId/$round'
-      fullPath: '/$topic/$year/$sessionId/$round'
-      preLoaderRoute: typeof TopicYearSessionIdRoundRouteImport
-      parentRoute: typeof TopicRouteRoute
-    }
-    '/$topic/$year/$sessionId/results': {
-      id: '/$topic/$year/$sessionId/results'
-      path: '/$year/$sessionId/results'
-      fullPath: '/$topic/$year/$sessionId/results'
-      preLoaderRoute: typeof TopicYearSessionIdResultsRouteImport
-      parentRoute: typeof TopicRouteRoute
-    }
     '/$topic/$year/$sessionId/settings': {
       id: '/$topic/$year/$sessionId/settings'
       path: '/$year/$sessionId/settings'
@@ -174,16 +135,12 @@ declare module '@tanstack/react-router' {
 
 interface TopicRouteRouteChildren {
   TopicYearIndexRoute: typeof TopicYearIndexRoute
-  TopicYearSessionIdRoundRoute: typeof TopicYearSessionIdRoundRoute
-  TopicYearSessionIdResultsRoute: typeof TopicYearSessionIdResultsRoute
   TopicYearSessionIdSettingsRoute: typeof TopicYearSessionIdSettingsRoute
   TopicYearSessionIdIndexRoute: typeof TopicYearSessionIdIndexRoute
 }
 
 const TopicRouteRouteChildren: TopicRouteRouteChildren = {
   TopicYearIndexRoute: TopicYearIndexRoute,
-  TopicYearSessionIdRoundRoute: TopicYearSessionIdRoundRoute,
-  TopicYearSessionIdResultsRoute: TopicYearSessionIdResultsRoute,
   TopicYearSessionIdSettingsRoute: TopicYearSessionIdSettingsRoute,
   TopicYearSessionIdIndexRoute: TopicYearSessionIdIndexRoute,
 }

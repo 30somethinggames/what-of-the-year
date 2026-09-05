@@ -73,7 +73,7 @@ export const createSession = mutation({
   },
 });
 
-export const endSession = mutation({
+export const forfeitSession = mutation({
   args: {
     sessionId: v.id("sessions"),
   },
@@ -86,13 +86,13 @@ export const endSession = mutation({
       .withIndex("by_session_uid", (q) => q.eq("sessionId", sessionId).eq("uid", identity.subject))
       .unique();
 
-    if (!host?.isHost) throw apiError("NOT_HOST", "Only the host can end the session");
+    if (!host?.isHost) throw apiError("NOT_HOST", "Only the host can forfeit the session");
 
-    // No rate limit: a one-shot lifecycle transition — the ENDED assert below
+    // No rate limit: a one-shot lifecycle transition — the FORFEIT assert below
     // rejects every repeat, so there is nothing to throttle.
     const session = await ctx.db.get(sessionId);
     if (!session) throw apiError("NOT_FOUND", "Session not found");
-    if (session.status === SessionStatus.ENDED) {
+    if (session.status === SessionStatus.FORFEIT) {
       throw apiError("SESSION_CLOSED", "Session has already ended");
     }
 
@@ -109,7 +109,7 @@ export const endSession = mutation({
       await ctx.db.patch(round._id, { revealJobId: undefined, revealEndsAt: undefined });
     }
 
-    await ctx.db.patch(sessionId, { status: SessionStatus.ENDED });
+    await ctx.db.patch(sessionId, { status: SessionStatus.FORFEIT });
   },
 });
 

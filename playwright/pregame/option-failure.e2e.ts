@@ -28,8 +28,8 @@ test("options: a failing option fetch replaces the round screen with the error s
   await page.getByTestId("lobby-start").click();
   await expect(page.getByTestId("pick-input")).toBeVisible();
 
-  // Same session and round, options that cannot load.
-  await page.goto(`/games/${FAILING_YEAR}/${sessionId}/10`);
+  // Same session, options that cannot load.
+  await page.goto(`/games/${FAILING_YEAR}/${sessionId}`);
 
   await expect(page.getByTestId("error-state")).toBeVisible();
   await expect(page.getByTestId("error-retry")).toBeVisible();
