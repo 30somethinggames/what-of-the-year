@@ -148,7 +148,7 @@ test("non-host: host leaving game shows toast and redirects to home", async ({ b
   await hostPage.getByTestId("lobby-start").click();
   await expect(guestPage.getByText("Round 10")).toBeVisible();
 
-  // Host leaves game mid-round (triggers endSession)
+  // Host leaves game mid-round (triggers forfeitSession)
   await hostPage.getByTestId("settings-button").click();
   await expect(hostPage.getByTestId("leave-game")).toBeVisible();
   await hostPage.getByTestId("leave-game").click();
@@ -156,7 +156,7 @@ test("non-host: host leaving game shows toast and redirects to home", async ({ b
 
   // Guest sees error toast and is redirected to home
   await expect(guestPage.getByTestId("toast")).toBeVisible();
-  await expect(guestPage.getByTestId("toast")).toHaveText("The host ended the game.");
+  await expect(guestPage.getByTestId("toast")).toHaveText("The host forfeited the game.");
   await expect(guestPage.getByTestId("home-start")).toBeVisible();
 
   await hostContext.close();

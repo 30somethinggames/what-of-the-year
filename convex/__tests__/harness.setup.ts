@@ -118,6 +118,44 @@ export async function seedLobbyGame(t: TestConvex): Promise<SeededGame> {
   return game;
 }
 
+/**
+ * An ACTIVE session on its final round: round 1 is `open`, every other round
+ * is `closed`, and `activeRoundNumber` is 1 (the state `completeReveal` leaves
+ * after round 2).
+ */
+export async function seedFinalRound(t: TestConvex): Promise<SeededGame> {
+  const game = await seedActiveGame(t);
+
+  await t.run(async (ctx) => {
+    await ctx.db.patch(game.sessionId, { activeRoundNumber: 1 });
+    for (const [index, roundId] of game.roundIds.entries()) {
+      const isFinal = index === 0;
+      await ctx.db.patch(roundId, {
+        state: isFinal ? "open" : "closed",
+        startedAt: Date.now(),
+        closedAt: isFinal ? null : Date.now(),
+      });
+    }
+  });
+
+  return game;
+}
+
+/**
+ * A COMPLETE session: every round `closed`, `activeRoundNumber` 1 (the state
+ * `completeReveal` leaves after round 1).
+ */
+export async function seedCompleteGame(t: TestConvex): Promise<SeededGame> {
+  const game = await seedFinalRound(t);
+
+  await t.run(async (ctx) => {
+    await ctx.db.patch(game.sessionId, { status: SessionStatus.COMPLETE });
+    await ctx.db.patch(game.roundIds[0], { state: "closed", closedAt: Date.now() });
+  });
+
+  return game;
+}
+
 export const OPTION = {
   id: 1234,
   name: "Blue Prince",

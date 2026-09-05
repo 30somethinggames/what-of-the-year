@@ -15,9 +15,9 @@ export function useGameOver({ isHost, session }: Args) {
   const { show } = useToast();
 
   useEffect(() => {
-    if (!isHost && session?.status === SessionStatus.ENDED) {
+    if (!isHost && session?.status === SessionStatus.FORFEIT) {
       navigate({ to: "/", replace: true });
-      show({ variant: "error", message: "The host ended the game." });
+      show({ variant: "error", message: "The host forfeited the game." });
     }
   }, [session?.status, isHost]);
 }

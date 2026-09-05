@@ -6,7 +6,7 @@ interface Props extends SidebarContentProps {
   isOpen: boolean;
 }
 
-export function Sidebar({ isOpen, handleClose, sessionId, topic, year }: Props) {
+export function Sidebar({ isOpen, handleClose, sessionId }: Props) {
   return (
     <AnimatePresence>
       {isOpen ? (
@@ -25,12 +25,7 @@ export function Sidebar({ isOpen, handleClose, sessionId, topic, year }: Props) 
             exit={{ x: "-100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
           >
-            <SidebarContent
-              sessionId={sessionId}
-              topic={topic}
-              year={year}
-              handleClose={handleClose}
-            />
+            <SidebarContent sessionId={sessionId} handleClose={handleClose} />
           </motion.aside>
         </>
       ) : null}

@@ -7,6 +7,8 @@ import {
   MEMBER_UID,
   OUTSIDER_UID,
   seedActiveGame,
+  seedFinalRound,
+  seedCompleteGame,
   seedSelection,
   setupTest,
 } from "./harness.setup";
@@ -78,11 +80,9 @@ describe("advanceRound", () => {
     const t = await setupTest();
     const { sessionId, roundIds } = await seedActiveGame(t);
 
-    const result = await t
+    await t
       .withIdentity({ subject: HOST_UID })
       .mutation(api.rounds.advanceRound, { sessionId, currentRoundNumber: MAX_ROUNDS });
-
-    expect(result).toEqual({ hasNextRound: true });
 
     const { closed, next, session } = await t.run(async (ctx) => ({
       closed: await ctx.db.get(roundIds[MAX_ROUNDS - 1]),
@@ -128,12 +128,44 @@ describe("advanceRound", () => {
     ).rejects.toThrow(/WRONG_STATE/);
   });
 
+  it("completes the session when the host advances an empty final round", async () => {
+    const t = await setupTest();
+    const { sessionId, roundIds } = await seedFinalRound(t);
+
+    await t
+      .withIdentity({ subject: HOST_UID })
+      .mutation(api.rounds.advanceRound, { sessionId, currentRoundNumber: 1 });
+
+    const { session, final } = await t.run(async (ctx) => ({
+      session: await ctx.db.get(sessionId),
+      final: await ctx.db.get(roundIds[0]),
+    }));
+
+    expect(session?.status).toBe(SessionStatus.COMPLETE);
+    expect(session?.activeRoundNumber).toBe(1);
+    expect(final?.state).toBe("closed");
+  });
+
+  it("throws once the session is complete and leaves the final round closed", async () => {
+    const t = await setupTest();
+    const { sessionId, roundIds } = await seedCompleteGame(t);
+
+    await expect(
+      t
+        .withIdentity({ subject: HOST_UID })
+        .mutation(api.rounds.advanceRound, { sessionId, currentRoundNumber: 1 }),
+    ).rejects.toThrow(/WRONG_STATE/);
+
+    const final = await t.run(async (ctx) => await ctx.db.get(roundIds[0]));
+    expect(final?.state).toBe("closed");
+  });
+
   it("throws once the session has ended and leaves the rounds untouched", async () => {
     const t = await setupTest();
     const { sessionId, roundIds } = await seedActiveGame(t);
     const host = t.withIdentity({ subject: HOST_UID });
 
-    await host.mutation(api.sessions.endSession, { sessionId });
+    await host.mutation(api.sessions.forfeitSession, { sessionId });
 
     await expect(
       host.mutation(api.rounds.advanceRound, { sessionId, currentRoundNumber: MAX_ROUNDS }),
@@ -173,6 +205,42 @@ describe("completeReveal", () => {
     expect(next?.state).toBe("open");
   });
 
+  it("completes the session when the final round's reveal completes", async () => {
+    const t = await setupTest();
+    const game = await seedFinalRound(t);
+    const { sessionId, roundIds } = game;
+    await t.run(async (ctx) => {
+      await ctx.db.insert("selections", {
+        sessionId,
+        roundId: roundIds[0],
+        uid: MEMBER_UID,
+        pick: { id: "1", name: "Blue Prince" },
+        points: 10,
+        roundNumber: 1,
+        savedAt: Date.now(),
+      });
+    });
+
+    await t
+      .withIdentity({ subject: HOST_UID })
+      .mutation(api.rounds.advanceRound, { sessionId, currentRoundNumber: 1 });
+
+    const revealing = await t.run(async (ctx) => await ctx.db.get(roundIds[0]));
+    expect(revealing?.state).toBe("revealing");
+
+    await t.mutation(internal.rounds.completeReveal, { sessionId, roundNumber: 1 });
+
+    const { session, final } = await t.run(async (ctx) => ({
+      session: await ctx.db.get(sessionId),
+      final: await ctx.db.get(roundIds[0]),
+    }));
+
+    expect(session?.status).toBe(SessionStatus.COMPLETE);
+    expect(session?.activeRoundNumber).toBe(1);
+    expect(final?.state).toBe("closed");
+    expect(final?.revealJobId).toBeUndefined();
+  });
+
   it("does nothing once the session has ended", async () => {
     const t = await setupTest();
     const game = await seedActiveGame(t);
@@ -181,7 +249,7 @@ describe("completeReveal", () => {
     const { sessionId, roundIds } = game;
 
     await host.mutation(api.rounds.advanceRound, { sessionId, currentRoundNumber: MAX_ROUNDS });
-    await host.mutation(api.sessions.endSession, { sessionId });
+    await host.mutation(api.sessions.forfeitSession, { sessionId });
 
     await t.mutation(internal.rounds.completeReveal, { sessionId, roundNumber: MAX_ROUNDS });
 
@@ -191,7 +259,7 @@ describe("completeReveal", () => {
       next: await ctx.db.get(roundIds[MAX_ROUNDS - 2]),
     }));
 
-    expect(session?.status).toBe(SessionStatus.ENDED);
+    expect(session?.status).toBe(SessionStatus.FORFEIT);
     expect(session?.activeRoundNumber).toBe(MAX_ROUNDS);
     expect(current?.state).toBe("revealing");
     expect(next?.state).toBe("pending");

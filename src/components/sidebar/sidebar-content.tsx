@@ -16,19 +16,17 @@ import { tryCatch } from "utils/try-catch";
 
 export interface SidebarContentProps {
   sessionId: SessionID;
-  topic: string;
-  year: string;
   handleClose?: () => void;
 }
 
-export function SidebarContent({ sessionId, topic, year, handleClose }: SidebarContentProps) {
+export function SidebarContent({ sessionId, handleClose }: SidebarContentProps) {
   const navigate = useNavigate();
   const toast = useToast();
   const { session, activeRound } = useSession(sessionId);
   const { players, isHost } = usePlayers(sessionId);
   const { selections } = useSelections(sessionId, activeRound);
   const advanceRound = useMutation(api.rounds.advanceRound);
-  const endSession = useMutation(api.sessions.endSession);
+  const forfeitSession = useMutation(api.sessions.forfeitSession);
   const leaveSession = useMutation(api.players.leaveSession);
   const kickFromGame = useMutation(api.players.kickFromGame);
 
@@ -36,22 +34,15 @@ export function SidebarContent({ sessionId, topic, year, handleClose }: SidebarC
 
   const completedUids = new Set(selections.map((s) => s.uid));
 
+  // Closing the last round flips the session to COMPLETE, which the session
+  // screen turns into the results view — nothing to navigate to here.
   const onNextRound = async () => {
     if (!activeRound) return;
-    const { data, error } = await tryCatch(
-      advanceRound({ sessionId, currentRoundNumber: activeRound }),
-    );
+    const { error } = await tryCatch(advanceRound({ sessionId, currentRoundNumber: activeRound }));
     if (error) {
       Sentry.captureException(error);
       toast.show({ message: getApiError(error).message, variant: "error" });
       return;
-    }
-    if (!data.hasNextRound) {
-      navigate({
-        to: "/$topic/$year/$sessionId/results",
-        params: { topic, year, sessionId },
-        replace: true,
-      });
     }
   };
 
@@ -61,7 +52,7 @@ export function SidebarContent({ sessionId, topic, year, handleClose }: SidebarC
     // ErrorBoundary would turn into DisplayError instead of home.
     await navigate({ to: "/", replace: true });
 
-    const mutation = isHost ? endSession({ sessionId }) : leaveSession({ sessionId });
+    const mutation = isHost ? forfeitSession({ sessionId }) : leaveSession({ sessionId });
     const { error } = await tryCatch(mutation);
     if (error) {
       // Leave the room regardless — the player is done here either way.

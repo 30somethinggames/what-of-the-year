@@ -65,7 +65,8 @@ export const advanceRound = mutation({
         await ctx.scheduler.cancel(currentRound.revealJobId);
       }
 
-      return await completeRevealLogic(ctx, sessionId, currentRoundNumber, currentRound._id);
+      await completeRevealLogic(ctx, sessionId, currentRoundNumber, currentRound._id);
+      return;
     }
 
     const hasSelections = await ctx.db
@@ -75,7 +76,8 @@ export const advanceRound = mutation({
 
     if (!hasSelections) {
       await ctx.db.patch(currentRound._id, { closedAt: Date.now() });
-      return await completeRevealLogic(ctx, sessionId, currentRoundNumber, currentRound._id);
+      await completeRevealLogic(ctx, sessionId, currentRoundNumber, currentRound._id);
+      return;
     }
 
     const revealDurationMs = session.playerCount * 4_000 + 5_000;
@@ -92,8 +94,6 @@ export const advanceRound = mutation({
       revealJobId: jobId,
       revealEndsAt,
     });
-
-    return { hasNextRound: true };
   },
 });
 
@@ -107,13 +107,13 @@ export const completeReveal = internalMutation({
     // jobs queued by `advanceRound` and `saveSelection`.
     const session = await ctx.db.get(sessionId);
     if (!session) throw apiError("NOT_FOUND", "Session not found");
-    if (session.status === SessionStatus.ENDED) return;
+    if (session.status === SessionStatus.FORFEIT) return;
 
     const round = await getRoundByNumber(ctx.db, sessionId, roundNumber);
     if (!round) throw apiError("NOT_FOUND", "Round not found");
     if (round.state !== "revealing") return;
 
-    return await completeRevealLogic(ctx, sessionId, roundNumber, round._id);
+    await completeRevealLogic(ctx, sessionId, roundNumber, round._id);
   },
 });
 
@@ -129,23 +129,24 @@ async function completeRevealLogic(
     revealEndsAt: undefined,
   });
 
-  const hasNextRound = roundNumber > 1;
-
-  if (hasNextRound) {
-    const nextRoundNumber = roundNumber - 1;
-
-    const nextRound = await getRoundByNumber(ctx.db, sessionId, nextRoundNumber);
-    if (!nextRound) throw apiError("NOT_FOUND", "Next round not found");
-
-    await ctx.db.patch(nextRound._id, {
-      state: "open",
-      startedAt: Date.now(),
-    });
-
-    await ctx.db.patch(sessionId, {
-      activeRoundNumber: nextRoundNumber,
-    });
+  // Round 1 is the last one played: closing it completes the game, and the
+  // session status alone tells every client to show results.
+  if (roundNumber === 1) {
+    await ctx.db.patch(sessionId, { status: SessionStatus.COMPLETE });
+    return;
   }
 
-  return { hasNextRound };
+  const nextRoundNumber = roundNumber - 1;
+
+  const nextRound = await getRoundByNumber(ctx.db, sessionId, nextRoundNumber);
+  if (!nextRound) throw apiError("NOT_FOUND", "Next round not found");
+
+  await ctx.db.patch(nextRound._id, {
+    state: "open",
+    startedAt: Date.now(),
+  });
+
+  await ctx.db.patch(sessionId, {
+    activeRoundNumber: nextRoundNumber,
+  });
 }

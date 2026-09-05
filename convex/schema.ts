@@ -17,7 +17,8 @@ export default defineSchema({
     status: v.union(
       v.literal(SessionStatus.LOBBY),
       v.literal(SessionStatus.ACTIVE),
-      v.literal(SessionStatus.ENDED),
+      v.literal(SessionStatus.COMPLETE),
+      v.literal(SessionStatus.FORFEIT),
     ),
   }),
 

@@ -28,7 +28,7 @@ export function Settings({ sessionId, round }: Props) {
   const { isLoading: isPlayersLoading, players, isHost } = usePlayers(sessionId);
   const { isLoading: isSelectionsLoading, selections } = useSelections(sessionId, round);
   const advanceRound = useMutation(api.rounds.advanceRound);
-  const endSession = useMutation(api.sessions.endSession);
+  const forfeitSession = useMutation(api.sessions.forfeitSession);
   const kickFromGame = useMutation(api.players.kickFromGame);
 
   useGameOver({ isHost, session });
@@ -51,7 +51,7 @@ export function Settings({ sessionId, round }: Props) {
 
   const onLeaveGame = async () => {
     if (isHost) {
-      const { error } = await tryCatch(endSession({ sessionId }));
+      const { error } = await tryCatch(forfeitSession({ sessionId }));
       if (error) {
         // Leave the room regardless — the host is done here either way.
         Sentry.captureException(error);

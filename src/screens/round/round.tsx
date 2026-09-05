@@ -1,5 +1,4 @@
 import * as Sentry from "@sentry/react";
-import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 
 import { Autocomplete } from "components/autocomplete";
@@ -29,7 +28,6 @@ interface Props {
 }
 
 export function Round({ sessionId, topic, year }: Props) {
-  const navigate = useNavigate();
   const toast = useToast();
   const {
     isLoading,
@@ -41,11 +39,7 @@ export function Round({ sessionId, topic, year }: Props) {
     selections,
     players,
     isHost,
-  } = useRoundState({
-    sessionId,
-    topic,
-    year,
-  });
+  } = useRoundState({ sessionId });
 
   const saveSelection = useMutation(api.selections.saveSelection);
   const editSelection = useMutation(api.selections.editSelection);
@@ -68,21 +62,16 @@ export function Round({ sessionId, topic, year }: Props) {
   if (!session) return <DisplayError />;
 
   if (isRevealing) {
+    // Closing the last round flips the session to COMPLETE, which the session
+    // screen turns into the results view — nothing to navigate to here.
     const onSkip = async () => {
-      const { data, error } = await tryCatch(
+      const { error } = await tryCatch(
         advanceRound({ sessionId, currentRoundNumber: session.activeRoundNumber }),
       );
       if (error) {
         Sentry.captureException(error);
         toast.show({ message: getApiError(error).message, variant: "error" });
         return;
-      }
-      if (!data.hasNextRound) {
-        navigate({
-          to: "/$topic/$year/$sessionId/results",
-          params: { topic, year: String(year), sessionId },
-          replace: true,
-        });
       }
     };
 

@@ -77,7 +77,6 @@ test("lobby: host reopening the lobby URL mid-game lands on the active round", a
   // Host reloads the lobby URL while the game is active
   await page.goto(`/games/2026/${sessionId}`);
 
-  await expect(page).toHaveURL(`/games/2026/${sessionId}/10`);
   await expect(page.getByTestId("pick-input")).toBeVisible();
   await expect(page.getByTestId("lobby-start")).toHaveCount(0);
 });
