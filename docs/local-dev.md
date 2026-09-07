@@ -18,7 +18,11 @@ else.
 | --- | --- |
 | `.husky/pre-commit` | format + lint on staged files, then `check:types` |
 | `ci.yml` `checks` job | all four, on every PR and merge-queue run |
-| you | `bun run check:format && bun run check:lint && bun run check:types && bun run test` |
+| you | `mise run checks` |
+
+`mise.toml` defines the tasks — `checks`, `dev`, `e2e`, `gate` — and they call
+these scripts rather than replacing them. One name means the same thing to a
+person, to CI and to an agent; `mise tasks` lists them.
 
 Ignore lists live in `.oxfmtrc.json` and `.oxlintrc.json` (`ignorePatterns`,
 one per tool, which is what oxc's docs recommend; there is no shared file).
@@ -31,10 +35,18 @@ blocking. Run `bun run test`, not bare `bun test`, or the floor is skipped.
 
 ## E2E
 
-`bun run test:web` runs Playwright against a Vite dev server on `:5173` and
-needs `.env.local` (`CONVEX_DEPLOYMENT`, `VITE_CONVEX_URL`, `CONVEX_SITE_URL`,
-`TEST_SECRET`). Server state is seeded and cleared through the HTTP helpers
-in `playwright/helpers/convex.ts`, never through the UI.
+`mise run e2e` provisions its own backend and runs Playwright against it: it
+creates a Convex preview deployment named after the current branch, mints a
+`TEST_SECRET` and an auth keypair for the run, builds the bundle against the
+new deployment's URL, and serves that build. It reads no `.env.local` — the
+values are passed to Playwright as environment for that one command.
+
+The only thing it needs is `CONVEX_DEPLOY_KEY` in the environment, a preview
+deploy key from the Convex dashboard. It fails immediately and says so when
+that is missing.
+
+Server state is seeded and cleared through the HTTP helpers in
+`playwright/helpers/convex.ts`, never through the UI.
 
 Two settings in `playwright.config.ts` matter when reading results:
 
@@ -42,38 +54,49 @@ Two settings in `playwright.config.ts` matter when reading results:
   retry is reported as **flaky** and the run is green, so read the "flaky" line
   rather than the exit code (or use `--retries 0` for the real failure rate).
   In CI that same spec is a plain failure and fails the job.
-- `reuseExistingServer` locally, so a dev server you already have on `:5173`
-  is used as is.
+- The suite always serves the built bundle, never `bun run dev`, and never
+  reuses a running server. The backend URL is baked in at build time by the
+  deploy that created the preview, so a dev server reading `.env.local` would
+  talk to a different deployment than the one the run just provisioned. The
+  port is chosen free per run, so a run collides with neither your dev server
+  nor another checkout.
 
-Agent sandboxes usually cannot bind `:5173` (`listen EPERM`), so the
-pipeline's implement agent cannot run this suite.
+An agent sandbox usually cannot bind a port (`listen EPERM`), so an agent
+writing a change cannot run this suite; whatever gates the branch runs it
+afterwards.
+
+`package.json` declares `gate` — the four checks then the e2e suite — so that
+what must pass before a PR is one named thing rather than something each caller
+assembles for itself. `mise run gate` and CI both run it, and so does anything
+else that gates this repo from outside it.
 
 ## Which backend the suite runs against
 
 One recipe. Every e2e run gets its own Convex preview deployment, named after
 whatever it is running for: `ci.yml`'s `e2e` job takes `pr-<n>` on a pull
-request, `mg-<sha>` in the merge queue and `main` post-merge; the pipeline
-takes `agent-<issue>`; a checkout takes its branch name. Two runs never share a
-backend. `convex deploy --preview-create <name>` replaces the deployment of
+request, `mg-<sha>` in the merge queue and `main` post-merge; a checkout takes
+its branch name, or the short commit when the checkout is detached. Two runs
+share a backend only if they are on the same branch of the same repo, in which
+case set `PREVIEW_NAME` on one of them. `convex deploy --preview-create <name>` replaces the deployment of
 that name, so a re-run reuses its own and nobody else's, and the preview is
 thrown away with the branch.
 
 The only credential involved is a preview deploy key (`CONVEX_DEPLOY_KEY`),
 which can create preview deployments and set env vars on them and nothing
 else — it cannot reach prod or a dev deployment. Each run mints its own
-`TEST_SECRET` and auth keypair (`scripts/generate-test-keys.mjs`) and sets
+`TEST_SECRET` and auth keypair and sets
 `OPTIONS_FIXTURES=1`, so the suite stores no long-lived secret.
 
-Not landed yet: `bun run test:web` in a local checkout still uses whatever
-`.env.local` points at. The same recipe reaches local runs and the pipeline
-with the rest of #154; this change converts CI only.
+Convex expires previews five days after creation, so there is nothing to clean
+up and no cron to run.
 
 ## The dev deployment is shared
 
-`bun run convex:dev`, `bunx convex dev --once`, and by extension `test:web`
-push the **current branch's** functions and schema to the one dev deployment
-named in `.env.local`. That is the dev loop, not the e2e recipe above: one
-deployment for every branch you check out.
+`bun run convex:dev` and `bunx convex dev --once` push the **current branch's**
+functions and schema to the one dev deployment named in `.env.local`. That is
+the dev loop: one deployment for every branch you check out. The e2e suite no
+longer touches it — it runs on its own preview — so the rows it used to leave
+behind are no longer a source of schema push failures.
 Consequences:
 
 - Any other local client of that deployment, another worktree or `main`
@@ -89,14 +112,11 @@ Consequences:
   bunx convex dev --once
   ```
 
-- The local Convex CLI may rewrite `convex/_generated/server.d.ts` and
-  `server.js` on every push (it adds an `env` export the committed files lack).
-  That is CLI version drift, not part of your change; restore the files before
-  committing:
-
-  ```sh
-  git restore --source=main convex/_generated
-  ```
+- `convex/_generated/server.{d.ts,js}` are regenerated by any push or deploy,
+  including every `mise run e2e`. The committed files now match what the CLI
+  emits, so this should be a no-op; if a diff does appear it is a real CLI
+  version change and belongs in your commit, not restored away. #165 adds the
+  CI check that catches it drifting again.
 
 ## Generated files
 

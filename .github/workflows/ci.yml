@@ -88,18 +88,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
-      # Dependabot runs read the Dependabot secrets store and forks read none,
-      # so the key can be empty here. Fail with the reason rather than skipping:
-      # a required check that skips is a silent green (#72).
-      - name: Require the preview deploy key
-        run: |
-          if [ -z "$CONVEX_DEPLOY_KEY" ]; then
-            echo "CONVEX_DEPLOY_KEY is empty for this run, so there is no backend to test against." >&2
-            echo "Dependabot reads its own secrets store; add the preview deploy key there." >&2
-            echo "Fork PRs get no secrets at all; re-run the change from a branch in this repo." >&2
-            exit 1
-          fi
-
       # As in `checks`. No node step: mise.toml pins one because Playwright's
       # runner needs it on a laptop, and ubuntu-latest already ships one.
       - name: Read the pinned bun version
@@ -138,67 +126,20 @@ jobs:
       # image drops one, Playwright fails to launch with an explicit "Host system
       # is missing dependencies" error naming this command as the fix.
 
-      # One preview deployment per run, named after what triggered it, so two
-      # actors never share a backend: CI takes `pr-<n>` / `mg-<sha>` / `main`,
-      # the pipeline takes `agent-<n>`, a laptop takes its branch name.
-      # `--preview-create` on an existing name replaces it, so a re-run of the
-      # same PR reuses its own deployment and nobody else's.
-      - name: Name this run's preview deployment
-        id: preview
+      # The same script `mise run e2e` runs. It creates this run's preview
+      # deployment, mints the test secret and auth keypair, builds against the
+      # new URL and runs Playwright. CI's only difference is the preview's name.
+      # Called directly rather than through mise: the runner has no mise, and
+      # the repo's allowed-actions list does not include one.
+      - name: Run e2e
         env:
-          EVENT: ${{ github.event_name }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          MERGE_SHA: ${{ github.event.merge_group.head_sha }}
-        run: |
-          case "$EVENT" in
-            pull_request) NAME="pr-$PR_NUMBER" ;;
-            merge_group) NAME="mg-${MERGE_SHA:0:12}" ;;
-            *) NAME="main" ;;
-          esac
-          echo "name=$NAME" >> "$GITHUB_OUTPUT"
-
-      # Ephemeral per run: the preview is thrown away with the PR, so nothing
-      # here is worth storing as a repo secret. Fixture option sources keep the
-      # suite off IGDB/TMDB/OpenLibrary.
-      - name: Generate ephemeral credentials
-        id: creds
-        run: |
-          echo "test_secret=$(openssl rand -hex 32)" >> "$GITHUB_OUTPUT"
-          bun scripts/generate-test-keys.mjs
-
-      # The deploy hands the new deployment's URL to the build, which bakes it
-      # into the bundle `bun run preview` serves. Only the cloud URL is exposed,
-      # so the site origin the test helpers POST to is derived from it.
-      - name: Deploy Convex preview and build frontend
-        env:
-          PREVIEW_NAME: ${{ steps.preview.outputs.name }}
-        run: |
-          bunx convex deploy \
-            --preview-create "$PREVIEW_NAME" \
-            --cmd 'printf %s "$VITE_CONVEX_URL" > /tmp/convex-url.txt && bun run build' \
-            --cmd-url-env-var-name VITE_CONVEX_URL
-          CLOUD_URL=$(cat /tmp/convex-url.txt)
-          echo "CONVEX_SITE_URL=${CLOUD_URL%.cloud}.site" >> "$GITHUB_ENV"
-
-      # After the deploy, not before: `--preview-create` is what creates the
-      # deployment. Setting TEST_SECRET re-analyses the modules, which is what
-      # registers the `/test/*` routes `convex/http.ts` gates on it.
-      - name: Configure the preview deployment
-        env:
-          PREVIEW_NAME: ${{ steps.preview.outputs.name }}
-          TEST_SECRET: ${{ steps.creds.outputs.test_secret }}
-        run: |
-          bunx convex env set TEST_SECRET "$TEST_SECRET" --preview-name "$PREVIEW_NAME"
-          bunx convex env set OPTIONS_FIXTURES 1 --preview-name "$PREVIEW_NAME"
-          cat /tmp/jwt-private-key.txt | bunx convex env set JWT_PRIVATE_KEY --preview-name "$PREVIEW_NAME"
-          bunx convex env set JWKS "$(cat /tmp/jwks.json)" --preview-name "$PREVIEW_NAME"
-
-      - name: Run Playwright tests
-        env:
-          TEST_SECRET: ${{ steps.creds.outputs.test_secret }}
+          PREVIEW_NAME: >-
+            ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number)
+             || github.event_name == 'merge_group' && format('mg-{0}', github.event.merge_group.head_sha)
+             || 'main' }}
           PLAYWRIGHT_FORCE_TTY: "120"
           FORCE_COLOR: "1"
-        run: bunx playwright test
+        run: bun scripts/e2e.ts
 
       # Failed and flaky specs on the check's Details page, so nobody has to
       # download the report to learn which test broke.

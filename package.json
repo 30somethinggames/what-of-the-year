@@ -14,9 +14,11 @@
     "convex:dev": "bunx convex dev",
     "test": "bun test --coverage",
     "test:watch": "bun test --watch",
-    "test:web": "set -a && source .env.local && set +a && bunx playwright test",
-    "test:web:ui": "set -a && source .env.local && set +a && bunx playwright test --ui",
-    "prepare": "husky"
+    "test:web": "bun scripts/e2e.ts",
+    "test:web:ui": "bun scripts/e2e.ts --ui",
+    "prepare": "husky",
+    "gate": "bun run checks && bun run test:web",
+    "checks": "bun run check:format && bun run check:lint && bun run check:types && bun run test"
   },
   "dependencies": {
     "@convex-dev/auth": "0.0.95",

@@ -26,5 +26,5 @@
       "services/*": ["./src/services/*"]
     }
   },
-  "include": ["*.ts", "src", "convex", "playwright"]
+  "include": ["*.ts", "src", "convex", "playwright", "scripts"]
 }

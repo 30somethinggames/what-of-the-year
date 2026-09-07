@@ -12,7 +12,7 @@ Docs, read when relevant:
 
 ## Checks
 
-CI enforces the four `check:*` / `test` scripts in `package.json`; run them before pushing. E2E is `bun run test:web` and needs `.env.local`.
+CI enforces the four `check:*` / `test` scripts in `package.json`; run them before pushing — `mise run checks` is all four. E2E is `mise run e2e`, which creates its own Convex preview deployment and needs only `CONVEX_DEPLOY_KEY` in the environment. `mise run gate` is both, and is what CI runs.
 
 ## Invariants
 
