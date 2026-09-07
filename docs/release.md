@@ -19,7 +19,7 @@ registry; the package stays private.
 | `include-component-in-tag` | `false` | plain `v0.1.0` tags. The `node` strategy derives the component from the package name, and the schema default is `true`, so dropping this line would produce `what-of-the-year-v0.1.0` |
 | `pull-request-title-pattern` | `chore(release): v${version}` | matches the `type(scope)` PR title convention |
 | `bootstrap-sha` | main's tip at adoption | there is no `v0.0.1` tag to anchor on; without it the first release PR replays ~150 commits of history. The first changelog entry starts at adoption and earlier `feat`/`fix` commits are not backfilled |
-| `changelog-sections` | `feat`, `fix`, `ci` | `chore` commits are hidden from the changelog on purpose; release-please still reads them, they just don't get a section |
+| `changelog-sections` | `feat`, `fix`, `ci` | every other type is hidden from the changelog on purpose; release-please still reads them, they just don't get a section. Which types deserve a heading is independent of which types a PR title may use |
 
 Only `feat` and `fix` commits bump the version (`fix` → patch, `feat` → minor,
 `!` / `BREAKING CHANGE` → major). `ci` and `chore` commits ride along in the

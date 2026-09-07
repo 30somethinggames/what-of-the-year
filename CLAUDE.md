@@ -24,7 +24,7 @@ Docs, read when relevant:
 
 ## Git
 
-- `type(scope): summary`, type ∈ `feat|fix|chore|ci`, scope = area touched. PR titles too.
+- `type(scope): summary`, type = any Conventional Commits type, scope = area touched. PR titles too.
 - Branches: `<issue#>/<slug>`. Commits and PR titles carry the type, not the branch.
 - Fill every section of the PR template. `Closes #<issue>` goes in the PR **description**, one line per ticket.
 - Never add a `Claude-Session` trailer to commits or a session link to PR bodies.
