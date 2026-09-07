@@ -18,4 +18,4 @@ git add $STAGED_FILES
 fi
 
 # Check TypeScript types
-bun run check:types
+bun run types

@@ -12,15 +12,15 @@
 
    ```bash
    bunx convex dev   # in one terminal
-   mise run dev      # in another
+   bun run dev      # in another
    ```
 
 ## Running the tests
 
 ```bash
-mise run checks   # format, lint, types, unit
-mise run e2e      # Playwright, against a preview deployment it creates
-mise run gate     # both, exactly what CI runs on a PR
+bun run check      # format, lint, types, unit tests
+bun run test:e2e   # Playwright, against a preview deployment it creates
+bun run ci         # both — exactly what CI runs on a PR
 ```
 
 `e2e` needs a Convex **preview deploy key** exported as `CONVEX_DEPLOY_KEY` —

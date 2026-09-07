@@ -12,7 +12,7 @@ Docs, read when relevant:
 
 ## Checks
 
-CI enforces the four `check:*` / `test` scripts in `package.json`; run them before pushing — `mise run checks` is all four. E2E is `mise run e2e`, which creates its own Convex preview deployment and needs only `CONVEX_DEPLOY_KEY` in the environment. `mise run gate` is both, and is what CI runs.
+`bun run check` is format, lint, types and unit tests; run it before pushing. `bun run test:e2e` creates its own Convex preview deployment and needs only `CONVEX_DEPLOY_KEY` in the environment. `bun run ci` is both, and is exactly what CI runs.
 
 ## Invariants
 
