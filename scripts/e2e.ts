@@ -96,6 +96,23 @@ try {
     CONVEX_SITE_URL: cloudUrl.replace(/\.cloud$/, ".site"),
     E2E_PORT: String(port),
   });
+
+  // The deploy above regenerated convex/_generated. Nothing noticed when the
+  // result differed from what is committed, so the next `convex` bump would
+  // land stale generated files quietly. Here rather than in `ci.yml` so the
+  // command a person runs is the command CI runs. --porcelain, not
+  // `git diff`, so a generated file the CLI newly emits counts as drift too.
+  const drift = (await $`git status --porcelain -- convex/_generated`.text()).trim();
+  if (drift) {
+    console.error(drift);
+    await $`git diff -- convex/_generated`.nothrow();
+    console.error(
+      `${process.env.GITHUB_ACTIONS ? "::error::" : ""}convex/_generated is stale: the deploy ` +
+        "regenerated it into something other than what is committed. Run 'bunx convex dev --once' " +
+        "(or 'bunx convex codegen' against a deployment) and commit convex/_generated.",
+    );
+    process.exitCode = 1;
+  }
 } finally {
   await rm(work, { recursive: true, force: true });
 }
