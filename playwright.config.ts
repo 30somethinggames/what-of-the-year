@@ -36,7 +36,10 @@ export default defineConfig({
   // server reading `.env.local` would talk to a different deployment than the
   // one the suite just provisioned. `mise run e2e` builds before it gets here.
   webServer: {
-    command: `bun run preview --port ${port}`,
+    // --strictPort: vite otherwise serves on port+1 when the probed port was
+    // taken in between, and Playwright polls the wrong one until the 120s
+    // timeout with nothing saying why.
+    command: `bun run preview --port ${port} --strictPort`,
     url: `http://localhost:${port}`,
     reuseExistingServer: false,
     timeout: 120_000,

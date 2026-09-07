@@ -88,18 +88,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
-      # Dependabot runs read the Dependabot secrets store and forks read none,
-      # so the key can be empty here. Fail with the reason rather than skipping:
-      # a required check that skips is a silent green (#72).
-      - name: Require the preview deploy key
-        run: |
-          if [ -z "$CONVEX_DEPLOY_KEY" ]; then
-            echo "CONVEX_DEPLOY_KEY is empty for this run, so there is no backend to test against." >&2
-            echo "Dependabot reads its own secrets store; add the preview deploy key there." >&2
-            echo "Fork PRs get no secrets at all; re-run the change from a branch in this repo." >&2
-            exit 1
-          fi
-
       # As in `checks`. No node step: mise.toml pins one because Playwright's
       # runner needs it on a laptop, and ubuntu-latest already ships one.
       - name: Read the pinned bun version

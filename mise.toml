@@ -19,7 +19,7 @@ node = "24"
 
 [tasks.checks]
 description = "Format, lint, types, unit tests — what must pass before a commit"
-run = "bun run check:format && bun run check:lint && bun run check:types && bun run test"
+run = "bun run checks"
 
 [tasks.dev]
 description = "Vite dev server on :5173"
@@ -31,5 +31,4 @@ run = "bun scripts/e2e.ts"
 
 [tasks.gate]
 description = "Everything CI runs on a PR: checks, then the e2e suite"
-depends = ["checks"]
-run = "mise run e2e"
+run = "bun run gate"

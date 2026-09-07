@@ -22,9 +22,12 @@ import { exportJWK, exportPKCS8, generateKeyPair } from "jose";
 
 if (!process.env.CONVEX_DEPLOY_KEY) {
   console.error(
-    "no Convex preview deploy key. Mint one in the Convex dashboard (project\n" +
-      "settings) and export CONVEX_DEPLOY_KEY. It can only create preview\n" +
-      "deployments and set env vars on them.",
+    "CONVEX_DEPLOY_KEY is empty, so there is no backend to test against.\n" +
+      "Mint a preview deploy key in the Convex dashboard (project settings) and\n" +
+      "export it. It can only create preview deployments and set env vars on\n" +
+      "them; it cannot reach prod or anyone's dev deployment.\n" +
+      "Dependabot reads its own secrets store; add the key there too.\n" +
+      "Fork PRs get no secrets at all; re-run the change from a branch in this repo.",
   );
   process.exit(1);
 }
@@ -33,9 +36,13 @@ if (!process.env.CONVEX_DEPLOY_KEY) {
 // a deployment of the same name, so re-running a branch reuses its own and
 // nobody else's, and expires previews itself after five days. CI overrides the
 // name with pr-<n>, mg-<sha> or main.
-const branch = (await $`git rev-parse --abbrev-ref HEAD`.text()).trim();
+// A detached checkout has no branch name — `--abbrev-ref` prints the literal
+// "HEAD" — so fall back to the commit, or every detached checkout on a machine
+// would share one deployment.
+const ref = (await $`git rev-parse --abbrev-ref HEAD`.text()).trim();
+const label = ref === "HEAD" ? (await $`git rev-parse --short HEAD`.text()).trim() : ref;
 const preview =
-  process.env.PREVIEW_NAME ?? branch.replace(/[^a-zA-Z0-9]+/g, "-").replace(/^-|-$/g, "");
+  process.env.PREVIEW_NAME ?? label.replace(/[^a-zA-Z0-9]+/g, "-").replace(/^-|-$/g, "");
 
 // Minted per run and never written down.
 const testSecret = Buffer.from(crypto.getRandomValues(new Uint8Array(32))).toString("hex");
@@ -77,7 +84,10 @@ try {
   // which the CLI's argument parser reads as a flag.
   await $`bunx convex env set JWT_PRIVATE_KEY --preview-name ${preview} < ${new Response(jwtPrivateKey)}`;
 
-  await $`bun run test:web`.env({
+  // Playwright directly, not `bun run test:web`: that script is this script.
+  // Arguments after the script name are forwarded, so `--ui` and `--retries 0`
+  // reach Playwright through the one supported entry point.
+  await $`bunx playwright test ${process.argv.slice(2)}`.env({
     ...process.env,
     TEST_SECRET: testSecret,
     CONVEX_SITE_URL: cloudUrl.replace(/\.cloud$/, ".site"),

@@ -28,9 +28,10 @@ mint one in the Convex dashboard under project settings. It can only create
 preview deployments and set env vars on them; it cannot reach prod or anyone's
 dev deployment.
 
-Each run deploys to a preview named after your current branch, so two
-checkouts never share a backend, and mints its own `TEST_SECRET` and auth
-keypair. Convex expires previews after five days. Nothing is written to
+Each run deploys to a preview named after your current branch — or the short
+commit, in a detached checkout — and mints its own `TEST_SECRET` and auth
+keypair. Two runs collide only on the same branch of the same repo; set
+`PREVIEW_NAME` on one of them if that happens. Convex expires previews after five days. Nothing is written to
 `.env.local` and nothing needs to be.
 
 ## Production deployment
