@@ -1,0 +1,5 @@
+{
+  "checks": "bun run check:format && bun run check:lint && bun run check:types && bun test",
+  "gate": "bunx playwright install chromium && bun run check:format && bun run check:lint && bun run check:types && bun test && bun run test:web",
+  "env_allow": "CONVEX_DEPLOYMENT|VITE_CONVEX_URL|CONVEX_SITE_URL|TEST_SECRET"
+}
