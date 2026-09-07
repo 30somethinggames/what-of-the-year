@@ -13,8 +13,8 @@ jobs:
           TITLE: ${{ github.event.pull_request.title }}
         run: |
           # type(scope): summary — type ∈ feat|fix|chore|ci; scope is the area touched
-          # ([a-z0-9-], e.g. convex, lobby, deps), never an issue number or seery/agent prefix.
+          # ([a-z0-9-], e.g. convex, lobby, deps), never an issue number or a branch prefix.
           if ! printf '%s\n' "$TITLE" | grep -Eq '^(feat|fix|chore|ci)\([a-z][a-z0-9-]*\): \S'; then
-            echo "::error::PR title must be 'type(scope): summary' (type feat|fix|chore|ci; scope = area touched, e.g. convex, lobby, deps — not an issue number or seery/agent prefix). Got: $TITLE"
+            echo "::error::PR title must be 'type(scope): summary' (type feat|fix|chore|ci; scope = area touched, e.g. convex, lobby, deps — not an issue number or a branch prefix). Got: $TITLE"
             exit 1
           fi
