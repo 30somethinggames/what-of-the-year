@@ -27,7 +27,7 @@ run = "bun run dev"
 
 [tasks.e2e]
 description = "Playwright against a Convex preview deployment this run creates"
-run = "./scripts/e2e.sh"
+run = "bun scripts/e2e.ts"
 
 [tasks.gate]
 description = "Everything CI runs on a PR: checks, then the e2e suite"

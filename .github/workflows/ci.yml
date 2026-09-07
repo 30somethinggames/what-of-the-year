@@ -151,7 +151,7 @@ jobs:
              || 'main' }}
           PLAYWRIGHT_FORCE_TTY: "120"
           FORCE_COLOR: "1"
-        run: ./scripts/e2e.sh
+        run: bun scripts/e2e.ts
 
       # Failed and flaky specs on the check's Details page, so nobody has to
       # download the report to learn which test broke.
