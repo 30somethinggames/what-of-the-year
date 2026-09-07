@@ -30,17 +30,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
-      # mise.toml is the one place the bun version is pinned; setup-bun cannot
-      # read it (only .bun-version, .tool-versions, package.json), so lift the
-      # pin out here rather than keeping a second copy in this file.
-      - name: Read bun version from mise.toml
-        id: bun-version
-        run: sed -n 's/^bun = "\(.*\)"$/version=\1/p' mise.toml >> "$GITHUB_OUTPUT"
-
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
-        with:
-          bun-version: ${{ steps.bun-version.outputs.version }}
+      # Same toolchain as every other environment: mise reads mise.toml and
+      # installs the pinned bun (and node, for Playwright). One pin, one tool.
+      - name: Install toolchain
+        uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4.3.0
 
       - name: Cache bun dependencies
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
@@ -93,15 +86,8 @@ jobs:
         run: |
           nohup docker pull "$CONVEX_BACKEND_IMAGE" >/tmp/convex-pull.log 2>&1 &
 
-      # See the checks job: mise.toml is the single source for the bun pin.
-      - name: Read bun version from mise.toml
-        id: bun-version
-        run: sed -n 's/^bun = "\(.*\)"$/version=\1/p' mise.toml >> "$GITHUB_OUTPUT"
-
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
-        with:
-          bun-version: ${{ steps.bun-version.outputs.version }}
+      - name: Install toolchain
+        uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4.3.0
 
       - name: Cache bun dependencies
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
