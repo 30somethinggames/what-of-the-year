@@ -9,7 +9,6 @@ on:
   push:
     branches:
       - main
-  # Merge queue: required checks run on the queue's temp branch before merge.
   merge_group:
 
 concurrency:
@@ -30,10 +29,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
-      # One pin, one source: the version comes from mise.toml, the same file a
-      # laptop installs from. mise itself is not used here — this repo allows
-      # github-owned actions plus three vendors, and widening that list for a
-      # convenience action buys nothing these two steps do not.
+      # Not jdx/mise-action: it is not on the repo's allowed-actions list, and
+      # these two steps are why it does not need to be. See docs/contributing.md.
       - name: Read the pinned bun version
         id: bun-version
         run: sed -n 's/^bun = "\(.*\)"$/bun=\1/p' mise.toml >> "$GITHUB_OUTPUT"
@@ -53,9 +50,7 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
-      # By name, so what CI runs and what you run cannot drift apart. The two
-      # halves of `bun run ci` are split across these jobs deliberately: `check`
-      # fails fast and needs no backend, `test:e2e` provisions one.
+      # By name, so what CI runs and what you run cannot drift apart.
       - name: Run checks
         run: bun run check
 
@@ -73,9 +68,6 @@ jobs:
       contents: read
 
     env:
-      # A preview deploy key: it can create preview deployments and set env vars
-      # on them, and nothing else. It cannot touch prod or anyone's dev
-      # deployment, which is why this job is allowed a secret at all.
       CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
 
     steps:
@@ -114,17 +106,10 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: bunx playwright install chromium
 
-      # No `playwright install-deps`: every library chromium links against is
-      # already in the ubuntu-latest image (the step only ever added CJK/Cyrillic
-      # fonts nothing here renders) and it cost ~12s of apt every run. If a future
-      # image drops one, Playwright fails to launch with an explicit "Host system
-      # is missing dependencies" error naming this command as the fix.
+      # No `playwright install-deps`: ubuntu-latest already has every library
+      # chromium links against, and Playwright names the command if that changes.
 
-      # The same script `bun run test:e2e` runs. It creates this run's preview
-      # deployment, mints the test secret and auth keypair, builds against the
-      # new URL and runs Playwright. CI's only difference is the preview's name.
-      # Called directly rather than through mise: the runner has no mise, and
-      # the repo's allowed-actions list does not include one.
+      # The same command a person runs; CI only overrides the preview's name.
       - name: Run e2e
         env:
           PREVIEW_NAME: >-
@@ -135,8 +120,7 @@ jobs:
           FORCE_COLOR: "1"
         run: bun run test:e2e
 
-      # Failed and flaky specs on the check's Details page, so nobody has to
-      # download the report to learn which test broke.
+      # Which spec broke, on the Details page, without downloading the report.
       - name: Summarize e2e results
         if: ${{ !cancelled() }}
         run: |

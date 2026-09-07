@@ -46,6 +46,21 @@ reviewer** saying why:
 - a design token added to `src/index.css`,
 - a test that was changed rather than added.
 
+## CI and third-party actions
+
+This repo's Actions policy is `selected`: GitHub-owned actions, plus
+`oven-sh/setup-bun`, `googleapis/release-please-action` and
+`anthropics/claude-code-action`, all pinned to a full commit SHA. Anything else
+fails before the job starts, with a message naming the action.
+
+Adding to that list widens the supply chain that can write to this repo, so the
+answer is usually to do the work in a `run:` step instead. `ci.yml` reads the
+pinned bun version out of `mise.toml` with `sed` for exactly this reason —
+`jdx/mise-action` would have been one line, and one more vendor.
+
+Third-party actions are also why a pinned SHA is required rather than a tag: a
+tag can be moved to point at different code.
+
 ## Closing tickets
 
 Every PR that resolves a ticket carries `Closes #<issue>` in its
