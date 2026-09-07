@@ -5,16 +5,19 @@ versions of these rules; this is the reasoning behind them.
 
 ## Branches
 
-- Human work: `seery/<topic>`.
-- Agent work: `agent/<issue#>-<slug>`. These branches are opened by an agent
-  pipeline that polls the project board and runs on a machine outside this
-  repo; it implements one Ready ticket per run and opens a PR. It never
-  merges, and every PR it opens is read by a person like any other.
+`<issue#>/<slug>`, one branch per ticket:
 
-Provenance lives in the branch name and the `Co-Authored-By` trailer, never in
-the commit scope. That keeps `git log` readable by area and still answers "who
-wrote this" from the PR. Never add a `Claude-Session` trailer to commits or a
-session link to PR bodies.
+    187/e2e-provisions-its-own-preview
+    189/guest-sees-wrong-toast
+    190/rename-scripts
+
+The number is the ticket the branch closes, so a branch points at the reason it
+exists and every branch groups under its issue. Nothing else belongs in the
+name: not who wrote it, not what wrote it, not what kind of change it is — the
+commits say that, in Conventional Commits form, and so does the PR title.
+Provenance lives in the `Co-Authored-By` trailer, and every PR is read and
+merged by a person regardless. Never add a `Claude-Session` trailer to commits
+or a session link to PR bodies.
 
 ## Commits and PR titles
 
