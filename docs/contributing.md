@@ -85,10 +85,15 @@ tag can be moved to point at different code.
 
 ## Closing tickets
 
-Every PR that resolves a ticket carries `Closes #<issue>` in its
-**description**, one line per ticket. Commit-message keywords are not enough:
-`main` accepts only squash and rebase merges, and after either the body
-keyword is the reliable auto-close path.
+Every PR that resolves a ticket opens with `Closes #<issue>`, first line of the
+description, one line per ticket. It goes first because it is the link back to
+why the change exists, which is the first thing a reader wants.
+
+It has to be the **description** rather than a commit message. `main` squashes
+with the commit messages as the body, so the description never becomes the
+commit — what closes the ticket is GitHub linking it from the PR itself when the
+PR merges. That works wherever the keyword sits in the body; first is a choice,
+not a requirement.
 
 ## Merging
 
