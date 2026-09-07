@@ -6,7 +6,10 @@ versions of these rules; this is the reasoning behind them.
 ## Branches
 
 - Human work: `seery/<topic>`.
-- Agent work: `agent/<issue#>-<slug>`.
+- Agent work: `agent/<issue#>-<slug>`. These branches are opened by an agent
+  pipeline that polls the project board and runs on a machine outside this
+  repo; it implements one Ready ticket per run and opens a PR. It never
+  merges, and every PR it opens is read by a person like any other.
 
 Provenance lives in the branch name and the `Co-Authored-By` trailer, never in
 the commit scope. That keeps `git log` readable by area and still answers "who

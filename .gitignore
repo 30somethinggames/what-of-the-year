@@ -47,5 +47,3 @@ yarn-error.*
 
 
 .claude/settings.local.json
-
-.pipeline/
