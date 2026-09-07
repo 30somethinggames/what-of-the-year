@@ -1,0 +1,14 @@
+# Toolchain pins. Install mise (https://mise.jdx.dev), then `mise install`.
+
+[tools]
+# The project runtime and package manager. Keep in step with `engines.bun` in
+# package.json and with the version CI installs (`.github/workflows/ci.yml`
+# reads this file).
+bun = "1.3.11"
+
+# Playwright only. Its test runner (1.62) will not load our specs under the bun
+# runtime — `bunx playwright test` with no node on PATH fails with
+# "N errors building …/*.e2e.ts" — so `bun run test:web` needs a node here.
+# Nothing else in the repo does. When Playwright runs under bun, delete this
+# line; there is nothing else to unwind.
+node = "24"

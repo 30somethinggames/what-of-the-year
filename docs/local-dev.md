@@ -5,6 +5,12 @@ from the code.
 
 ## Checks
 
+The toolchain is pinned in `mise.toml`: install [mise](https://mise.jdx.dev),
+then `mise install` before `bun install`. Bun is the runtime; the node pin is
+there only because Playwright's runner will not load our specs under bun (see
+the comment in `mise.toml`), so it is needed for `bun run test:web` and nothing
+else.
+
 `package.json` defines four: `check:format` (oxfmt), `check:lint` (oxlint),
 `check:types` (tsc), `test` (bun test). They run in three places:
 
