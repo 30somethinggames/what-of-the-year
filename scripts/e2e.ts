@@ -8,11 +8,11 @@ import { join } from "node:path";
  * Runs the e2e suite against a Convex preview deployment this script creates.
  *
  * The suite takes no deployment settings from `.env.local`. The deployment is
- * made here, the secrets are minted here, and both reach Playwright as
- * environment for one command. That is what lets a fresh checkout, an agent
- * worktree and CI run the same thing without anybody copying an env file
- * around. `CONVEX_DEPLOY_KEY` is the exception and has to come from somewhere:
- * bun loads `.env.local` in a checkout, and a worktree's caller supplies it.
+ * made here and the secrets are minted here, and both reach Playwright as
+ * environment for one command, so every checkout runs the same thing without
+ * anybody copying an env file around. The one exception is
+ * `CONVEX_DEPLOY_KEY`, which cannot be minted here — bun loads it from
+ * `.env.local`.
  *
  * It cannot live in Playwright's `globalSetup`: the config needs `baseURL` and
  * `webServer.command` at load time, and both depend on the preview URL and the
