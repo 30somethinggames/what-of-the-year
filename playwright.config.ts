@@ -1,5 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
 
+// `mise run e2e` picks a free port so two checkouts can run at once.
+const port = process.env.E2E_PORT ?? "5173";
+
 export default defineConfig({
   globalSetup: "./playwright/helpers/global-setup.ts",
   testDir: "./playwright",
@@ -17,7 +20,7 @@ export default defineConfig({
     timeout: 15_000,
   },
   use: {
-    baseURL: "http://localhost:5173",
+    baseURL: `http://localhost:${port}`,
     // There is no retry in CI, so the trace has to come off the failure itself.
     trace: process.env.CI ? "retain-on-failure" : "on-first-retry",
     screenshot: "only-on-failure",
@@ -28,10 +31,14 @@ export default defineConfig({
       use: { ...devices["Desktop Chrome"] },
     },
   ],
+  // Always the built bundle, never the dev server. The backend URL is baked in
+  // at build time by the deploy that created this run's preview, so a dev
+  // server reading `.env.local` would talk to a different deployment than the
+  // one the suite just provisioned. `mise run e2e` builds before it gets here.
   webServer: {
-    command: process.env.CI ? "bun run preview --port 5173" : "bun run dev",
-    url: "http://localhost:5173",
-    reuseExistingServer: !process.env.CI,
+    command: `bun run preview --port ${port}`,
+    url: `http://localhost:${port}`,
+    reuseExistingServer: false,
     timeout: 120_000,
   },
 });

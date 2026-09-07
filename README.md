@@ -1,34 +1,37 @@
 ## Get started
 
-1. Request access to the Convex team from a project admin
-2. Create `.env.local` with the following variables:
+1. Request access to the Convex team from a project admin.
+2. Install [mise](https://mise.jdx.dev) and the toolchain:
 
    ```bash
-   CONVEX_DEPLOYMENT=dev:<your-deployment-slug>
-   VITE_CONVEX_URL=https://<your-deployment-slug>.convex.cloud
-   CONVEX_SITE_URL=https://<your-deployment-slug>.convex.site
-   TEST_SECRET=<run: openssl rand -hex 32>
+   mise install && bun i
    ```
-- Run `bunx convex dev` to create your dev deployment and get the slug
-- Generate `TEST_SECRET` with `openssl rand -hex 32`, then set it on the deployment: `bunx convex env set TEST_SECRET <value>`
 
-3. Install dependencies
+3. Start the app. `convex dev` creates your personal dev deployment on first
+   run and writes `.env.local` itself — there is nothing to fill in by hand.
 
    ```bash
-   bun i
+   bunx convex dev   # in one terminal
+   mise run dev      # in another
    ```
 
-4. Start the Convex dev server (creates your personal dev deployment)
+## Running the tests
 
-   ```bash
-   bunx convex dev
-   ```
+```bash
+mise run checks   # format, lint, types, unit
+mise run e2e      # Playwright, against a preview deployment it creates
+mise run gate     # both, exactly what CI runs on a PR
+```
 
-5. Start the app
+`e2e` needs a Convex **preview deploy key** exported as `CONVEX_DEPLOY_KEY` —
+mint one in the Convex dashboard under project settings. It can only create
+preview deployments and set env vars on them; it cannot reach prod or anyone's
+dev deployment.
 
-   ```bash
-   bun dev
-   ```
+Each run deploys to a preview named after your current branch, so two
+checkouts never share a backend, and mints its own `TEST_SECRET` and auth
+keypair. Convex expires previews after five days. Nothing is written to
+`.env.local` and nothing needs to be.
 
 ## Production deployment
 

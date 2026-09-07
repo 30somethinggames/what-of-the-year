@@ -14,8 +14,8 @@
     "convex:dev": "bunx convex dev",
     "test": "bun test --coverage",
     "test:watch": "bun test --watch",
-    "test:web": "set -a && source .env.local && set +a && bunx playwright test",
-    "test:web:ui": "set -a && source .env.local && set +a && bunx playwright test --ui",
+    "test:web": "bunx playwright test",
+    "test:web:ui": "bunx playwright test --ui",
     "prepare": "husky"
   },
   "dependencies": {

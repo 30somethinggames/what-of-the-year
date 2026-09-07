@@ -18,7 +18,11 @@ else.
 | --- | --- |
 | `.husky/pre-commit` | format + lint on staged files, then `check:types` |
 | `ci.yml` `checks` job | all four, on every PR and merge-queue run |
-| you | `bun run check:format && bun run check:lint && bun run check:types && bun run test` |
+| you | `mise run checks` |
+
+`mise.toml` defines the tasks — `checks`, `dev`, `e2e`, `gate` — and they call
+these scripts rather than replacing them. One name means the same thing to a
+person, to CI and to an agent; `mise tasks` lists them.
 
 Ignore lists live in `.oxfmtrc.json` and `.oxlintrc.json` (`ignorePatterns`,
 one per tool, which is what oxc's docs recommend; there is no shared file).
@@ -31,10 +35,18 @@ blocking. Run `bun run test`, not bare `bun test`, or the floor is skipped.
 
 ## E2E
 
-`bun run test:web` runs Playwright against a Vite dev server on `:5173` and
-needs `.env.local` (`CONVEX_DEPLOYMENT`, `VITE_CONVEX_URL`, `CONVEX_SITE_URL`,
-`TEST_SECRET`). Server state is seeded and cleared through the HTTP helpers
-in `playwright/helpers/convex.ts`, never through the UI.
+`mise run e2e` provisions its own backend and runs Playwright against it: it
+creates a Convex preview deployment named after the current branch, mints a
+`TEST_SECRET` and an auth keypair for the run, builds the bundle against the
+new deployment's URL, and serves that build. It reads no `.env.local` — the
+values are passed to Playwright as environment for that one command.
+
+The only thing it needs is `CONVEX_DEPLOY_KEY` in the environment, a preview
+deploy key from the Convex dashboard. It fails immediately and says so when
+that is missing.
+
+Server state is seeded and cleared through the HTTP helpers in
+`playwright/helpers/convex.ts`, never through the UI.
 
 Two settings in `playwright.config.ts` matter when reading results:
 
@@ -42,8 +54,12 @@ Two settings in `playwright.config.ts` matter when reading results:
   retry is reported as **flaky** and the run is green, so read the "flaky" line
   rather than the exit code (or use `--retries 0` for the real failure rate).
   In CI that same spec is a plain failure and fails the job.
-- `reuseExistingServer` locally, so a dev server you already have on `:5173`
-  is used as is.
+- The suite always serves the built bundle, never `bun run dev`, and never
+  reuses a running server. The backend URL is baked in at build time by the
+  deploy that created the preview, so a dev server reading `.env.local` would
+  talk to a different deployment than the one the run just provisioned. The
+  port is chosen free per run, so a run collides with neither your dev server
+  nor another checkout.
 
 Agent sandboxes usually cannot bind `:5173` (`listen EPERM`), so the
 pipeline's implement agent cannot run this suite.
@@ -64,16 +80,16 @@ else — it cannot reach prod or a dev deployment. Each run mints its own
 `TEST_SECRET` and auth keypair (`scripts/generate-test-keys.mjs`) and sets
 `OPTIONS_FIXTURES=1`, so the suite stores no long-lived secret.
 
-Not landed yet: `bun run test:web` in a local checkout still uses whatever
-`.env.local` points at. The same recipe reaches local runs and the pipeline
-with the rest of #154; this change converts CI only.
+Convex expires previews five days after creation, so there is nothing to clean
+up and no cron to run.
 
 ## The dev deployment is shared
 
-`bun run convex:dev`, `bunx convex dev --once`, and by extension `test:web`
-push the **current branch's** functions and schema to the one dev deployment
-named in `.env.local`. That is the dev loop, not the e2e recipe above: one
-deployment for every branch you check out.
+`bun run convex:dev` and `bunx convex dev --once` push the **current branch's**
+functions and schema to the one dev deployment named in `.env.local`. That is
+the dev loop: one deployment for every branch you check out. The e2e suite no
+longer touches it — it runs on its own preview — so the rows it used to leave
+behind are no longer a source of schema push failures.
 Consequences:
 
 - Any other local client of that deployment, another worktree or `main`
