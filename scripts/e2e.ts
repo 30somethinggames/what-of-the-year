@@ -7,10 +7,12 @@ import { join } from "node:path";
 /**
  * Runs the e2e suite against a Convex preview deployment this script creates.
  *
- * The suite reads no `.env.local`. The deployment is made here, the secrets are
- * minted here, and both reach Playwright as environment for one command. That
- * is what lets a fresh checkout, an agent worktree and CI run the same thing
- * without anybody copying an env file around.
+ * The suite takes no deployment settings from `.env.local`. The deployment is
+ * made here and the secrets are minted here, and both reach Playwright as
+ * environment for one command, so every checkout runs the same thing without
+ * anybody copying an env file around. The one exception is
+ * `CONVEX_DEPLOY_KEY`, which cannot be minted here — bun loads it from
+ * `.env.local`.
  *
  * It cannot live in Playwright's `globalSetup`: the config needs `baseURL` and
  * `webServer.command` at load time, and both depend on the preview URL and the
@@ -24,8 +26,9 @@ if (!process.env.CONVEX_DEPLOY_KEY) {
   console.error(
     "CONVEX_DEPLOY_KEY is empty, so there is no backend to test against.\n" +
       "Mint a preview deploy key in the Convex dashboard (project settings) and\n" +
-      "export it. It can only create preview deployments and set env vars on\n" +
-      "them; it cannot reach prod or anyone's dev deployment.\n" +
+      "put it in .env.local — bun loads that file, so nothing needs exporting.\n" +
+      "It can only create preview deployments and set env vars on them; it\n" +
+      "cannot reach prod or anyone's dev deployment.\n" +
       "Dependabot reads its own secrets store; add the key there too.\n" +
       "Fork PRs get no secrets at all; re-run the change from a branch in this repo.",
   );

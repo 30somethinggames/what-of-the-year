@@ -39,12 +39,15 @@ blocking. Run `bun run test`, not bare `bun test`, or the floor is skipped.
 `bun run test:e2e` provisions its own backend and runs Playwright against it: it
 creates a Convex preview deployment named after the current branch, mints a
 `TEST_SECRET` and an auth keypair for the run, builds the bundle against the
-new deployment's URL, and serves that build. It reads no `.env.local` — the
-values are passed to Playwright as environment for that one command.
+new deployment's URL, and serves that build. It takes no deployment settings
+from `.env.local`; everything the suite talks to is created by the run and
+passed to Playwright as environment for that one command.
 
-The only thing it needs is `CONVEX_DEPLOY_KEY` in the environment, a preview
-deploy key from the Convex dashboard. It fails immediately and says so when
-that is missing.
+The one thing it needs is `CONVEX_DEPLOY_KEY`, a preview deploy key from the
+Convex dashboard. Keep it in `.env.local`: bun loads that file automatically, so
+a checkout needs no exporting and no shell setup. The script fails immediately
+and says so when the key is missing.
+
 
 Server state is seeded and cleared through the HTTP helpers in
 `playwright/helpers/convex.ts`, never through the UI.
@@ -62,9 +65,9 @@ Two settings in `playwright.config.ts` matter when reading results:
   port is chosen free per run, so a run collides with neither your dev server
   nor another checkout.
 
-An agent sandbox usually cannot bind a port (`listen EPERM`), so an agent
-writing a change cannot run this suite; whatever gates the branch runs it
-afterwards.
+A sandboxed environment often cannot bind a port (`listen EPERM`), so the suite
+may not be runnable where a change is written. Run it before you open the PR;
+CI runs it either way.
 
 `package.json` declares `gate` — the four checks then the e2e suite — so that
 what must pass before a PR is one named thing rather than something each caller
@@ -100,8 +103,8 @@ longer touches it — it runs on its own preview — so the rows it used to leav
 behind are no longer a source of schema push failures.
 Consequences:
 
-- Any other local client of that deployment, another worktree or `main`
-  checked out elsewhere, is now on this branch's API.
+- Any other local client of that deployment — a second checkout, or `main`
+  open elsewhere — is now on this branch's API.
 - A schema change is **refused** while stored rows violate it
   (`Schema validation failed … Path: .status`). Rows from earlier e2e runs are
   the usual cause. Clear them with the suite's cleanup endpoint, then push
