@@ -39,12 +39,17 @@ blocking. Run `bun run test`, not bare `bun test`, or the floor is skipped.
 `bun run test:e2e` provisions its own backend and runs Playwright against it: it
 creates a Convex preview deployment named after the current branch, mints a
 `TEST_SECRET` and an auth keypair for the run, builds the bundle against the
-new deployment's URL, and serves that build. It reads no `.env.local` — the
-values are passed to Playwright as environment for that one command.
+new deployment's URL, and serves that build. It takes no deployment settings
+from `.env.local`; everything the suite talks to is created by the run and
+passed to Playwright as environment for that one command.
 
-The only thing it needs is `CONVEX_DEPLOY_KEY` in the environment, a preview
-deploy key from the Convex dashboard. It fails immediately and says so when
-that is missing.
+The one thing it needs is `CONVEX_DEPLOY_KEY`, a preview deploy key from the
+Convex dashboard. Keep it in `.env.local`: bun loads that file automatically, so
+a checkout needs no exporting and no shell setup. The script fails immediately
+and says so when the key is missing.
+
+An unattended runner working a worktree is the exception — a worktree has no
+`.env.local`, so whatever invokes the gate has to supply the key itself.
 
 Server state is seeded and cleared through the HTTP helpers in
 `playwright/helpers/convex.ts`, never through the UI.

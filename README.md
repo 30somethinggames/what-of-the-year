@@ -23,10 +23,12 @@ bun run test:e2e   # Playwright, against a preview deployment it creates
 bun run ci         # both — exactly what CI runs on a PR
 ```
 
-`e2e` needs a Convex **preview deploy key** exported as `CONVEX_DEPLOY_KEY` —
-mint one in the Convex dashboard under project settings. It can only create
-preview deployments and set env vars on them; it cannot reach prod or anyone's
-dev deployment.
+`test:e2e` needs a Convex **preview deploy key**. Mint one in the Convex
+dashboard under project settings and add it to `.env.local` as
+`CONVEX_DEPLOY_KEY` — bun loads that file, so there is nothing to export. It can
+only create preview deployments and set env vars on them; it cannot reach prod
+or anyone's dev deployment. It is the one credential this repo cannot create for
+you: keys come from the dashboard.
 
 Each run deploys to a preview named after your current branch — or the short
 commit, in a detached checkout — and mints its own `TEST_SECRET` and auth
