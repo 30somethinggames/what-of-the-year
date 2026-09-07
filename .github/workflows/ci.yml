@@ -53,17 +53,11 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
-      - name: Check formatting
-        run: bun run check:format
-
-      - name: Check linting
-        run: bun run check:lint
-
-      - name: Check types
-        run: bun run check:types
-
-      - name: Run unit tests
-        run: bun run test
+      # By name, so what CI runs and what you run cannot drift apart. The two
+      # halves of `bun run ci` are split across these jobs deliberately: `check`
+      # fails fast and needs no backend, `test:e2e` provisions one.
+      - name: Run checks
+        run: bun run check
 
   # `needs: checks` is deliberate: a red lint/type/unit run means another push
   # is coming anyway, so an e2e run against that commit is wasted minutes. The
@@ -126,7 +120,7 @@ jobs:
       # image drops one, Playwright fails to launch with an explicit "Host system
       # is missing dependencies" error naming this command as the fix.
 
-      # The same script `mise run e2e` runs. It creates this run's preview
+      # The same script `bun run test:e2e` runs. It creates this run's preview
       # deployment, mints the test secret and auth keypair, builds against the
       # new URL and runs Playwright. CI's only difference is the preview's name.
       # Called directly rather than through mise: the runner has no mise, and
@@ -139,7 +133,7 @@ jobs:
              || 'main' }}
           PLAYWRIGHT_FORCE_TTY: "120"
           FORCE_COLOR: "1"
-        run: bun scripts/e2e.ts
+        run: bun run test:e2e
 
       # Failed and flaky specs on the check's Details page, so nobody has to
       # download the report to learn which test broke.
