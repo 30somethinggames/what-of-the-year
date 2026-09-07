@@ -46,14 +46,29 @@ Two settings in `playwright.config.ts` matter when reading results:
   is used as is.
 
 Agent sandboxes usually cannot bind `:5173` (`listen EPERM`), so the
-pipeline's implement agent cannot run this suite. CI runs it against a
-throwaway Docker Convex backend (`ci.yml` `e2e` job).
+pipeline's implement agent cannot run this suite.
+
+## Which backend the suite runs against
+
+E2E backends are **Convex preview deployments for machines, your own cloud dev
+deployment for you**. A machine names its preview after whatever it is working
+on, so two actors never collide: `ci.yml`'s `e2e` job takes `pr-<n>` on a pull
+request, `mg-<sha>` in the merge queue and `main` post-merge; the pipeline
+takes `agent-<issue>`. `convex deploy --preview-create <name>` replaces the
+deployment of that name, so a re-run reuses its own and nobody else's, and the
+preview is thrown away with the branch. The only credential involved is a
+preview deploy key (`CONVEX_DEPLOY_KEY`), which can create preview deployments
+and set env vars on them and nothing else — it cannot reach prod or anyone's
+dev deployment. Each run mints its own `TEST_SECRET` and auth keypair
+(`scripts/generate-test-keys.mjs`) and sets `OPTIONS_FIXTURES=1`, so no
+long-lived secret is stored for the suite.
 
 ## The dev deployment is shared
 
 `bun run convex:dev`, `bunx convex dev --once`, and by extension `test:web`
 push the **current branch's** functions and schema to the one dev deployment
-named in `.env.local`. There is no per-branch backend (#154 tracks that).
+named in `.env.local`. Machines get a preview per run (above); your own
+deployment is still one backend for every branch you check out.
 Consequences:
 
 - Any other local client of that deployment, another worktree or `main`

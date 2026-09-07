@@ -71,28 +71,34 @@ jobs:
   e2e:
     needs: checks
     runs-on: ubuntu-latest
-    # Backend pull, deploy and the suite land around 5 min; 15 leaves room for a
-    # slow runner without waiting out the 6-hour default on a wedged container.
+    # Preview deploy, build and the suite land around 5 min; 15 leaves room for a
+    # slow runner without waiting out the 6-hour default on a wedged step.
     timeout-minutes: 15
 
     permissions:
       contents: read
 
     env:
-      # Pinned by digest; referenced twice below (prefetch, then run).
-      CONVEX_BACKEND_IMAGE: ghcr.io/get-convex/convex-backend@sha256:1f2044e3eac463ac78973b136c0baf72d4ada602611d853d6f99f280e29e0a98
+      # A preview deploy key: it can create preview deployments and set env vars
+      # on them, and nothing else. It cannot touch prod or anyone's dev
+      # deployment, which is why this job is allowed a secret at all.
+      CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
-      # ~7s of the run is the backend image pull. Start it in the background so
-      # it overlaps the restores and the build below; the start step still pulls
-      # authoritatively (dockerd coalesces the in-flight layers), so a failed
-      # prefetch costs nothing but the overlap.
-      - name: Prefetch Convex backend image
+      # Dependabot runs read the Dependabot secrets store and forks read none,
+      # so the key can be empty here. Fail with the reason rather than skipping:
+      # a required check that skips is a silent green (#72).
+      - name: Require the preview deploy key
         run: |
-          nohup docker pull "$CONVEX_BACKEND_IMAGE" >/tmp/convex-pull.log 2>&1 &
+          if [ -z "$CONVEX_DEPLOY_KEY" ]; then
+            echo "CONVEX_DEPLOY_KEY is empty for this run, so there is no backend to test against." >&2
+            echo "Dependabot reads its own secrets store; add the preview deploy key there." >&2
+            echo "Fork PRs get no secrets at all; re-run the change from a branch in this repo." >&2
+            exit 1
+          fi
 
       # As in `checks`. No node step: mise.toml pins one because Playwright's
       # runner needs it on a laptop, and ubuntu-latest already ships one.
@@ -132,58 +138,64 @@ jobs:
       # image drops one, Playwright fails to launch with an explicit "Host system
       # is missing dependencies" error naming this command as the fix.
 
-      # The build needs nothing from the backend, so it runs first and covers the
-      # tail of the image prefetch above.
-      - name: Build frontend
-        run: VITE_CONVEX_URL=http://127.0.0.1:3210 bun run build
-
-      # Hermetic backend: a throwaway local Convex instance, ephemeral credentials,
-      # fixture option sources. No cloud, no repo secrets — runs identically for
-      # any actor (humans, Dependabot, forks).
-      - name: Start local Convex backend
+      # One preview deployment per run, named after what triggered it, so two
+      # actors never share a backend: CI takes `pr-<n>` / `mg-<sha>` / `main`,
+      # the pipeline takes `agent-<n>`, a laptop takes its branch name.
+      # `--preview-create` on an existing name replaces it, so a re-run of the
+      # same PR reuses its own deployment and nobody else's.
+      - name: Name this run's preview deployment
+        id: preview
+        env:
+          EVENT: ${{ github.event_name }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          MERGE_SHA: ${{ github.event.merge_group.head_sha }}
         run: |
-          INSTANCE_SECRET=$(openssl rand -hex 32)
-          echo "INSTANCE_SECRET=$INSTANCE_SECRET" >> "$GITHUB_ENV"
-          docker run -d --name convex-backend \
-            -p 3210:3210 -p 3211:3211 \
-            -e INSTANCE_NAME=woty-ci \
-            -e INSTANCE_SECRET="$INSTANCE_SECRET" \
-            -e CONVEX_CLOUD_ORIGIN=http://127.0.0.1:3210 \
-            -e CONVEX_SITE_ORIGIN=http://127.0.0.1:3211 \
-            -e DISABLE_BEACON=true \
-            "$CONVEX_BACKEND_IMAGE"
-          for i in $(seq 1 60); do
-            curl -fsS http://127.0.0.1:3210/version >/dev/null 2>&1 && exit 0
-            sleep 1
-          done
-          echo "Convex backend failed to become healthy" >&2
-          docker logs convex-backend >&2
-          exit 1
+          case "$EVENT" in
+            pull_request) NAME="pr-$PR_NUMBER" ;;
+            merge_group) NAME="mg-${MERGE_SHA:0:12}" ;;
+            *) NAME="main" ;;
+          esac
+          echo "name=$NAME" >> "$GITHUB_OUTPUT"
 
+      # Ephemeral per run: the preview is thrown away with the PR, so nothing
+      # here is worth storing as a repo secret. Fixture option sources keep the
+      # suite off IGDB/TMDB/OpenLibrary.
       - name: Generate ephemeral credentials
         id: creds
         run: |
-          ADMIN_KEY=$(docker exec convex-backend ./generate_admin_key.sh | tail -1)
-          echo "::add-mask::$ADMIN_KEY"
-          echo "admin_key=$ADMIN_KEY" >> "$GITHUB_OUTPUT"
           echo "test_secret=$(openssl rand -hex 32)" >> "$GITHUB_OUTPUT"
           bun scripts/generate-test-keys.mjs
 
-      - name: Deploy functions and configure backend
+      # The deploy hands the new deployment's URL to the build, which bakes it
+      # into the bundle `bun run preview` serves. Only the cloud URL is exposed,
+      # so the site origin the test helpers POST to is derived from it.
+      - name: Deploy Convex preview and build frontend
         env:
-          CONVEX_SELF_HOSTED_URL: http://127.0.0.1:3210
-          CONVEX_SELF_HOSTED_ADMIN_KEY: ${{ steps.creds.outputs.admin_key }}
+          PREVIEW_NAME: ${{ steps.preview.outputs.name }}
         run: |
-          bunx convex deploy --yes
-          bunx convex env set TEST_SECRET "${{ steps.creds.outputs.test_secret }}"
-          bunx convex env set OPTIONS_FIXTURES 1
-          cat /tmp/jwt-private-key.txt | bunx convex env set JWT_PRIVATE_KEY
-          bunx convex env set JWKS "$(cat /tmp/jwks.json)"
+          bunx convex deploy \
+            --preview-create "$PREVIEW_NAME" \
+            --cmd 'printf %s "$VITE_CONVEX_URL" > /tmp/convex-url.txt && bun run build' \
+            --cmd-url-env-var-name VITE_CONVEX_URL
+          CLOUD_URL=$(cat /tmp/convex-url.txt)
+          echo "CONVEX_SITE_URL=${CLOUD_URL%.cloud}.site" >> "$GITHUB_ENV"
+
+      # After the deploy, not before: `--preview-create` is what creates the
+      # deployment. Setting TEST_SECRET re-analyses the modules, which is what
+      # registers the `/test/*` routes `convex/http.ts` gates on it.
+      - name: Configure the preview deployment
+        env:
+          PREVIEW_NAME: ${{ steps.preview.outputs.name }}
+          TEST_SECRET: ${{ steps.creds.outputs.test_secret }}
+        run: |
+          bunx convex env set TEST_SECRET "$TEST_SECRET" --preview-name "$PREVIEW_NAME"
+          bunx convex env set OPTIONS_FIXTURES 1 --preview-name "$PREVIEW_NAME"
+          cat /tmp/jwt-private-key.txt | bunx convex env set JWT_PRIVATE_KEY --preview-name "$PREVIEW_NAME"
+          bunx convex env set JWKS "$(cat /tmp/jwks.json)" --preview-name "$PREVIEW_NAME"
 
       - name: Run Playwright tests
         env:
           TEST_SECRET: ${{ steps.creds.outputs.test_secret }}
-          CONVEX_SITE_URL: http://127.0.0.1:3211
           PLAYWRIGHT_FORCE_TTY: "120"
           FORCE_COLOR: "1"
         run: bunx playwright test
@@ -210,12 +222,6 @@ jobs:
             (specs("flaky") | if length > 0 then "## e2e flaky — passed on retry (\(length))\n" + ([render] | join("\n")) + "\n" else empty end),
             (if (specs("unexpected") | length) == 0 and (specs("flaky") | length) == 0 then "## e2e — all passed, no retries" else empty end)
           ' "$F" >> "$GITHUB_STEP_SUMMARY"
-
-      - name: Dump backend logs on failure
-        if: failure()
-        # The build runs before the backend starts, so a build failure reaches
-        # here with no container; don't add a second red step for that.
-        run: docker logs convex-backend || true
 
       - name: Upload test artifacts
         if: ${{ !cancelled() }}
