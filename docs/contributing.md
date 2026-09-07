@@ -21,12 +21,31 @@ or a session link to PR bodies.
 
 ## Commits and PR titles
 
-Conventional Commits: `type(scope): summary`, type is one of `feat`, `fix`,
-`chore`, `ci`. The scope is the area touched (`convex`, `lobby`, `round`,
-`session`, `ci`, `deps`, `rules`), never the author or the issue number. PR
-titles use the same format; `pr-title.yml` rejects anything else, and the
-release tooling reads the type to decide the version bump and changelog
-section (see `release.md`).
+Conventional Commits: `type(scope): summary`. The scope is the area touched
+(`convex`, `lobby`, `round`, `session`, `ci`, `deps`, `rules`), never the author
+or the issue number, and it is required. PR titles use the same format;
+`pr-title.yml` rejects anything else.
+
+The types are the Conventional Commits set. Pick the one that describes the
+change, not the one that sounds safest:
+
+| | |
+| --- | --- |
+| `feat` | new behaviour someone can use |
+| `fix` | a defect in behaviour that already shipped |
+| `perf` | same behaviour, measurably faster or smaller |
+| `refactor` | same behaviour, different shape |
+| `docs` | documentation and comments only |
+| `test` | tests only |
+| `style` | formatting only, no code meaning changed |
+| `build` | dependencies, bundling, the toolchain |
+| `ci` | workflows and anything that runs in CI |
+| `chore` | housekeeping that fits nothing above |
+| `revert` | undoing an earlier commit |
+
+Only `feat` and `fix` change a version, and only the types listed in
+`changelog-sections` appear in the changelog — everything else rides along
+silently. So the type is for the reader, not for the release; see `release.md`.
 
 ## Before asking for review
 
