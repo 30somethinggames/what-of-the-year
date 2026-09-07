@@ -145,6 +145,12 @@ test("non-host: host leaving game shows toast and redirects to home", async ({ b
   await expect(guestPage.getByTestId("setup-submit")).toBeEnabled();
   await guestPage.getByTestId("setup-submit").click();
 
+  // Wait for the join to reach the host before starting. Joins close when the
+  // session leaves the lobby, so starting first can land the guest's join on an
+  // active session, which is refused — the guest never joins and sees "Session
+  // is closed" instead of anything this test is about.
+  await expect(hostPage.getByText("Guest")).toBeVisible();
+
   await hostPage.getByTestId("lobby-start").click();
   await expect(guestPage.getByText("Round 10")).toBeVisible();
 
