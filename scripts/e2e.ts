@@ -77,6 +77,24 @@ try {
     --cmd-url-env-var-name VITE_CONVEX_URL`;
   const cloudUrl = (await readFile(urlFile, "utf8")).trim();
 
+  // The deploy just regenerated convex/_generated. Checking here, rather than
+  // after the suite, means a stale tree costs one deploy instead of a deploy
+  // plus the whole suite — and it still gets reported when a test fails, which
+  // it would not if the check ran last. `git status --porcelain` rather than
+  // `git diff` so a file the CLI newly emits counts too.
+  const drift = (await $`git status --porcelain -- convex/_generated`.text()).trim();
+  if (drift) {
+    await $`git diff -- convex/_generated`.nothrow();
+    console.error(
+      `${process.env.GITHUB_ACTIONS ? "::error::" : ""}convex/_generated is stale. The deploy ` +
+        "regenerated it into something other than what is committed:\n" +
+        drift +
+        "\nRun `bunx convex dev --once`, or `bunx convex codegen` against a deployment, and " +
+        "commit convex/_generated.",
+    );
+    throw new Error("convex/_generated is stale");
+  }
+
   // After the deploy, not before: --preview-create is what creates the
   // deployment. Setting TEST_SECRET re-analyses the modules, which is what
   // registers the /test/* routes convex/http.ts gates on it.
@@ -96,23 +114,6 @@ try {
     CONVEX_SITE_URL: cloudUrl.replace(/\.cloud$/, ".site"),
     E2E_PORT: String(port),
   });
-
-  // The deploy above regenerated convex/_generated. Nothing noticed when the
-  // result differed from what is committed, so the next `convex` bump would
-  // land stale generated files quietly. Here rather than in `ci.yml` so the
-  // command a person runs is the command CI runs. --porcelain, not
-  // `git diff`, so a generated file the CLI newly emits counts as drift too.
-  const drift = (await $`git status --porcelain -- convex/_generated`.text()).trim();
-  if (drift) {
-    console.error(drift);
-    await $`git diff -- convex/_generated`.nothrow();
-    console.error(
-      `${process.env.GITHUB_ACTIONS ? "::error::" : ""}convex/_generated is stale: the deploy ` +
-        "regenerated it into something other than what is committed. Run 'bunx convex dev --once' " +
-        "(or 'bunx convex codegen' against a deployment) and commit convex/_generated.",
-    );
-    process.exitCode = 1;
-  }
 } finally {
   await rm(work, { recursive: true, force: true });
 }
