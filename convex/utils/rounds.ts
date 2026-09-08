@@ -9,6 +9,15 @@ export function isRoundRevealed(round: Doc<"rounds">) {
   return round.state === "revealing" || round.state === "closed";
 }
 
+/**
+ * How long a reveal runs before `completeReveal` closes the round — long enough
+ * for every player's pick to be shown in turn. Shared with the test seed so a
+ * seeded `revealing` round times out exactly like one `advanceRound` opened.
+ */
+export function revealDurationMs(playerCount: number) {
+  return playerCount * 4_000 + 5_000;
+}
+
 export async function getRoundByNumber(
   db: DatabaseReader,
   sessionId: Id<"sessions">,

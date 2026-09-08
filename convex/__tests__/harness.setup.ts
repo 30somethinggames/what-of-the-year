@@ -2,9 +2,10 @@ import { Glob } from "bun";
 
 import { convexTest } from "convex-test";
 
-import type { Id } from "../_generated/dataModel";
-import { MAX_PLAYERS, MAX_ROUNDS, SessionStatus } from "../constants";
+import { MAX_ROUNDS } from "../constants";
 import schema from "../schema";
+import type { Phase, SeededGame } from "../test/phases";
+import { seedSession } from "../test/phases";
 
 // `convex-test` normally discovers modules via Vite's `import.meta.glob`, which
 // Bun does not implement — build the equivalent `path -> loader` map by hand.
@@ -15,21 +16,38 @@ const RATE_LIMITER_ROOT = new URL(
   import.meta.url,
 ).pathname;
 
-function moduleMap(root: string) {
+function moduleMap(root: string, httpSuffix = "") {
   const modules: Record<string, () => Promise<unknown>> = {};
 
   for (const path of new Glob("**/*.{ts,js}").scanSync({ cwd: root })) {
     if (path.endsWith(".d.ts") || path.includes(".test.") || path.startsWith("__tests__/"))
       continue;
-    modules[`./${path}`] = () => import(root + path);
+    const specifier = root + path + (path === "http.ts" ? httpSuffix : "");
+    modules[`./${path}`] = () => import(specifier);
   }
 
   return modules;
 }
 
+/**
+ * `convex/http.ts` decides at module evaluation which `/test/*` routes exist,
+ * so a test that changes `TEST_SECRET` or `IS_PROD` has to get past bun's
+ * module cache. A distinct specifier is the only way; everything http.ts
+ * imports stays shared.
+ */
+let httpGeneration = 0;
+
+interface SetupOptions {
+  /** Evaluate `convex/http.ts` again, against the environment set right now. */
+  freshHttp?: boolean;
+}
+
 /** A `convex-test` instance with the rate limiter component registered. */
-export async function setupTest() {
-  const t = convexTest(schema, moduleMap(CONVEX_ROOT));
+export async function setupTest({ freshHttp = false }: SetupOptions = {}) {
+  const t = convexTest(
+    schema,
+    moduleMap(CONVEX_ROOT, freshHttp ? `?http=${++httpGeneration}` : ""),
+  );
   const rateLimiterSchema = (await import(`${RATE_LIMITER_ROOT}schema.ts`)).default;
 
   t.registerComponent("rateLimiter", rateLimiterSchema, moduleMap(RATE_LIMITER_ROOT));
@@ -43,61 +61,28 @@ export const OUTSIDER_UID = "outsider-uid";
 
 type TestConvex = Awaited<ReturnType<typeof setupTest>>;
 
-export type SeededGame = {
-  sessionId: Id<"sessions">;
-  roundIds: Id<"rounds">[];
-};
+export type { SeededGame };
+
+/** The two players every harness seed carries: `HOST_UID` hosts, `MEMBER_UID` joins. */
+const PLAYERS = [
+  { name: "Host", avatar: "🐙", uid: HOST_UID },
+  { name: "Member", avatar: "🦊", uid: MEMBER_UID },
+];
+
+/**
+ * The phases below go through the same `seedSession` the `/test/seed-game`
+ * route uses, so a unit test and an e2e spec are looking at the same rows.
+ */
+function seedPhase(t: TestConvex, phase: Phase) {
+  return t.run((ctx) => seedSession(ctx, { phase, players: PLAYERS }));
+}
 
 /**
  * An ACTIVE session with a host, one other member, and `MAX_ROUNDS` rounds
  * where the highest-numbered round is `open` (matching `startSession`).
  */
 export async function seedActiveGame(t: TestConvex): Promise<SeededGame> {
-  return await t.run(async (ctx) => {
-    const sessionId = await ctx.db.insert("sessions", {
-      topic: "games",
-      year: 2025,
-      maxRounds: MAX_ROUNDS,
-      maxPlayers: MAX_PLAYERS,
-      playerCount: 2,
-      activeRoundNumber: MAX_ROUNDS,
-      status: SessionStatus.ACTIVE,
-    });
-
-    await ctx.db.insert("players", {
-      sessionId,
-      uid: HOST_UID,
-      name: "Host",
-      avatar: "🐙",
-      isHost: true,
-    });
-    await ctx.db.insert("players", {
-      sessionId,
-      uid: MEMBER_UID,
-      name: "Member",
-      avatar: "🦊",
-      isHost: false,
-    });
-
-    const roundIds: Id<"rounds">[] = [];
-
-    for (let number = 1; number <= MAX_ROUNDS; number++) {
-      const isActive = number === MAX_ROUNDS;
-      roundIds.push(
-        await ctx.db.insert("rounds", {
-          sessionId,
-          number,
-          state: isActive ? "open" : "pending",
-          weight: MAX_ROUNDS + 1 - number,
-          selectionsComplete: 0,
-          startedAt: isActive ? Date.now() : null,
-          closedAt: null,
-        }),
-      );
-    }
-
-    return { sessionId, roundIds };
-  });
+  return await seedPhase(t, `round:${MAX_ROUNDS}`);
 }
 
 /**
@@ -105,17 +90,7 @@ export async function seedActiveGame(t: TestConvex): Promise<SeededGame> {
  * rounds (matching `createSession`).
  */
 export async function seedLobbyGame(t: TestConvex): Promise<SeededGame> {
-  const game = await seedActiveGame(t);
-
-  await t.run(async (ctx) => {
-    await ctx.db.patch(game.sessionId, {
-      status: SessionStatus.LOBBY,
-      activeRoundNumber: 1,
-    });
-    await ctx.db.patch(game.roundIds[MAX_ROUNDS - 1], { state: "pending", startedAt: null });
-  });
-
-  return game;
+  return await seedPhase(t, "lobby");
 }
 
 /**
@@ -124,21 +99,7 @@ export async function seedLobbyGame(t: TestConvex): Promise<SeededGame> {
  * after round 2).
  */
 export async function seedFinalRound(t: TestConvex): Promise<SeededGame> {
-  const game = await seedActiveGame(t);
-
-  await t.run(async (ctx) => {
-    await ctx.db.patch(game.sessionId, { activeRoundNumber: 1 });
-    for (const [index, roundId] of game.roundIds.entries()) {
-      const isFinal = index === 0;
-      await ctx.db.patch(roundId, {
-        state: isFinal ? "open" : "closed",
-        startedAt: Date.now(),
-        closedAt: isFinal ? null : Date.now(),
-      });
-    }
-  });
-
-  return game;
+  return await seedPhase(t, "round:1");
 }
 
 /**
@@ -146,14 +107,7 @@ export async function seedFinalRound(t: TestConvex): Promise<SeededGame> {
  * `completeReveal` leaves after round 1).
  */
 export async function seedCompleteGame(t: TestConvex): Promise<SeededGame> {
-  const game = await seedFinalRound(t);
-
-  await t.run(async (ctx) => {
-    await ctx.db.patch(game.sessionId, { status: SessionStatus.COMPLETE });
-    await ctx.db.patch(game.roundIds[0], { state: "closed", closedAt: Date.now() });
-  });
-
-  return game;
+  return await seedPhase(t, "ended");
 }
 
 export const OPTION = {

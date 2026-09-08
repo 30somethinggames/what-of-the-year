@@ -1,4 +1,5 @@
 import { internal } from "../_generated/api";
+import type { ActionCtx } from "../_generated/server";
 import { httpAction } from "../_generated/server";
 import { timingSafeEqual } from "../utils/env";
 
@@ -11,29 +12,40 @@ function guardTest(request: Request) {
   return null;
 }
 
-export const addPlayer = httpAction(async (ctx, request) => {
-  const denied = guardTest(request);
-  if (denied) return denied;
+/**
+ * A `/test/*` route: the secret guard, the JSON body, and a JSON reply. The
+ * body reaches the mutation unvalidated on purpose — the mutation's own `args`
+ * validators are the check, and there is one of them rather than two.
+ */
+// oxlint-disable-next-line no-explicit-any -- the body is whatever the mutation validates.
+function testRoute(run: (ctx: ActionCtx, body: any) => Promise<unknown>) {
+  return httpAction(async (ctx, request) => {
+    const denied = guardTest(request);
+    if (denied) return denied;
 
-  const body = await request.json();
-  const result = await ctx.runMutation(internal.test.seed.addPlayer, body);
+    const result = (await run(ctx, await request.json())) ?? { ok: true };
 
-  return new Response(JSON.stringify(result), {
-    headers: { "Content-Type": "application/json" },
+    return new Response(JSON.stringify(result), {
+      headers: { "Content-Type": "application/json" },
+    });
   });
-});
+}
 
-export const makeSelection = httpAction(async (ctx, request) => {
-  const denied = guardTest(request);
-  if (denied) return denied;
+export const createSession = testRoute((ctx, body) =>
+  ctx.runMutation(internal.test.seed.createSession, body),
+);
 
-  const body = await request.json();
-  await ctx.runMutation(internal.test.seed.makeSelection, body);
+export const seedGame = testRoute((ctx, body) =>
+  ctx.runMutation(internal.test.seed.seedGame, body),
+);
 
-  return new Response(JSON.stringify({ ok: true }), {
-    headers: { "Content-Type": "application/json" },
-  });
-});
+export const addPlayer = testRoute((ctx, body) =>
+  ctx.runMutation(internal.test.seed.addPlayer, body),
+);
+
+export const makeSelection = testRoute((ctx, body) =>
+  ctx.runMutation(internal.test.seed.makeSelection, body),
+);
 
 export const cleanup = httpAction(async (ctx, request) => {
   const denied = guardTest(request);

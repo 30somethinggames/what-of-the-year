@@ -8,7 +8,7 @@ import { rateLimiter } from "./ratelimits";
 import { requireSessionMember } from "./utils/auth";
 import { apiError } from "./utils/errors";
 import { buildPickArg } from "./utils/pick";
-import { getRoundByNumber, isRoundRevealed } from "./utils/rounds";
+import { getRoundByNumber, isRoundRevealed, revealDurationMs } from "./utils/rounds";
 
 export const getSelections = query({
   args: { sessionId: v.id("sessions"), number: v.number() },
@@ -113,10 +113,10 @@ export const saveSelection = mutation({
     const allComplete = selectionsComplete > 0 && selectionsComplete >= session.playerCount;
 
     if (allComplete) {
-      const revealDurationMs = session.playerCount * 4_000 + 5_000;
-      const revealEndsAt = Date.now() + revealDurationMs;
+      const durationMs = revealDurationMs(session.playerCount);
+      const revealEndsAt = Date.now() + durationMs;
 
-      const jobId = await ctx.scheduler.runAfter(revealDurationMs, internal.rounds.completeReveal, {
+      const jobId = await ctx.scheduler.runAfter(durationMs, internal.rounds.completeReveal, {
         sessionId,
         roundNumber,
       });
