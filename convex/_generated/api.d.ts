@@ -24,6 +24,7 @@ import type * as selections from "../selections.js";
 import type * as sessions from "../sessions.js";
 import type * as test_fixtures from "../test/fixtures.js";
 import type * as test_http from "../test/http.js";
+import type * as test_phases from "../test/phases.js";
 import type * as test_seed from "../test/seed.js";
 import type * as tmdb from "../tmdb.js";
 import type * as utils_auth from "../utils/auth.js";
@@ -58,6 +59,7 @@ declare const fullApi: ApiFromModules<{
   sessions: typeof sessions;
   "test/fixtures": typeof test_fixtures;
   "test/http": typeof test_http;
+  "test/phases": typeof test_phases;
   "test/seed": typeof test_seed;
   tmdb: typeof tmdb;
   "utils/auth": typeof utils_auth;
