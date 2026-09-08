@@ -12,18 +12,20 @@
 
    ```bash
    bunx convex dev   # in one terminal
-   bun run dev      # in another
+   mise run dev      # in another
    ```
 
 ## Running the tests
 
 ```bash
-bun run check      # format, lint, types, unit tests
-bun run test:e2e   # Playwright, against a preview deployment it creates
-bun run ci         # both — exactly what CI runs on a PR
+mise run check      # format, lint, types, unit tests
+mise run test:e2e   # Playwright, against a preview deployment it creates
+mise run ci         # both — exactly what CI runs on a PR
 ```
 
-`test:e2e` needs a Convex **preview deploy key**. Mint one in the Convex
+`mise tasks` lists everything with a description.
+
+`mise run test:e2e` needs a Convex **preview deploy key**. Mint one in the Convex
 dashboard under project settings and add it to `.env.local` as
 `CONVEX_DEPLOY_KEY` — bun loads that file, so there is nothing to export. It can
 only create preview deployments and set env vars on them; it cannot reach prod

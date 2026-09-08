@@ -12,3 +12,51 @@ bun = "1.3.11"
 # Nothing else in the repo does. When Playwright runs under bun, delete this
 # line; there is nothing else to unwind.
 node = "24"
+
+# Tasks are the entry point for everything a person or CI runs. `mise tasks`
+# lists them. package.json keeps only the scripts other tools invoke by name.
+#
+# Commands go through `bunx` so they resolve node_modules/.bin. Putting that on
+# PATH with `[env]` would work too, but a mise.toml with an env block has to be
+# trusted before it runs, and that is a setup step on every checkout.
+
+[tasks.dev]
+description = "Vite dev server"
+run = "bunx vite"
+
+[tasks.format]
+description = "Check formatting"
+run = "bunx oxfmt --check ."
+
+[tasks."format:fix"]
+description = "Format in place"
+run = "bunx oxfmt ."
+
+[tasks.lint]
+description = "Lint"
+run = "bunx oxlint ."
+
+[tasks."lint:fix"]
+description = "Lint and fix what can be fixed"
+run = "bunx oxlint --fix ."
+
+[tasks.types]
+description = "Type-check"
+run = "bunx tsc --noEmit"
+
+[tasks.test]
+description = "Unit tests, with the coverage floor"
+run = "bun test --coverage"
+
+[tasks."test:e2e"]
+description = "Playwright against a Convex preview deployment this run creates"
+run = "bun scripts/e2e.ts"
+
+[tasks.check]
+description = "Format, lint, types and unit tests — what must pass before a commit"
+depends = ["format", "lint", "types", "test"]
+
+[tasks.ci]
+description = "Everything CI runs on a PR"
+depends = ["check"]
+run = "mise run test:e2e"

@@ -17,5 +17,6 @@ bunx oxfmt --no-error-on-unmatched-pattern $STAGED_FILES
 git add $STAGED_FILES
 fi
 
-# Check TypeScript types
-bun run types
+# Check TypeScript types. Called directly, not through mise: a git hook runs
+# with a restricted PATH and mise may not be on it.
+bunx tsc --noEmit

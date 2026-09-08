@@ -4,19 +4,9 @@
   "private": true,
   "author": "Ryan Seery & Melissa DeLorenzo",
   "scripts": {
-    "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
     "convex:dev": "bunx convex dev",
-    "format": "oxfmt --check .",
-    "format:fix": "oxfmt .",
-    "lint": "oxlint .",
-    "lint:fix": "oxlint --fix .",
-    "types": "bunx tsc --noEmit",
-    "test": "bun test --coverage",
-    "test:e2e": "bun scripts/e2e.ts",
-    "check": "bun run format && bun run lint && bun run types && bun run test",
-    "ci": "bun run check && bun run test:e2e",
     "prepare": "husky"
   },
   "dependencies": {
