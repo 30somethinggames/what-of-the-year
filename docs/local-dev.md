@@ -43,6 +43,15 @@ new deployment's URL, and serves that build. It takes no deployment settings
 from `.env.local`; everything the suite talks to is created by the run and
 passed to Playwright as environment for that one command.
 
+`mise run test:e2e:smoke` runs the same thing over the three journey specs
+only — `pregame/smoke`, `game/single-player`, `game/multiplayer`, the ones
+tagged `@smoke`. That is the subset for the loop while working; before a PR run
+the whole suite, and CI runs everything regardless. It is a task rather than
+something you remember because the tag is ours, not Playwright's, and `mise
+tasks` is where this repo says what there is to run. Arguments reach Playwright
+either way, so any other slice is a flag: `mise run test:e2e -- --grep @smoke`
+is exactly what the task runs, and `-- --ui` or `-- --retries 0` work the same.
+
 The one thing it needs is `CONVEX_DEPLOY_KEY`, a preview deploy key from the
 Convex dashboard. Keep it in `.env.local`: bun loads that file automatically, so
 a checkout needs no exporting and no shell setup. The script fails immediately

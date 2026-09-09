@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("smoke: home → setup → lobby → round → settings", async ({ page }) => {
+test("smoke: home → setup → lobby → round → settings", { tag: "@smoke" }, async ({ page }) => {
   await page.goto("/");
 
   // Home Screen

@@ -10,7 +10,7 @@ async function pickRound(page: Page, letter: string) {
   await page.getByTestId("reveal-skip").click();
 }
 
-test("single-player: full game", async ({ page }) => {
+test("single-player: full game", { tag: "@smoke" }, async ({ page }) => {
   await page.goto("/");
 
   // Home → Setup
