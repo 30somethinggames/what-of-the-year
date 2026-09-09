@@ -4,7 +4,7 @@
 # The project runtime and package manager. Keep in step with `engines.bun` in
 # package.json and with the version CI installs (`.github/workflows/ci.yml`
 # reads this file).
-bun = "1.3.11"
+bun = "1.4.2"
 
 # Playwright only. Its test runner (1.62) will not load our specs under the bun
 # runtime — `bunx playwright test` with no node on PATH fails with
