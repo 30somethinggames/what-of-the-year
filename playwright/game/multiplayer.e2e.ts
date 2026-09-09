@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 import { addPlayer, makeSelection } from "../helpers/convex";
 
-test("multiplayer: host flow with advance-round", async ({ page }) => {
+test("multiplayer: host flow with advance-round", { tag: "@smoke" }, async ({ page }) => {
   await page.goto("/");
 
   // Home → Setup

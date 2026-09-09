@@ -52,6 +52,10 @@ run = "bun test --coverage"
 description = "Playwright against a Convex preview deployment this run creates"
 run = "bun scripts/e2e.ts"
 
+[tasks."test:e2e:smoke"]
+description = "The three journey specs only — the fast subset for the working loop"
+run = "bun scripts/e2e.ts --grep @smoke"
+
 [tasks.check]
 description = "Format, lint, types and unit tests — what must pass before a commit"
 depends = ["format", "lint", "types", "test"]
