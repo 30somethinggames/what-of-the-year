@@ -1,6 +1,8 @@
 import { expect, test } from "@playwright/test";
 
-import { addPlayer, makeSelection } from "../helpers/convex";
+import { addPlayer, makeSelection, seedGame, signIn } from "../helpers/convex";
+
+const YEAR = 2026;
 
 test("multiplayer: host flow with advance-round", { tag: "@smoke" }, async ({ page }) => {
   await page.goto("/");
@@ -116,4 +118,53 @@ test("multiplayer: host flow with advance-round", { tag: "@smoke" }, async ({ pa
   await expect(page.getByText("Mario")).toBeVisible();
   await expect(page.getByText("Hades")).toBeVisible();
   await expect(page.getByText(/\d+pts/).first()).toBeVisible();
+});
+
+test("multiplayer: a guest's pick reaches the host's player list", async ({ browser }) => {
+  const hostContext = await browser.newContext();
+  const hostPage = await hostContext.newPage();
+  const guestContext = await browser.newContext();
+  const guestPage = await guestContext.newPage();
+
+  // Each page signs itself in before the seed runs — a page can only be handed
+  // an identity it already holds, see `currentUid` in helpers/convex.ts.
+  const hostUid = await signIn(hostPage);
+  const guestUid = await signIn(guestPage);
+
+  const { sessionId } = await seedGame({
+    phase: "round:10",
+    year: YEAR,
+    players: [
+      { name: "Ryan", uid: hostUid },
+      { name: "Melissa", uid: guestUid },
+    ],
+  });
+
+  await hostPage.goto(`/games/${YEAR}/${sessionId}`);
+  await guestPage.goto(`/games/${YEAR}/${sessionId}`);
+  await expect(guestPage.getByTestId("pick-input")).toBeVisible();
+
+  // The host watches the list while the round is still open — with two players
+  // and only one pick in, nothing closes the round.
+  await hostPage.getByTestId("settings-button").click();
+  await expect(hostPage.getByTestId("sidebar-title")).toBeVisible();
+
+  const guestRow = hostPage.getByText("Melissa").locator("..");
+  const hostRow = hostPage.getByText("Ryan").locator("..");
+  await expect(guestRow).toContainText("...");
+
+  // Guest picks in their own browser
+  await guestPage.getByTestId("pick-input").fill("a");
+  await expect(guestPage.getByTestId("suggestion-item").first()).toBeVisible();
+  await guestPage.getByTestId("suggestion-item").first().click();
+  await expect(guestPage.getByTestId("submit-pick")).toBeEnabled();
+  await guestPage.getByTestId("submit-pick").click();
+
+  // Host's list marks the guest done and leaves the host, who has not picked,
+  // as they were
+  await expect(guestRow).toContainText("✓");
+  await expect(hostRow).toContainText("...");
+
+  await hostContext.close();
+  await guestContext.close();
 });

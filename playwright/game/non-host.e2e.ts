@@ -1,5 +1,9 @@
 import { expect, test, type Page } from "@playwright/test";
 
+import { seedGame, signIn } from "../helpers/convex";
+
+const YEAR = 2026;
+
 async function pickRound(page: Page, letter: string) {
   await page.getByTestId("pick-input").fill(letter);
   await expect(page.getByTestId("suggestion-item").first()).toBeVisible();
@@ -164,6 +168,47 @@ test("non-host: host leaving game shows toast and redirects to home", async ({ b
   await expect(guestPage.getByTestId("toast")).toBeVisible();
   await expect(guestPage.getByTestId("toast")).toHaveText("The host forfeited the game.");
   await expect(guestPage.getByTestId("home-start")).toBeVisible();
+
+  await hostContext.close();
+  await guestContext.close();
+});
+
+test("non-host: host advancing mid-game moves the guest's round", async ({ browser }) => {
+  const hostContext = await browser.newContext();
+  const hostPage = await hostContext.newPage();
+  const guestContext = await browser.newContext();
+  const guestPage = await guestContext.newPage();
+
+  // Each page signs itself in before the seed runs — a page can only be handed
+  // an identity it already holds, see `currentUid` in helpers/convex.ts.
+  const hostUid = await signIn(hostPage);
+  const guestUid = await signIn(guestPage);
+
+  const { sessionId } = await seedGame({
+    phase: "round:8",
+    year: YEAR,
+    players: [
+      { name: "Ryan", uid: hostUid },
+      { name: "Melissa", uid: guestUid },
+    ],
+  });
+
+  await hostPage.goto(`/games/${YEAR}/${sessionId}`);
+  await guestPage.goto(`/games/${YEAR}/${sessionId}`);
+
+  // Both are on round 8 before the advance, so what follows is the advance
+  // reaching a live guest page rather than a page loading after the fact.
+  await expect(hostPage.getByText("Round 8")).toBeVisible();
+  await expect(guestPage.getByText("Round 8")).toBeVisible();
+
+  // Host advances from the sidebar. Nobody has picked, so the round advances
+  // directly — no reveal to skip.
+  await hostPage.getByTestId("settings-button").click();
+  await expect(hostPage.getByTestId("advance-round")).toBeVisible();
+  await hostPage.getByTestId("advance-round").click();
+
+  await expect(guestPage.getByText("Round 7")).toBeVisible();
+  await expect(hostPage.getByText("Round 7")).toBeVisible();
 
   await hostContext.close();
   await guestContext.close();

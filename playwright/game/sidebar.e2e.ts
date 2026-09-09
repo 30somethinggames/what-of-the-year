@@ -1,6 +1,8 @@
 import { expect, test } from "@playwright/test";
 
-import { addPlayer } from "../helpers/convex";
+import { addPlayer, seedGame, signIn } from "../helpers/convex";
+
+const YEAR = 2026;
 
 test("sidebar: opens and closes via button and backdrop", async ({ page }) => {
   await page.goto("/");
@@ -77,4 +79,50 @@ test("kick: host kicks a player from the game sidebar", async ({ page }) => {
   // Close sidebar
   await page.getByTestId("close-sidebar").click();
   await expect(page.getByTestId("sidebar-title")).not.toBeVisible();
+});
+
+test("kick: the kicked player's own screen reacts", async ({ browser }) => {
+  const hostContext = await browser.newContext();
+  const hostPage = await hostContext.newPage();
+  const guestContext = await browser.newContext();
+  const guestPage = await guestContext.newPage();
+
+  // Each page signs itself in before the seed runs — a page can only be handed
+  // an identity it already holds, see `currentUid` in helpers/convex.ts.
+  const hostUid = await signIn(hostPage);
+  const guestUid = await signIn(guestPage);
+
+  const { sessionId } = await seedGame({
+    phase: "round:10",
+    year: YEAR,
+    players: [
+      { name: "Ryan", uid: hostUid },
+      { name: "Melissa", uid: guestUid },
+    ],
+  });
+
+  await hostPage.goto(`/games/${YEAR}/${sessionId}`);
+  await guestPage.goto(`/games/${YEAR}/${sessionId}`);
+
+  // The guest is subscribed before the kick lands, so what follows is the kick
+  // reaching a live page rather than a page loading after the fact.
+  await expect(guestPage.getByText("Round 10")).toBeVisible();
+
+  await hostPage.getByTestId("settings-button").click();
+  await expect(hostPage.getByTestId("sidebar-title")).toBeVisible();
+  await expect(hostPage.getByText("Melissa")).toBeVisible();
+
+  await hostPage.getByText("Melissa").locator("..").getByTestId("kick-player").click();
+
+  // The kicked player's live queries throw NOT_MEMBER, which the root
+  // ErrorBoundary turns into the error state with a way home.
+  await expect(guestPage.getByTestId("error-state")).toBeVisible();
+  await expect(guestPage.getByText("Player not in session")).toBeVisible();
+  await expect(guestPage.getByTestId("error-home")).toBeVisible();
+
+  // And the host's list drops them.
+  await expect(hostPage.getByText("Melissa")).not.toBeVisible();
+
+  await hostContext.close();
+  await guestContext.close();
 });
