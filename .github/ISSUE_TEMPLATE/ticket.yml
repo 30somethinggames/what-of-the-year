@@ -5,7 +5,7 @@ body:
     id: summary
     attributes:
       label: Summary
-      description: What and why, in a paragraph. Link the source (bug report, tweet, PR comment) if there is one. One paragraph per line, however long — GitHub renders every newline as a line break, so do not hard-wrap.
+      description: What and why, in a paragraph. Link the source (bug report, tweet, PR comment) if there is one.
     validations:
       required: true
   - type: textarea
@@ -19,7 +19,7 @@ body:
     id: acceptance
     attributes:
       label: Acceptance
-      description: "How we know it is done, as Given / When / Then — one per behaviour, each observable by someone who did not write it. Checks that must pass and tests that must exist go here too, as their own bullets. See docs/contributing.md."
+      description: "How we know it is done, as Given / When / Then — one per behaviour, each observable by someone who did not write it. Checks that must pass and tests that must exist go here too, as their own bullets."
       placeholder: |
         - Given a lobby with two guests
           When the host leaves
@@ -31,4 +31,4 @@ body:
     id: out-of-scope
     attributes:
       label: Out of scope
-      description: Adjacent things this ticket deliberately does not touch.
+      description: Adjacent things this ticket deliberately does not touch, and why, so the next reader does not reopen the decision.
