@@ -47,6 +47,30 @@ Only `feat` and `fix` change a version, and only the types listed in
 `changelog-sections` appear in the changelog — everything else rides along
 silently. So the type is for the reader, not for the release; see `release.md`.
 
+## Tickets
+
+`.github/ISSUE_TEMPLATE/ticket.yml`: Summary, Change, Acceptance, Out of scope. Summary is what is wrong and why it matters. Change is what is different when this is done, concrete enough that a diff can be checked against it. Out of scope is where a decision goes so the next reader does not reopen it.
+
+Acceptance is **Given / When / Then**, one per behaviour, each observable by someone who did not write it:
+
+    - Given a lobby with two guests
+      When the host leaves
+      Then the lobby closes and both guests see the closed toast
+    - `bun run checks` passes
+
+Given the starting state, When the thing happens, Then what must be true. Checks that must pass and tests that must exist are their own bullets. A restatement of Change is not acceptance — if the Then is "the code does what Change said", there is nothing to observe and nothing to disagree with.
+
+An investigation ticket has a Change and an Acceptance like any other. The Change is the work of investigating; the Acceptance is the recommendation and the evidence that justifies it. "Keep what we have" is a legitimate outcome and is named as one.
+
+## Writing it
+
+Applies to tickets, PR bodies, and comments on either.
+
+- **Do not hard-wrap.** One paragraph or one bullet per line, however long. GitHub renders every newline in an issue or PR body as a line break, so a body wrapped at 80 columns renders as ragged fixed-width text. This is the rule most often broken, because most editors wrap by default.
+- **GitHub-flavoured markdown.** Tables, task lists and fenced code render. Nested bullets indent two spaces; nothing else indents.
+- **Be terse in a Summary.** What is wrong, what will be different, stop. The reasoning belongs in the section it is about.
+- **Reference, do not restate.** A rule copied into a second place drifts from the first. Point at the file that states it.
+
 ## Before asking for review
 
 - Rebase onto the PR's base. `git log --oneline <base>..HEAD` must show only
