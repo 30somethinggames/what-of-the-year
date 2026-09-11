@@ -19,11 +19,16 @@ body:
     id: acceptance
     attributes:
       label: Acceptance
-      description: How we know it is done — behaviour to observe, checks that must pass, tests that must exist.
+      description: "How we know it is done, as Given / When / Then — one per behaviour, each observable by someone who did not write it. Checks that must pass and tests that must exist go here too, as their own bullets."
+      placeholder: |
+        - Given a lobby with two guests
+          When the host leaves
+          Then the lobby closes and both guests see the closed toast
+        - `bun run checks` passes
     validations:
       required: true
   - type: textarea
     id: out-of-scope
     attributes:
       label: Out of scope
-      description: Adjacent things this ticket deliberately does not touch.
+      description: Adjacent things this ticket deliberately does not touch, and why, so the next reader does not reopen the decision.

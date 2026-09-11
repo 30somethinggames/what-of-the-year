@@ -6,7 +6,7 @@ Detailed rules live in `.claude/rules/` and load when you touch matching files. 
 
 Docs, read when relevant:
 
-- `docs/contributing.md`: branches, commits, PR process, what to disclose.
+- `docs/contributing.md`: branches, commits, PR process, what to disclose, and how to write a ticket or PR body — including that nothing is hard-wrapped, because GitHub renders every newline as a line break.
 - `docs/local-dev.md`: checks, e2e, the shared dev deployment, generated files.
 - `docs/release.md`: how releases are cut.
 
