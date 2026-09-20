@@ -11,7 +11,7 @@ there only because Playwright will not load our specs under bun (see
 the comment in `mise.toml`), so it is needed for `mise run test:e2e` and nothing
 else.
 
-`mise.toml` defines four checks: `format` (oxfmt), `lint` (oxlint), `types` (tsc),
+`mise.toml` defines four: `format` (oxfmt), `lint` (oxlint), `types` (tsc),
 `test` (bun test). Each checks without changing anything; `format:fix`
 and `lint:fix` are the counterparts that write. They run in three places:
 
