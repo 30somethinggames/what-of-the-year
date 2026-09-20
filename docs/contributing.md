@@ -95,7 +95,7 @@ reviewer** saying why:
 ## CI and third-party actions
 
 This repo's Actions policy is `selected`: GitHub-owned actions, plus
-`googleapis/release-please-action` and `jdx/mise-action`, both pinned to a full
+`googleapis/release-please-action` and `jdx/mise-action`, all pinned to a full
 commit SHA. Anything else fails before the job starts, with a message naming the
 action.
 
