@@ -7,11 +7,11 @@ from the code.
 
 The toolchain is pinned in `mise.toml`: install [mise](https://mise.jdx.dev),
 then `mise install` before `bun install`. Bun is the runtime; the node pin is
-there only because Playwright's runner will not load our specs under bun (see
+there only because Playwright will not load our specs under bun (see
 the comment in `mise.toml`), so it is needed for `mise run test:e2e` and nothing
 else.
 
-`mise.toml` defines four: `format` (oxfmt), `lint` (oxlint), `types` (tsc),
+`mise.toml` defines four checks: `format` (oxfmt), `lint` (oxlint), `types` (tsc),
 `test` (bun test). Each checks without changing anything; `format:fix`
 and `lint:fix` are the counterparts that write. They run in three places:
 
@@ -32,7 +32,8 @@ one per tool, which is what oxc's docs recommend; there is no shared file).
 `test` runs with `--coverage`, which prints the per-file table. The floor that
 turns a coverage drop into a failure is the `[test] coverageThreshold` in
 `bunfig.toml`, set just under the real number so it ratchets up rather than
-blocking. Run `bun run test`, not bare `bun test`, or the floor is skipped.
+blocking. Run `mise run test`, not bare `bun test`: the floor applies only
+under `--coverage`, which the task passes.
 
 ## E2E
 
@@ -71,21 +72,14 @@ Two settings in `playwright.config.ts` matter when reading results:
   retry is reported as **flaky** and the run is green, so read the "flaky" line
   rather than the exit code (or use `--retries 0` for the real failure rate).
   In CI that same spec is a plain failure and fails the job.
-- The suite always serves the built bundle, never `bun run dev`, and never
+- The suite always serves the built bundle, never `mise run dev`, and never
   reuses a running server. The backend URL is baked in at build time by the
   deploy that created the preview, so a dev server reading `.env.local` would
   talk to a different deployment than the one the run just provisioned. The
   port is chosen free per run, so a run collides with neither your dev server
   nor another checkout.
 
-A sandboxed environment often cannot bind a port (`listen EPERM`), so the suite
-may not be runnable where a change is written. Run it before you open the PR;
-CI runs it either way.
-
-`package.json` declares `gate` — the four checks then the e2e suite — so that
-what must pass before a PR is one named thing rather than something each caller
-assembles for itself. `mise run ci` and CI both run it, and so does anything
-else that gates this repo from outside it.
+Run `mise run test:e2e` before you open the PR; CI runs it either way.
 
 ## Which backend the suite runs against
 
@@ -138,7 +132,7 @@ Consequences:
 ## Generated files
 
 - `src/routeTree.gen.ts` is written by the TanStack Router Vite plugin during
-  `bun run dev` / `bun run build`. Regenerate it, never hand-edit it.
+  `mise run dev` / `bun run build`. Regenerate it, never hand-edit it.
 - `convex/_generated/**` is written by the Convex CLI. Commit it only when a
   function signature actually changed.
 

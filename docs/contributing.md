@@ -56,7 +56,7 @@ Acceptance is **Given / When / Then**, one per behaviour, each observable by som
     - Given a lobby with two guests
       When the host leaves
       Then the lobby closes and both guests see the closed toast
-    - `bun run checks` passes
+    - `mise run check` passes
 
 Given the starting state, When the thing happens, Then what must be true. Checks that must pass and tests that must exist are their own bullets. A restatement of Change is not acceptance — if the Then is "the code does what Change said", there is nothing to observe and nothing to disagree with.
 
