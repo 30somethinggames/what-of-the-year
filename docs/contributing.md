@@ -122,3 +122,11 @@ not a requirement.
 Squash or rebase only, into `main`, through the merge queue. The queue re-runs
 `checks` and `e2e` on its temporary branch, which is also how the release PR
 gets validated (see `release.md`).
+
+The ruleset gates on those checks and the queue, not on an approval. One
+account holds write access, GitHub does not let an author approve their own
+PR, so a required review could never be satisfied and was bypassed on every
+merge (#241). A review is still expected on every agent PR; the reader's merge
+is it. When the pipeline has its own GitHub user, code-owner review comes back
+for `.github/`, `.claude/`, `AGENTS.md` and `convex/schema.ts`, so an agent PR
+to those paths needs a person and everything else needs green checks.
