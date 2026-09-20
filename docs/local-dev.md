@@ -81,6 +81,12 @@ Two settings in `playwright.config.ts` matter when reading results:
 
 Run `mise run test:e2e` before you open the PR; CI runs it either way.
 
+`mise run serve` is the same provisioning without the suite: the branch's
+preview deployment, the bundle built against it, served on a free port until
+killed, with the URL and the run's seeding secret printed once it answers.
+It is how a change is looked at by hand and how it is recorded for its PR;
+`verify.md` is the recipe. The provisioning both share is `scripts/preview.ts`.
+
 ## Which backend the suite runs against
 
 One recipe. Every e2e run gets its own Convex preview deployment, named after

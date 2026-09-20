@@ -56,6 +56,10 @@ run = "bun scripts/e2e.ts"
 description = "The three journey specs only — the fast subset for the working loop"
 run = "bun scripts/e2e.ts --grep @smoke"
 
+[tasks.serve]
+description = "The built app against this branch's preview deployment — to look at a change, or record it for a PR"
+run = "bun scripts/serve.ts"
+
 [tasks.check]
 description = "Format, lint, types and unit tests — what must pass before a commit"
 depends = ["format", "lint", "types", "test"]

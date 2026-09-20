@@ -37,6 +37,8 @@ yarn-error.*
 # Playwright
 /playwright-report/
 /test-results/
+# What `docs/verify.md` records for a PR
+/proof/
 
 # typescript
 *.tsbuildinfo
