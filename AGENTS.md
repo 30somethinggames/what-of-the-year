@@ -2,7 +2,7 @@
 
 Yearly-picks party game. Vite + React 19 + TanStack Router (file-based) + Convex backend + Tailwind 4. Runtime and package manager: bun.
 
-Detailed rules live in `.claude/rules/` and load when you touch matching files. Cross-cutting changes should read both `convex.md` and `react.md`.
+Detailed rules live in `.claude/rules/` and load when you touch matching files. Cross-cutting changes should read both `convex.md` and `react.md`. They stay there: path-scoped rules have no generic equivalent, and nested `AGENTS.md` files would scatter five rules across `convex/`, `src/`, `src/routes/` and every `__tests__/`.
 
 Docs, read when relevant:
 

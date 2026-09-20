@@ -1,6 +1,6 @@
 # Contributing
 
-How a change gets from a branch to `main`. `CLAUDE.md` carries the one-line
+How a change gets from a branch to `main`. `AGENTS.md` carries the one-line
 versions of these rules; this is the reasoning behind them.
 
 ## Branches
