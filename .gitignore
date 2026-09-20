@@ -38,6 +38,9 @@ yarn-error.*
 /playwright-report/
 /test-results/
 
+# Verification clips and screenshots, attached to a PR rather than committed
+/proof/
+
 # typescript
 *.tsbuildinfo
 

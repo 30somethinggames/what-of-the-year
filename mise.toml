@@ -48,6 +48,10 @@ run = "bunx tsc --noEmit"
 description = "Unit tests, with the coverage floor"
 run = "bun test --coverage"
 
+[tasks.serve]
+description = "The built app on a Convex preview deployment this run creates, for an agent to drive"
+run = "bun scripts/serve.ts"
+
 [tasks."test:e2e"]
 description = "Playwright against a Convex preview deployment this run creates"
 run = "bun scripts/e2e.ts"
