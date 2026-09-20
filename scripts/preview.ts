@@ -26,17 +26,10 @@ export type Provisioned = {
   testSecret: string;
 };
 
-/** Exits when the one credential this cannot mint is missing. */
-export function requireDeployKey(): void {
+function requireDeployKey(): void {
   if (process.env.CONVEX_DEPLOY_KEY) return;
   console.error(
-    "CONVEX_DEPLOY_KEY is empty, so there is no backend to run against.\n" +
-      "Mint a preview deploy key in the Convex dashboard (project settings) and\n" +
-      "put it in .env.local — bun loads that file, so nothing needs exporting.\n" +
-      "It can only create preview deployments and set env vars on them; it\n" +
-      "cannot reach prod or anyone's dev deployment.\n" +
-      "Dependabot reads its own secrets store; add the key there too.\n" +
-      "Fork PRs get no secrets at all; re-run the change from a branch in this repo.",
+    "CONVEX_DEPLOY_KEY is not set. Put a preview deploy key in .env.local; see docs/local-dev.md.",
   );
   process.exit(1);
 }

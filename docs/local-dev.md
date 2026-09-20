@@ -102,7 +102,10 @@ The only credential involved is a preview deploy key (`CONVEX_DEPLOY_KEY`),
 which can create preview deployments and set env vars on them and nothing
 else — it cannot reach prod or a dev deployment. Each run mints its own
 `TEST_SECRET` and auth keypair and sets
-`OPTIONS_FIXTURES=1`, so the suite stores no long-lived secret.
+`OPTIONS_FIXTURES=1`, so the suite stores no long-lived secret. CI holds the
+same key as a repository secret and, because Dependabot reads its own store,
+as a Dependabot secret too; a fork PR gets neither, so its `e2e` job fails
+until the change is pushed from a branch in this repo.
 
 Convex expires previews five days after creation, so there is nothing to clean
 up and no cron to run.
