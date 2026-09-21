@@ -7,6 +7,17 @@ paths:
 
 # Testing rules
 
+## Layers
+
+- Pure logic — a hook, a reducer, a helper — is a unit test under `bun:test`.
+- A Convex function — query, mutation or action — is a `convex-test` test.
+- Behaviour a player sees — a screen, or a flow between screens — is a Playwright spec against the run's own preview deployment.
+- No component layer and no visual layer: Tailwind 4 emits `@layer`, which a fake DOM ignores; `bun:test`'s DOM has an open hang since 1.4.0; there are about fifteen components and the journey specs reach all of them.
+- Revisit that when a component holds logic the journey specs cannot reach cheaply.
+- Evidence: [the report on #228](https://github.com/30somethinggames/what-of-the-year/issues/228#issuecomment-5752790935).
+
+## Rules
+
 - Unit tests: `bun:test` (`import { describe, expect, it } from "bun:test"`) in a `__tests__/` folder beside the code, named `<subject>.test.ts`, with module-level `mock*` fixtures.
 - Convex functions are tested with `convex-test`, including negative authz cases (non-member, non-host, wrong state) for every guard.
 - E2E specs: `playwright/<area>/<name>.e2e.ts`, driving the app exclusively through `page.getByTestId(...)` with `await expect(...)` assertions between steps.
