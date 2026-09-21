@@ -6,23 +6,10 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
   build: {
-    rollupOptions: {
-      output: {
-        // framer-motion and Sentry are large and change on their own schedule;
-        // their own chunks keep them out of the entry and cached across releases.
-        codeSplitting: {
-          groups: [
-            { name: "framer-motion", test: /node_modules[/\\]framer-motion[/\\]/ },
-            { name: "sentry", test: /node_modules[/\\]@sentry[/\\]/ },
-          ],
-        },
-      },
-    },
     sourcemap: true,
   },
   plugins: [
-    // Each route's component becomes its own lazily imported chunk.
-    tanstackRouter({ autoCodeSplitting: true, routesDirectory: "src/routes" }),
+    tanstackRouter({ routesDirectory: "src/routes" }),
     react(),
     tailwindcss(),
     sentryVitePlugin({
