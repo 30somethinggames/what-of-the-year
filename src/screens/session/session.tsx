@@ -16,10 +16,15 @@ import { useSessionState } from "./utils/use-session-state";
  * the right one.
  */
 export function Session({ topic, year, sessionId }: SessionProps) {
-  const { isLoading, session } = useSessionState({ sessionId });
+  const { isLoading, session, isHost } = useSessionState({ sessionId });
 
   if (isLoading) return <Loading />;
   if (!session) return <DisplayError />;
+
+  // A forfeit sends everyone but the host home (`useGameOver`). Results is
+  // member-only and would throw for a guest in the moment before they leave,
+  // so they get the loading state instead of a subscription that cannot succeed.
+  if (session.status === SessionStatus.FORFEIT && !isHost) return <Loading />;
 
   if (session.status === SessionStatus.LOBBY) {
     return (

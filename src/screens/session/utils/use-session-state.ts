@@ -15,5 +15,5 @@ export function useSessionState({ sessionId }: Props) {
 
   useGameOver({ isHost, session });
 
-  return { isLoading, session };
+  return { isLoading, session, isHost };
 }
