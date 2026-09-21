@@ -14,8 +14,6 @@ What this PR does and why.
 
 **What the reader must do.** A task list of whatever the recording cannot show: which checks/tests you ran, what you exercised by hand, and what you could not verify and why.
 
-- [ ]
-
 ## Notes for reviewer
 
 What to look at first, tradeoffs, anything you weren't sure about.
