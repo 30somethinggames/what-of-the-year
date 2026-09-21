@@ -18,8 +18,11 @@ deployment instead; the task refuses to replace one.
 
 Then the same two terminals the README describes:
 
-    bunx convex dev    # pushes convex/ on every save
+    bunx convex dev    # runs the local backend and pushes convex/ on every save
     mise run dev       # Vite, hot reload, prints its URL
+
+The backend is a subprocess of `convex dev`; close that terminal and the app
+has no backend. Keep both running for the whole session.
 
 Work with it open. A screen you never looked at is a screen you have not
 verified. `TEST_SECRET` in `.env.local` and the `/test/*` routes let you seed a

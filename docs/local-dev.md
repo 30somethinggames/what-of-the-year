@@ -113,7 +113,10 @@ anyone else's client. It picks a port pair from the checkout's path so two
 worktrees run two backends at once, writes the URLs into `.env.local`, and
 sets the switches the seeding helpers need (`TEST_SECRET`, `OPTIONS_FIXTURES`,
 an auth keypair). After that `bunx convex dev` and `mise run dev` use it with
-no extra flags, the same two-terminal loop the README describes.
+no extra flags, the same two-terminal loop the README describes. The backend
+process itself lives inside `convex dev` and stops with it, so keep that
+terminal open while you work; the task only creates the deployment and
+pushes once.
 
 It is what a worktree develops against: an agent working a ticket, or you with
 several branches checked out at once. Reach for it when you are changing
