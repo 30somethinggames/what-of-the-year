@@ -1,11 +1,12 @@
 import { expect, test } from "@playwright/test";
 
-import { createSession } from "../helpers/session";
+import { seedLobby, signIn } from "../helpers/convex";
 
 test("join: an empty or disallowed name keeps the join button disabled", async ({ browser }) => {
   const hostContext = await browser.newContext();
   const hostPage = await hostContext.newPage();
-  const sessionId = await createSession(hostPage, "Host");
+  const { sessionId } = await seedLobby({ name: "Host", hostUid: await signIn(hostPage) });
+  await hostPage.goto(`/games/2026/${sessionId}`);
 
   const guestContext = await browser.newContext();
   const guestPage = await guestContext.newPage();
@@ -46,7 +47,8 @@ test("join: the name field stops accepting input at the server's max length", as
 test("join: whitespace-only and duplicate names are accepted today", async ({ browser }) => {
   const hostContext = await browser.newContext();
   const hostPage = await hostContext.newPage();
-  const sessionId = await createSession(hostPage, "Twin");
+  const { sessionId } = await seedLobby({ name: "Twin", hostUid: await signIn(hostPage) });
+  await hostPage.goto(`/games/2026/${sessionId}`);
 
   // The ticket expected a whitespace-only name to be blocked. It is not:
   // `validateName` only screens characters and length, `joinSession` adds

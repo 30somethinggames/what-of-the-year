@@ -2,19 +2,20 @@ import { expect, test } from "@playwright/test";
 
 import { MAX_PLAYERS } from "convex/constants";
 
-import { addPlayer } from "../helpers/convex";
-import { createSession } from "../helpers/session";
+import { addPlayer, seedLobby, signIn } from "../helpers/convex";
 
 test("join: a full session rejects the newcomer with the server's error", async ({ browser }) => {
   const hostContext = await browser.newContext();
   const hostPage = await hostContext.newPage();
 
-  const sessionId = await createSession(hostPage, "Host");
+  const { sessionId } = await seedLobby({ name: "Host", hostUid: await signIn(hostPage) });
 
   // The host holds the first seat; seed the rest so the lobby is at the cap.
   for (let i = 2; i <= MAX_PLAYERS; i++) {
     await addPlayer({ sessionId, name: `Player ${i}`, avatar: "🎮" });
   }
+
+  await hostPage.goto(`/games/2026/${sessionId}`);
   await expect(hostPage.getByText(`${MAX_PLAYERS} of ${MAX_PLAYERS}`)).toBeVisible();
 
   const guestContext = await browser.newContext();

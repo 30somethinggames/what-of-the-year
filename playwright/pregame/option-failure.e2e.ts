@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { createSession } from "../helpers/session";
+import { seedGame, signIn } from "../helpers/convex";
 
 // The option actions run `parseYear` before they reach fixtures or a third-party
 // call, so a year outside the picker's range makes `getGames` throw for the same
@@ -23,12 +23,12 @@ test("options: a failing option fetch replaces the join screen with the error st
 test("options: a failing option fetch replaces the round screen with the error state", async ({
   page,
 }) => {
-  const sessionId = await createSession(page, "Host");
+  const { sessionId } = await seedGame({
+    phase: "round:10",
+    players: [{ name: "Host", uid: await signIn(page) }],
+  });
 
-  await page.getByTestId("lobby-start").click();
-  await expect(page.getByTestId("pick-input")).toBeVisible();
-
-  // Same session, options that cannot load.
+  // A round in play, under a year whose options cannot load.
   await page.goto(`/games/${FAILING_YEAR}/${sessionId}`);
 
   await expect(page.getByTestId("error-state")).toBeVisible();

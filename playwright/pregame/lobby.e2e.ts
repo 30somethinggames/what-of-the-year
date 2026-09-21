@@ -1,24 +1,24 @@
 import { expect, test } from "@playwright/test";
 
+import { seedGame, seedLobby, signIn } from "../helpers/convex";
+
+const YEAR = 2026;
+
 test("lobby: invite copies session URL to clipboard", async ({ browser }) => {
   const context = await browser.newContext({
     permissions: ["clipboard-read", "clipboard-write"],
   });
   const page = await context.newPage();
 
-  await page.goto("/");
-  await page.getByTestId("home-start").click();
-  await page.getByTestId("name-input").pressSequentially("Host");
-  await page.getByTestId("setup-submit").click();
+  const { sessionId } = await seedLobby({ name: "Host", year: YEAR, hostUid: await signIn(page) });
+  await page.goto(`/games/${YEAR}/${sessionId}`);
 
   await expect(page.getByTestId("invite")).toBeVisible();
-
-  const sessionId = await page.getByTestId("session-id").getAttribute("data-value");
 
   await page.getByTestId("invite").click();
 
   const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
-  expect(clipboardText).toContain(`/games/2026/${sessionId}`);
+  expect(clipboardText).toContain(`/games/${YEAR}/${sessionId}`);
 
   await context.close();
 });
@@ -26,24 +26,23 @@ test("lobby: invite copies session URL to clipboard", async ({ browser }) => {
 test("lobby: player leaves and host sees update", async ({ browser }) => {
   const hostContext = await browser.newContext();
   const hostPage = await hostContext.newPage();
-
-  // Host creates session
-  await hostPage.goto("/");
-  await hostPage.getByTestId("home-start").click();
-  await hostPage.getByTestId("name-input").pressSequentially("Host");
-  await hostPage.getByTestId("setup-submit").click();
-
-  await expect(hostPage.getByTestId("invite")).toBeVisible();
-
-  const sessionId = await hostPage.getByTestId("session-id").getAttribute("data-value");
-
-  // Guest joins via URL
   const guestContext = await browser.newContext();
   const guestPage = await guestContext.newPage();
 
-  await guestPage.goto(`/games/2026/${sessionId}`);
-  await guestPage.getByTestId("name-input").pressSequentially("Guest");
-  await guestPage.getByTestId("setup-submit").click();
+  const hostUid = await signIn(hostPage);
+  const guestUid = await signIn(guestPage);
+
+  const { sessionId } = await seedGame({
+    phase: "lobby",
+    year: YEAR,
+    players: [
+      { name: "Host", uid: hostUid },
+      { name: "Guest", uid: guestUid },
+    ],
+  });
+
+  await hostPage.goto(`/games/${YEAR}/${sessionId}`);
+  await guestPage.goto(`/games/${YEAR}/${sessionId}`);
 
   // Host sees guest
   await expect(hostPage.getByText("Guest")).toBeVisible();
@@ -63,19 +62,20 @@ test("lobby: player leaves and host sees update", async ({ browser }) => {
 });
 
 test("lobby: host reopening the lobby URL mid-game lands on the active round", async ({ page }) => {
-  await page.goto("/");
-  await page.getByTestId("home-start").click();
-  await page.getByTestId("name-input").pressSequentially("Host");
-  await page.getByTestId("setup-submit").click();
+  const { sessionId } = await seedGame({
+    phase: "lobby",
+    year: YEAR,
+    players: [{ name: "Host", uid: await signIn(page) }],
+  });
 
+  await page.goto(`/games/${YEAR}/${sessionId}`);
   await expect(page.getByTestId("lobby-start")).toBeVisible();
-  const sessionId = await page.getByTestId("session-id").getAttribute("data-value");
 
   await page.getByTestId("lobby-start").click();
   await expect(page.getByTestId("pick-input")).toBeVisible();
 
-  // Host reloads the lobby URL while the game is active
-  await page.goto(`/games/2026/${sessionId}`);
+  // Host reopens the lobby URL while the game is active
+  await page.goto(`/games/${YEAR}/${sessionId}`);
 
   await expect(page.getByTestId("pick-input")).toBeVisible();
   await expect(page.getByTestId("lobby-start")).toHaveCount(0);
