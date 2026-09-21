@@ -53,7 +53,7 @@ description = "Playwright against a Convex preview deployment this run creates"
 run = "bun scripts/e2e.ts"
 
 [tasks."test:e2e:smoke"]
-description = "The three journey specs only — the fast subset for the working loop"
+description = "The three journey specs only, in both projects — the fast subset for the working loop"
 run = "bun scripts/e2e.ts --grep @smoke"
 
 [tasks.backend]

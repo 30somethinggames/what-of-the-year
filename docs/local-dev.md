@@ -44,14 +44,29 @@ new deployment's URL, and serves that build. It takes no deployment settings
 from `.env.local`; everything the suite talks to is created by the run and
 passed to Playwright as environment for that one command.
 
+The suite runs in two Playwright projects, both against the one preview
+deployment the run creates:
+
+| project | device | what it covers |
+| --- | --- | --- |
+| `chromium` | `Desktop Chrome`, 1280×720 | every spec |
+| `mobile` | `Pixel 7` Chromium, 412×839 | `playwright/game/**` and the `@smoke` journeys |
+
+`mobile` is the repo's layout test: a phone is the real client for a game
+passed around a room, and a component or visual layer would not catch a
+Tailwind `@layer` regression anyway. It skips the pregame specs, whose subject
+is validation rather than layout. Run one with `--project`: `mise run test:e2e
+-- --project mobile`.
+
 `mise run test:e2e:smoke` runs the same thing over the three journey specs
 only — `pregame/smoke`, `game/single-player`, `game/multiplayer`, the ones
-tagged `@smoke`. That is the subset for the loop while working; before a PR run
-the whole suite, and CI runs everything regardless. It is a task rather than
-something you remember because the tag is ours, not Playwright's, and `mise
-tasks` is where this repo says what there is to run. Arguments reach Playwright
-either way, so any other slice is a flag: `mise run test:e2e -- --grep @smoke`
-is exactly what the task runs, and `-- --ui` or `-- --retries 0` work the same.
+tagged `@smoke` — in both projects. That is the subset for the loop while
+working; before a PR run the whole suite, and CI runs everything regardless.
+It is a task rather than something you remember because the tag is ours, not
+Playwright's, and `mise tasks` is where this repo says what there is to run.
+Arguments reach Playwright either way, so any other slice is a flag: `mise run
+test:e2e -- --grep @smoke` is exactly what the task runs, and `-- --ui` or
+`-- --retries 0` work the same.
 
 The one thing it needs is `CONVEX_DEPLOY_KEY`, a preview deploy key from the
 Convex dashboard. Keep it in `.env.local`: bun loads that file automatically, so
