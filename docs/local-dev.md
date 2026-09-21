@@ -96,10 +96,46 @@ The only credential involved is a preview deploy key (`CONVEX_DEPLOY_KEY`),
 which can create preview deployments and set env vars on them and nothing
 else — it cannot reach prod or a dev deployment. Each run mints its own
 `TEST_SECRET` and auth keypair and sets
-`OPTIONS_FIXTURES=1`, so the suite stores no long-lived secret.
+`OPTIONS_FIXTURES=1`, so the suite stores no long-lived secret. CI holds the
+same key as a repository secret and, because Dependabot reads its own store,
+as a Dependabot secret too; a fork PR gets neither, so its `e2e` job fails
+until the change is pushed from a branch in this repo.
 
 Convex expires previews five days after creation, so there is nothing to clean
 up and no cron to run.
+
+## A local backend per checkout
+
+`mise run backend` gives this checkout its own Convex backend: an **anonymous
+local deployment**, a CLI-managed binary with its state under `.convex/`
+(gitignored). No account, no key, no cost, and no way for a push to reach
+anyone else's client. It is three stock commands: `convex dev --once` under
+`CONVEX_AGENT_MODE=anonymous`, which creates the deployment, picks a free port
+and writes the URLs into `.env.local`; the auth library's own setup, which
+mints and sets the JWT keypair; and `convex env set OPTIONS_FIXTURES 1`, so
+the pick autocomplete serves fixtures instead of calling APIs whose keys a
+local deployment does not have. After that `bunx convex dev` and `mise run
+dev` use it with no extra flags, the same two-terminal loop the README
+describes. The backend process itself lives inside `convex dev` and stops with
+it, so keep that terminal open while you work.
+
+It is what a worktree develops against: an agent working a ticket, or you with
+several branches checked out at once. Reach for it when you are changing
+`convex/schema.ts` or a status literal and do not want the shared deployment
+refusing the push or serving a half-migrated API to another client. Stay on
+the cloud dev deployment for anything that needs a public URL: a phone, the
+Convex dashboard. The local backend has neither.
+
+`mise run backend:reset` throws the instance away and rebuilds it. That is the
+way out of a push refused by rows an earlier run left behind. Both tasks
+refuse to run when `.env.local` names a cloud deployment, so your own loop
+cannot be replaced by accident. The seeding routes need `TEST_SECRET` on the
+deployment and a push after it; set it yourself when you want them, the e2e
+suite does the same on its preview.
+
+Every local push regenerates `convex/_generated`, like every deploy does; the
+committed files match what the CLI emits, and a diff there is a real CLI
+change that belongs in your commit.
 
 ## The dev deployment is shared
 
