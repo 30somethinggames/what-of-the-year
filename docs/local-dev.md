@@ -109,14 +109,15 @@ up and no cron to run.
 `mise run backend` gives this checkout its own Convex backend: an **anonymous
 local deployment**, a CLI-managed binary with its state under `.convex/`
 (gitignored). No account, no key, no cost, and no way for a push to reach
-anyone else's client. It picks a port pair from the checkout's path so two
-worktrees run two backends at once, writes the URLs into `.env.local`, and
-sets the switches the seeding helpers need (`TEST_SECRET`, `OPTIONS_FIXTURES`,
-an auth keypair). After that `bunx convex dev` and `mise run dev` use it with
-no extra flags, the same two-terminal loop the README describes. The backend
-process itself lives inside `convex dev` and stops with it, so keep that
-terminal open while you work; the task only creates the deployment and
-pushes once.
+anyone else's client. It is three stock commands: `convex dev --once` under
+`CONVEX_AGENT_MODE=anonymous`, which creates the deployment, picks a free port
+and writes the URLs into `.env.local`; the auth library's own setup, which
+mints and sets the JWT keypair; and `convex env set OPTIONS_FIXTURES 1`, so
+the pick autocomplete serves fixtures instead of calling APIs whose keys a
+local deployment does not have. After that `bunx convex dev` and `mise run
+dev` use it with no extra flags, the same two-terminal loop the README
+describes. The backend process itself lives inside `convex dev` and stops with
+it, so keep that terminal open while you work.
 
 It is what a worktree develops against: an agent working a ticket, or you with
 several branches checked out at once. Reach for it when you are changing
@@ -127,9 +128,10 @@ Convex dashboard. The local backend has neither.
 
 `mise run backend:reset` throws the instance away and rebuilds it. That is the
 way out of a push refused by rows an earlier run left behind. Both tasks
-refuse to run when `.env.local` names a cloud deployment through either
-`CONVEX_DEPLOYMENT` or `VITE_CONVEX_URL`, so your own loop cannot be replaced
-by accident.
+refuse to run when `.env.local` names a cloud deployment, so your own loop
+cannot be replaced by accident. The seeding routes need `TEST_SECRET` on the
+deployment and a push after it; set it yourself when you want them, the e2e
+suite does the same on its preview.
 
 Every local push regenerates `convex/_generated`, like every deploy does; the
 committed files match what the CLI emits, and a diff there is a real CLI

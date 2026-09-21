@@ -57,12 +57,33 @@ description = "The three journey specs only — the fast subset for the working 
 run = "bun scripts/e2e.ts --grep @smoke"
 
 [tasks.backend]
-description = "This checkout's own local Convex backend, written into .env.local — what a worktree develops against"
-run = "bun scripts/backend.ts"
+description = "A local Convex backend for this checkout, written into .env.local — what a worktree develops against"
+# Three stock commands. CONVEX_AGENT_MODE picks an anonymous local deployment
+# only while none is configured, and the CLI picks a free port itself, so two
+# checkouts run two backends. A checkout whose .env.local already names a
+# cloud deployment is refused first: a person's own loop is never replaced.
+run = """
+if grep -qsE '^CONVEX_DEPLOYMENT=.?(dev|prod|preview):' .env.local; then
+  echo ".env.local already names a cloud deployment. Keep using it, or remove CONVEX_DEPLOYMENT and VITE_CONVEX_URL from it to get a local backend." >&2
+  exit 1
+fi
+export CONVEX_AGENT_MODE=anonymous
+bunx convex dev --once --tail-logs disable
+bunx @convex-dev/auth --skip-git-check --web-server-url http://localhost:5173 </dev/null
+bunx convex env set OPTIONS_FIXTURES 1
+echo "Local backend ready. Keep 'bunx convex dev' running and start 'mise run dev'."
+"""
 
 [tasks."backend:reset"]
 description = "Throw the local backend away and bring it up clean"
-run = "bun scripts/backend.ts --reset"
+run = """
+if grep -qsE '^CONVEX_DEPLOYMENT=.?(dev|prod|preview):' .env.local; then
+  echo ".env.local names a cloud deployment; nothing here is local to reset." >&2
+  exit 1
+fi
+rm -rf .convex .env.local
+mise run backend
+"""
 
 [tasks.check]
 description = "Format, lint, types and unit tests — what must pass before a commit"

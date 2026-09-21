@@ -25,9 +25,10 @@ The backend is a subprocess of `convex dev`; close that terminal and the app
 has no backend. Keep both running for the whole session.
 
 Work with it open. A screen you never looked at is a screen you have not
-verified. `TEST_SECRET` in `.env.local` and the `/test/*` routes let you seed a
-phase instead of clicking through ten rounds; `playwright/helpers/convex.ts`
-shows the calls.
+verified. To seed a phase instead of clicking through ten rounds, set
+`TEST_SECRET` on the deployment (`bunx convex env set TEST_SECRET <hex>`, then
+a push), and use the `/test/*` routes the way `playwright/helpers/convex.ts`
+does.
 
 ## Record
 
