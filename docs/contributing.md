@@ -81,6 +81,19 @@ Applies to tickets, PR bodies, and comments on either.
   Verification, Notes for reviewer. A human reads every PR; the template exists
   so the surprising parts are easy to find.
 
+Anything under `src/` that renders needs evidence, not a claim: a WebM or a PNG
+that renders inline in the description, one per acceptance criterion, never a
+link to an artifact a reader has to download. Reference the local path from the
+body and attach the file on the same command, so GitHub rewrites the path in
+place:
+
+    gh pr create --body-file body.md --attach proof/<file>.webm
+    gh pr edit <n> --body-file body.md --attach proof/<file>.webm
+
+`--attach` needs GitHub CLI 2.99 or later and a user login; an Actions token is
+refused. It goes in the description, under **Verification**, not in a comment:
+the description is what a reader opens. How to record it is `verify.md`.
+
 ## Notes for reviewer: disclose the unusual
 
 Anything a reviewer would not expect gets its own line under **Notes for
