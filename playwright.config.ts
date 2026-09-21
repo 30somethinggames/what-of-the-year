@@ -30,6 +30,13 @@ export default defineConfig({
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
     },
+    {
+      // `grep` matches the path from `testDir` down as well as the title and
+      // the tags, so the second pattern is every spec under `game/`.
+      name: "mobile",
+      use: { ...devices["Pixel 7"] },
+      grep: [/@smoke/, /(^|\s)game\//],
+    },
   ],
   // Always the built bundle, never the dev server. The backend URL is baked in
   // at build time by the deploy that created this run's preview, so a dev
