@@ -34,6 +34,9 @@ yarn-error.*
 .env
 .env*.local
 
+# local Convex backend state, per checkout
+.convex/
+
 # Playwright
 /playwright-report/
 /test-results/

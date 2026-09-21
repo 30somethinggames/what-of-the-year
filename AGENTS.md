@@ -8,7 +8,7 @@ Docs, read when relevant:
 
 - `docs/contributing.md`: branches, commits, PR process, what to disclose, and how to write a ticket or PR body — including that nothing is hard-wrapped, because GitHub renders every newline as a line break.
 - `docs/local-dev.md`: checks, e2e, the shared dev deployment, generated files.
-- `docs/verify.md`: how a change is recorded for its PR — `mise run serve`, a clip or screenshot per acceptance criterion, embedded in the description.
+- `docs/verify.md`: how a change is developed and recorded for its PR — `mise run backend` once per checkout, the app running while you work, a clip or screenshot per acceptance criterion embedded in the description.
 - `docs/release.md`: how releases are cut.
 
 ## Checks

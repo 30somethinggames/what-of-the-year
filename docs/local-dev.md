@@ -81,12 +81,6 @@ Two settings in `playwright.config.ts` matter when reading results:
 
 Run `mise run test:e2e` before you open the PR; CI runs it either way.
 
-`mise run serve` is the same provisioning without the suite: the branch's
-preview deployment, the bundle built against it, served on a free port until
-killed, with the URL and the run's seeding secret printed once it answers.
-It is how a change is looked at by hand and how it is recorded for its PR;
-`verify.md` is the recipe. The provisioning both share is `scripts/preview.ts`.
-
 ## Which backend the suite runs against
 
 One recipe. Every e2e run gets its own Convex preview deployment, named after
@@ -109,6 +103,34 @@ until the change is pushed from a branch in this repo.
 
 Convex expires previews five days after creation, so there is nothing to clean
 up and no cron to run.
+
+## A local backend per checkout
+
+`mise run backend` gives this checkout its own Convex backend: an **anonymous
+local deployment**, a CLI-managed binary with its state under `.convex/`
+(gitignored). No account, no key, no cost, and no way for a push to reach
+anyone else's client. It picks a port pair from the checkout's path so two
+worktrees run two backends at once, writes the URLs into `.env.local`, and
+sets the switches the seeding helpers need (`TEST_SECRET`, `OPTIONS_FIXTURES`,
+an auth keypair). After that `bunx convex dev` and `mise run dev` use it with
+no extra flags, the same two-terminal loop the README describes.
+
+It is what a worktree develops against: an agent working a ticket, or you with
+several branches checked out at once. Reach for it when you are changing
+`convex/schema.ts` or a status literal and do not want the shared deployment
+refusing the push or serving a half-migrated API to another client. Stay on
+the cloud dev deployment for anything that needs a public URL: a phone, the
+Convex dashboard. The local backend has neither.
+
+`mise run backend:reset` throws the instance away and rebuilds it. That is the
+way out of a push refused by rows an earlier run left behind. Both tasks
+refuse to run when `.env.local` names a cloud deployment through either
+`CONVEX_DEPLOYMENT` or `VITE_CONVEX_URL`, so your own loop cannot be replaced
+by accident.
+
+Every local push regenerates `convex/_generated`, like every deploy does; the
+committed files match what the CLI emits, and a diff there is a real CLI
+change that belongs in your commit.
 
 ## The dev deployment is shared
 

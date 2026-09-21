@@ -56,9 +56,13 @@ run = "bun scripts/e2e.ts"
 description = "The three journey specs only — the fast subset for the working loop"
 run = "bun scripts/e2e.ts --grep @smoke"
 
-[tasks.serve]
-description = "The built app against this branch's preview deployment — to look at a change, or record it for a PR"
-run = "bun scripts/serve.ts"
+[tasks.backend]
+description = "This checkout's own local Convex backend, written into .env.local — what a worktree develops against"
+run = "bun scripts/backend.ts"
+
+[tasks."backend:reset"]
+description = "Throw the local backend away and bring it up clean"
+run = "bun scripts/backend.ts --reset"
 
 [tasks.check]
 description = "Format, lint, types and unit tests — what must pass before a commit"

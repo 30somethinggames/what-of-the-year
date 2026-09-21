@@ -1,27 +1,30 @@
-# Verifying a change on camera
+# Running the app while you work, and showing it in the PR
 
-A PR here shows its change working, in the description, under **Verification**:
-for each acceptance criterion a player would notice, a short video or a
-screenshot of the built app doing it, recorded by whoever made the change. This
-is the recipe. The rule that a PR must carry it is in `contributing.md`.
+A change a player would notice is developed with the app running, and its PR
+shows it working: in the description, under **Verification**, a short video
+or a screenshot per acceptance criterion, recorded by whoever made the change.
+This is the recipe. The rule that a PR must carry it is in `contributing.md`.
 
-## Stand the app up
+## Have the app up
 
-    mise run serve
+Once per checkout, a backend of its own:
 
-It provisions this branch's own Convex preview deployment, builds the bundle
-against it, serves the build, and prints five lines once the app answers:
+    mise run backend
 
-    URL=http://localhost:<port>
-    preview=<name>
-    CONVEX_URL=https://<slug>.convex.cloud
-    CONVEX_SITE_URL=https://<slug>.convex.site
-    TEST_SECRET=<hex>
+That is an anonymous local Convex deployment written into `.env.local`; see
+`local-dev.md`. A worktree has no `.env.local` when it is created, so this is
+the first thing to run in one. Your own checkout can keep its cloud dev
+deployment instead; the task refuses to replace one.
 
-It stays up until killed. It needs `CONVEX_DEPLOY_KEY` in `.env.local`, like
-the e2e suite, and nothing else. The secret and the site URL are this run's:
-they let you seed a phase through the `/test/*` routes instead of clicking
-through ten rounds. `playwright/helpers/convex.ts` shows the calls.
+Then the same two terminals the README describes:
+
+    bunx convex dev    # pushes convex/ on every save
+    mise run dev       # Vite, hot reload, prints its URL
+
+Work with it open. A screen you never looked at is a screen you have not
+verified. `TEST_SECRET` in `.env.local` and the `/test/*` routes let you seed a
+phase instead of clicking through ten rounds; `playwright/helpers/convex.ts`
+shows the calls.
 
 ## Record
 
