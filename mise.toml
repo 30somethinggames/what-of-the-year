@@ -62,11 +62,16 @@ description = "A local Convex backend for this checkout, written into .env.local
 # only while none is configured, and the CLI picks a free port itself, so two
 # checkouts run two backends. A checkout whose .env.local already names a
 # cloud deployment is refused first: a person's own loop is never replaced.
+# A cloud deployment named in the environment is ignored instead: Ronco runs
+# this in a worktree with the root checkout's .env.local exported, and the CLI
+# would otherwise refuse the preview deploy key, or push to the dev deployment
+# that CONVEX_DEPLOYMENT names. The unset covers every command below.
 run = """
 if grep -qsE '^CONVEX_DEPLOYMENT=.?(dev|prod|preview):' .env.local; then
   echo ".env.local already names a cloud deployment. Keep using it, or remove CONVEX_DEPLOYMENT and VITE_CONVEX_URL from it to get a local backend." >&2
   exit 1
 fi
+unset CONVEX_DEPLOY_KEY CONVEX_DEPLOYMENT CONVEX_SELF_HOSTED_URL CONVEX_SELF_HOSTED_ADMIN_KEY
 export CONVEX_AGENT_MODE=anonymous
 bunx convex dev --once --tail-logs disable
 bunx @convex-dev/auth --skip-git-check --web-server-url http://localhost:5173 </dev/null
