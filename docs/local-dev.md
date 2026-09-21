@@ -129,7 +129,10 @@ anyone else's client. It is three stock commands: `convex dev --once` under
 and writes the URLs into `.env.local`; the auth library's own setup, which
 mints and sets the JWT keypair; and `convex env set OPTIONS_FIXTURES 1`, so
 the pick autocomplete serves fixtures instead of calling APIs whose keys a
-local deployment does not have. After that `bunx convex dev` and `mise run
+local deployment does not have. A cloud deployment named in the environment
+rather than in this checkout's `.env.local` is ignored: Ronco runs the task in
+a worktree with the root checkout's env file exported, and the CLI would
+otherwise refuse the preview deploy key or push to the dev deployment. After that `bunx convex dev` and `mise run
 dev` use it with no extra flags, the same two-terminal loop the README
 describes. The backend process itself lives inside `convex dev` and stops with
 it, so keep that terminal open while you work.
