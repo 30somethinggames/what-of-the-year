@@ -15,25 +15,25 @@ async function pickRound(page: Page, letter: string) {
 test("non-host: lobby UI and round experience", async ({ browser }) => {
   const hostContext = await browser.newContext();
   const hostPage = await hostContext.newPage();
-
-  // Host creates session
-  await hostPage.goto("/");
-  await hostPage.getByTestId("home-start").click();
-  await hostPage.getByTestId("name-input").pressSequentially("Host");
-  await expect(hostPage.getByTestId("setup-submit")).toBeEnabled();
-  await hostPage.getByTestId("setup-submit").click();
-  await expect(hostPage.getByTestId("invite")).toBeVisible();
-
-  const sessionId = await hostPage.getByTestId("session-id").getAttribute("data-value");
-
-  // Non-host joins via URL
   const guestContext = await browser.newContext();
   const guestPage = await guestContext.newPage();
 
-  await guestPage.goto(`/games/2026/${sessionId}`);
-  await guestPage.getByTestId("name-input").pressSequentially("Guest");
-  await expect(guestPage.getByTestId("setup-submit")).toBeEnabled();
-  await guestPage.getByTestId("setup-submit").click();
+  // Each page signs itself in before the seed runs — a page can only be handed
+  // an identity it already holds, see `currentUid` in helpers/convex.ts.
+  const hostUid = await signIn(hostPage);
+  const guestUid = await signIn(guestPage);
+
+  const { sessionId } = await seedGame({
+    phase: "lobby",
+    year: YEAR,
+    players: [
+      { name: "Host", uid: hostUid },
+      { name: "Guest", uid: guestUid },
+    ],
+  });
+
+  await hostPage.goto(`/games/${YEAR}/${sessionId}`);
+  await guestPage.goto(`/games/${YEAR}/${sessionId}`);
 
   // Non-host lobby: sees Leave, no Invite or Start
   await expect(guestPage.getByTestId("leave-lobby")).toBeVisible();
@@ -81,28 +81,24 @@ test("non-host: lobby UI and round experience", async ({ browser }) => {
 test("non-host: leaving game removes player from host sidebar", async ({ browser }) => {
   const hostContext = await browser.newContext();
   const hostPage = await hostContext.newPage();
-
-  await hostPage.goto("/");
-  await hostPage.getByTestId("home-start").click();
-  await hostPage.getByTestId("name-input").pressSequentially("Ryan");
-  await expect(hostPage.getByTestId("setup-submit")).toBeEnabled();
-  await hostPage.getByTestId("setup-submit").click();
-  await expect(hostPage.getByTestId("invite")).toBeVisible();
-
-  const sessionId = await hostPage.getByTestId("session-id").getAttribute("data-value");
-
   const guestContext = await browser.newContext();
   const guestPage = await guestContext.newPage();
 
-  await guestPage.goto(`/games/2026/${sessionId}`);
-  await guestPage.getByTestId("name-input").pressSequentially("Melissa");
-  await expect(guestPage.getByTestId("setup-submit")).toBeEnabled();
-  await guestPage.getByTestId("setup-submit").click();
+  const hostUid = await signIn(hostPage);
+  const guestUid = await signIn(guestPage);
 
-  await expect(hostPage.getByText("Melissa")).toBeVisible();
+  const { sessionId } = await seedGame({
+    phase: "round:10",
+    year: YEAR,
+    players: [
+      { name: "Ryan", uid: hostUid },
+      { name: "Melissa", uid: guestUid },
+    ],
+  });
 
-  // Host starts game
-  await hostPage.getByTestId("lobby-start").click();
+  await hostPage.goto(`/games/${YEAR}/${sessionId}`);
+  await guestPage.goto(`/games/${YEAR}/${sessionId}`);
+
   await expect(hostPage.getByText("Round 10")).toBeVisible();
   await expect(guestPage.getByText("Round 10")).toBeVisible();
 
@@ -131,31 +127,26 @@ test("non-host: leaving game removes player from host sidebar", async ({ browser
 test("non-host: host leaving game shows toast and redirects to home", async ({ browser }) => {
   const hostContext = await browser.newContext();
   const hostPage = await hostContext.newPage();
-
-  await hostPage.goto("/");
-  await hostPage.getByTestId("home-start").click();
-  await hostPage.getByTestId("name-input").pressSequentially("Host");
-  await expect(hostPage.getByTestId("setup-submit")).toBeEnabled();
-  await hostPage.getByTestId("setup-submit").click();
-  await expect(hostPage.getByTestId("invite")).toBeVisible();
-
-  const sessionId = await hostPage.getByTestId("session-id").getAttribute("data-value");
-
   const guestContext = await browser.newContext();
   const guestPage = await guestContext.newPage();
 
-  await guestPage.goto(`/games/2026/${sessionId}`);
-  await guestPage.getByTestId("name-input").pressSequentially("Guest");
-  await expect(guestPage.getByTestId("setup-submit")).toBeEnabled();
-  await guestPage.getByTestId("setup-submit").click();
+  const hostUid = await signIn(hostPage);
+  const guestUid = await signIn(guestPage);
 
-  // Wait for the join to reach the host before starting. Joins close when the
-  // session leaves the lobby, so starting first can land the guest's join on an
-  // active session, which is refused — the guest never joins and sees "Session
-  // is closed" instead of anything this test is about.
-  await expect(hostPage.getByText("Guest")).toBeVisible();
+  const { sessionId } = await seedGame({
+    phase: "round:10",
+    year: YEAR,
+    players: [
+      { name: "Host", uid: hostUid },
+      { name: "Guest", uid: guestUid },
+    ],
+  });
 
-  await hostPage.getByTestId("lobby-start").click();
+  await hostPage.goto(`/games/${YEAR}/${sessionId}`);
+  await guestPage.goto(`/games/${YEAR}/${sessionId}`);
+
+  // The guest is subscribed before the host leaves, so what follows is the
+  // forfeit reaching a live page rather than a page loading after the fact.
   await expect(guestPage.getByText("Round 10")).toBeVisible();
 
   // Host leaves game mid-round (triggers forfeitSession)

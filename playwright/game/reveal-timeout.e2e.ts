@@ -1,15 +1,23 @@
 import { expect, test } from "@playwright/test";
 
-import { createSession } from "../helpers/session";
+import { seedGame, signIn } from "../helpers/convex";
+
+const YEAR = 2026;
 
 // Every other reveal spec clicks `reveal-skip`, so the scheduled
 // `internal.rounds.completeReveal` job never runs end to end. Here the host
 // leaves it alone: a one-player session reveals for playerCount * 4s + 5s = 9s
 // (convex/rounds.ts), well inside the 30s test timeout.
 test("reveal: the scheduled job advances the round when the host never skips", async ({ page }) => {
-  await createSession(page, "Host");
+  // Seeded open rather than seeded revealing: the pick has to go in through the
+  // UI for the app to schedule the job this spec waits on.
+  const { sessionId } = await seedGame({
+    phase: "round:10",
+    year: YEAR,
+    players: [{ name: "Host", uid: await signIn(page) }],
+  });
 
-  await page.getByTestId("lobby-start").click();
+  await page.goto(`/games/${YEAR}/${sessionId}`);
   await expect(page.getByText("Round 10")).toBeVisible();
 
   // Submitting the only pick closes the round and schedules the reveal.

@@ -1,11 +1,13 @@
 import { expect, test } from "@playwright/test";
 
-import { createSession, joinLobby } from "../helpers/session";
+import { seedLobby, signIn } from "../helpers/convex";
+import { joinLobby } from "../helpers/session";
 
 test("identity: a reload and a second tab keep the same anonymous player", async ({ browser }) => {
   const hostContext = await browser.newContext();
   const hostPage = await hostContext.newPage();
-  const sessionId = await createSession(hostPage, "Host");
+  const { sessionId } = await seedLobby({ name: "Host", hostUid: await signIn(hostPage) });
+  await hostPage.goto(`/games/2026/${sessionId}`);
 
   const guestContext = await browser.newContext();
   const guestPage = await guestContext.newPage();
@@ -34,7 +36,8 @@ test("identity: a reload and a second tab keep the same anonymous player", async
 test("identity: a player who leaves can rejoin the same lobby", async ({ browser }) => {
   const hostContext = await browser.newContext();
   const hostPage = await hostContext.newPage();
-  const sessionId = await createSession(hostPage, "Host");
+  const { sessionId } = await seedLobby({ name: "Host", hostUid: await signIn(hostPage) });
+  await hostPage.goto(`/games/2026/${sessionId}`);
 
   const guestContext = await browser.newContext();
   const guestPage = await guestContext.newPage();

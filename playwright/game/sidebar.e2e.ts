@@ -1,18 +1,17 @@
 import { expect, test } from "@playwright/test";
 
-import { addPlayer, seedGame, signIn } from "../helpers/convex";
+import { seedGame, signIn } from "../helpers/convex";
 
 const YEAR = 2026;
 
 test("sidebar: opens and closes via button and backdrop", async ({ page }) => {
-  await page.goto("/");
+  const { sessionId } = await seedGame({
+    phase: "round:10",
+    year: YEAR,
+    players: [{ name: "Host", uid: await signIn(page) }],
+  });
 
-  // Home → Setup → Lobby → Round
-  await page.getByTestId("home-start").click();
-  await page.getByTestId("name-input").pressSequentially("Host");
-  await page.getByTestId("setup-submit").click();
-  await expect(page.getByTestId("lobby-start")).toBeVisible();
-  await page.getByTestId("lobby-start").click();
+  await page.goto(`/games/${YEAR}/${sessionId}`);
   await expect(page.getByText("Round 10")).toBeVisible();
 
   // Sidebar is closed initially
@@ -40,24 +39,17 @@ test("sidebar: opens and closes via button and backdrop", async ({ page }) => {
 });
 
 test("kick: host kicks a player from the game sidebar", async ({ page }) => {
-  await page.goto("/");
+  const { sessionId } = await seedGame({
+    phase: "round:10",
+    year: YEAR,
+    players: [
+      { name: "Host", uid: await signIn(page) },
+      { name: "Player 2", avatar: "🎮" },
+      { name: "Player 3", avatar: "🎲" },
+    ],
+  });
 
-  // Home → Setup → Lobby
-  await page.getByTestId("home-start").click();
-  await page.getByTestId("name-input").pressSequentially("Host");
-  await page.getByTestId("setup-submit").click();
-
-  const sessionId = await page.locator('[data-testid="session-id"]').getAttribute("data-value");
-  if (!sessionId) throw new Error("Could not read session ID");
-
-  await addPlayer({ sessionId, name: "Player 2", avatar: "🎮" });
-  await addPlayer({ sessionId, name: "Player 3", avatar: "🎲" });
-
-  await expect(page.getByText("Player 2")).toBeVisible();
-  await expect(page.getByText("Player 3")).toBeVisible();
-
-  // Start game
-  await page.getByTestId("lobby-start").click();
+  await page.goto(`/games/${YEAR}/${sessionId}`);
   await expect(page.getByText("Round 10")).toBeVisible();
 
   // Open sidebar
