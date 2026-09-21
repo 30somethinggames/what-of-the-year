@@ -17,6 +17,7 @@ Docs, read when relevant:
 
 ## Invariants
 
+- **Show the change**: a PR touching anything under `src/` that renders embeds a video or screenshot per acceptance criterion under **Verification** in its description — see "Before asking for review" in `docs/contributing.md`.
 - **Disclose the unusual**: a new dependency, a `.github/` or `.claude/` change, or a regenerated file gets its own line in the PR's **Notes for reviewer** saying why.
 - **Error handling in UI**: wrap every awaited Convex mutation/action call in `tryCatch` from `utils/try-catch`; on error, `Sentry.captureException(error)`, surface `error.message` via `useToast`, then early-return. Navigate/update state only on success. Never bare try/catch, never fire-and-forget mutations. The one exception is anonymous sign-in, where nothing can render without an identity, so the error state replaces the toast.
 - Import Sentry as a namespace (`import * as Sentry from "@sentry/react"`); it is initialized only in `services/sentry`.
