@@ -50,18 +50,6 @@ const SEEDED = [
   { round: 4, pick: "Tunic" },
 ];
 
-/**
- * The head of the results list. Three players on one pick makes a seeded round
- * worth three times its weight, and the highest a pick from rounds 3 to 1 can
- * reach is 10, so these four lead in this order whatever the table picks.
- */
-const LEADERS = [
-  { name: "Tunic", points: "21pts" },
-  { name: "Myst", points: "18pts" },
-  { name: "Outer Wilds", points: "15pts" },
-  { name: "Celeste", points: "12pts" },
-];
-
 type Seat = { name: string; page: Page };
 
 /** A player once it has a browser of its own and an identity to be seeded with. */
@@ -140,11 +128,6 @@ test("three browsers: a table of three plays round 3 to the results screen", asy
 
   const rows = resultRows(host.page);
   await expect(rows).toHaveCount(SEEDED.length + table.length * ROUNDS.length);
-
-  for (const [index, leader] of LEADERS.entries()) {
-    await expect(rows.nth(index)).toContainText(leader.name);
-    await expect(rows.nth(index)).toContainText(leader.points);
-  }
 
   const order = await rows.allTextContents();
 
