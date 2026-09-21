@@ -29,8 +29,6 @@ test("lobby: player leaves and host sees update", async ({ browser }) => {
   const guestContext = await browser.newContext();
   const guestPage = await guestContext.newPage();
 
-  // Each page signs itself in before the seed runs — a page can only be handed
-  // an identity it already holds, see `currentUid` in helpers/convex.ts.
   const hostUid = await signIn(hostPage);
   const guestUid = await signIn(guestPage);
 
@@ -65,13 +63,18 @@ test("lobby: player leaves and host sees update", async ({ browser }) => {
 
 test("lobby: host reopening the lobby URL mid-game lands on the active round", async ({ page }) => {
   const { sessionId } = await seedGame({
-    phase: "round:10",
+    phase: "lobby",
     year: YEAR,
     players: [{ name: "Host", uid: await signIn(page) }],
   });
 
-  // The lobby URL and the game URL are the same URL — mid-game it renders the
-  // round, not the lobby.
+  await page.goto(`/games/${YEAR}/${sessionId}`);
+  await expect(page.getByTestId("lobby-start")).toBeVisible();
+
+  await page.getByTestId("lobby-start").click();
+  await expect(page.getByTestId("pick-input")).toBeVisible();
+
+  // Host reopens the lobby URL while the game is active
   await page.goto(`/games/${YEAR}/${sessionId}`);
 
   await expect(page.getByTestId("pick-input")).toBeVisible();

@@ -8,3 +8,12 @@ export async function joinLobby(page: Page, sessionId: string, name: string) {
   await page.getByTestId("setup-submit").click();
   await expect(page.getByTestId("leave-lobby")).toBeVisible();
 }
+
+/** Picks the first suggestion for `letter` and submits it. */
+export async function pickRound(page: Page, letter: string) {
+  await page.getByTestId("pick-input").fill(letter);
+  await expect(page.getByTestId("suggestion-item").first()).toBeVisible();
+  await page.getByTestId("suggestion-item").first().click();
+  await expect(page.getByTestId("submit-pick")).toBeEnabled();
+  await page.getByTestId("submit-pick").click();
+}

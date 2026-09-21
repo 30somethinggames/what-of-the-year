@@ -1,16 +1,9 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 import { seedGame, signIn } from "../helpers/convex";
+import { pickRound } from "../helpers/session";
 
 const YEAR = 2026;
-
-async function pickRound(page: Page, letter: string) {
-  await page.getByTestId("pick-input").fill(letter);
-  await expect(page.getByTestId("suggestion-item").first()).toBeVisible();
-  await page.getByTestId("suggestion-item").first().click();
-  await expect(page.getByTestId("submit-pick")).toBeEnabled();
-  await page.getByTestId("submit-pick").click();
-}
 
 test("reveal: shows player name and pick, host can skip", async ({ page }) => {
   const uid = await signIn(page);
@@ -57,8 +50,6 @@ test("reveal: non-host sees reveal but not skip button", async ({ browser }) => 
   const guestContext = await browser.newContext();
   const guestPage = await guestContext.newPage();
 
-  // Each page signs itself in before the seed runs — a page can only be handed
-  // an identity it already holds, see `currentUid` in helpers/convex.ts.
   const hostUid = await signIn(hostPage);
   const guestUid = await signIn(guestPage);
 
