@@ -1,7 +1,8 @@
 # Local development
 
 What runs where, and the things about the local setup that are not obvious
-from the code.
+from the code. What the app you are running actually does, phase by phase and
+rule by rule, is `game.md`.
 
 ## Checks
 

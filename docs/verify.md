@@ -3,7 +3,9 @@
 A change a player would notice is developed with the app running, and its PR
 shows it working: in the description, under **Verification**, a short video
 or a screenshot per acceptance criterion, recorded by whoever made the change.
-This is the recipe. The rule that a PR must carry it is in `contributing.md`.
+This is the recipe. The rule that a PR must carry it is in `contributing.md`,
+and what a player is supposed to see — the numbered rule a criterion is
+demonstrating — is in `game.md`.
 
 ## Have the app up
 
