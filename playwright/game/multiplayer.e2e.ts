@@ -19,7 +19,7 @@ test("multiplayer: host flow with advance-round", { tag: "@smoke" }, async ({ pa
   await expect(page.getByText("Host", { exact: true })).toBeVisible();
   await expect(page.getByTestId(testIds.lists.playerCount)).toBeVisible();
 
-  const sessionId = await page.locator('[data-testid="session-id"]').getAttribute("data-value");
+  const sessionId = await page.getByTestId(testIds.lobby.sessionId).getAttribute("data-value");
   if (!sessionId) throw new Error("Could not read session ID");
 
   // Add players via API

@@ -38,8 +38,6 @@ export const testIds = {
     title: "settings-title",
     close: "close-settings",
   },
-  // The settings screen and the sidebar are the same surface on two layouts,
-  // so they carry the same two buttons.
   sidebar: {
     title: "sidebar-title",
     close: "close-sidebar",
