@@ -1,9 +1,9 @@
 # What asserts each rule
 
 Every numbered rule in [the game](game.md), against the assertion that fails
-if the rule is broken. A rule with no such assertion is one a rewrite can lose
-without a test going red, and its row carries a proposal for the spec that
-would catch it.
+if the rule is broken. A rule nothing asserts — or a part of one — is what a
+rewrite can lose without a test going red, and its row carries a proposal for
+the spec that would catch it.
 
 ## How to read it
 
@@ -14,15 +14,13 @@ One row per rule, in the order `game.md` gives them.
 | rule | the rule's number, as `game.md` numbers it |
 | asserted by | the assertion's file and line — for a `(unit)` row, the `it()` that holds it |
 | what fails | what that assertion says, short enough to recognise |
-| gap | the part of the rule nothing asserts, or the proposal for a `none` row |
+| gap | the part of the rule nothing asserts, and the proposal that would close it where there is one |
 
 `none` in **asserted by** means nothing in the repo fails when the rule is
 broken. Line numbers are the ones this page was written against.
 
-A unit assertion counts. The risk the audit is against is a behaviour lost
-without a red test, and `convex-test` catches a server rule as surely as
-Playwright does. The gap column says when a rule is server-tested but never
-seen through a browser.
+The gap column says when a rule is server-tested but never seen through a
+browser.
 
 ## Home
 
@@ -92,7 +90,7 @@ seen through a browser.
 | rule | asserted by | what fails | gap |
 | --- | --- | --- | --- |
 | V1 | `playwright/game/reveal.e2e.ts:77` | both pages show the reveal container | — |
-| V2 | `playwright/game/reveal.e2e.ts:25` | the reveal names the player | **Proposal**: one pick on screen at a time and a dot per pick filling, in `game/reveal.e2e.ts` |
+| V2 | `playwright/game/reveal.e2e.ts:25` | the reveal names the player | one pick at a time, and the row of dots, have no assertion — **Proposal**: one pick on screen at a time and a dot per pick filling, in `game/reveal.e2e.ts` |
 | V3 | none | — | **Proposal**: the second pick replaces the first about 3 seconds in, and the last one stays, in `game/reveal.e2e.ts` |
 | V4 | none | — | **Proposal**: a round where one of two players never picked reveals one card, naming only the picker, in `game/reveal.e2e.ts` |
 | V5 | `playwright/game/reveal-timeout.e2e.ts:44` | with nobody skipping, the round still opens Round 9 | the `4n + 5` window is bounded only by the 30s test timeout |
@@ -214,7 +212,8 @@ known to be running.
 
 ## Proposals, in the order to cut them
 
-Most player-visible loss first. Each is one ticket under #263.
+Twelve: the eleven rules nothing asserts, and V2, which is asserted only in
+part. Most player-visible loss first, and each is one ticket under #263.
 
 1. **V4** — only submitted picks are revealed, in the server's order, and a player who never picked is not named. `game/reveal.e2e.ts`.
 2. **V3** — a pick holds the screen about 3 seconds, and the last one stays until the reveal ends. `game/reveal.e2e.ts`.
