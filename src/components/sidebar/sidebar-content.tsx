@@ -5,12 +5,11 @@ import { Button } from "components/button";
 import { PlayerList } from "components/lists/players";
 import { Loading } from "components/states/loading";
 import { useToast } from "components/toast/use-toast";
-import { api } from "convex/_generated/api";
-import { useMutation } from "convex/react";
 import type { SessionID } from "db/types";
-import { usePlayers } from "db/use-players";
+import { useKickFromGame, useLeaveSession, usePlayers } from "db/use-players";
+import { useAdvanceRound } from "db/use-round";
 import { useSelections } from "db/use-selections";
-import { useSession } from "db/use-sessions";
+import { useForfeitSession, useSession } from "db/use-sessions";
 import { getApiError } from "utils/api-error";
 import { tryCatch } from "utils/try-catch";
 
@@ -25,10 +24,10 @@ export function SidebarContent({ sessionId, handleClose }: SidebarContentProps) 
   const { session, activeRound } = useSession(sessionId);
   const { players, isHost } = usePlayers(sessionId);
   const { selections } = useSelections(sessionId, activeRound);
-  const advanceRound = useMutation(api.rounds.advanceRound);
-  const forfeitSession = useMutation(api.sessions.forfeitSession);
-  const leaveSession = useMutation(api.players.leaveSession);
-  const kickFromGame = useMutation(api.players.kickFromGame);
+  const advanceRound = useAdvanceRound();
+  const forfeitSession = useForfeitSession();
+  const leaveSession = useLeaveSession();
+  const kickFromGame = useKickFromGame();
 
   if (!session) return <Loading />;
 

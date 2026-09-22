@@ -1,5 +1,5 @@
 import { api } from "convex/_generated/api";
-import { useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import type { SessionID } from "db/types";
 
 /**
@@ -24,4 +24,24 @@ export function usePlayers(sessionId: SessionID | undefined) {
     currentUser,
     isHost: currentUser?.isHost ?? false,
   };
+}
+
+/** Adds the caller to a session as a player. */
+export function useJoinSession() {
+  return useMutation(api.players.joinSession);
+}
+
+/** Removes the caller from a lobby. */
+export function useLeaveSession() {
+  return useMutation(api.players.leaveSession);
+}
+
+/** Host-only: removes another player from a lobby. */
+export function useKickFromLobby() {
+  return useMutation(api.players.kickFromLobby);
+}
+
+/** Host-only: removes another player from a game in progress. */
+export function useKickFromGame() {
+  return useMutation(api.players.kickFromGame);
 }

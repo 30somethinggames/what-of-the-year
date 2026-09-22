@@ -1,5 +1,5 @@
 import { api } from "convex/_generated/api";
-import { useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import type { SessionID } from "db/types";
 
 /**
@@ -21,4 +21,31 @@ export function useSelections(sessionId: SessionID | undefined, roundNumber: num
     isLoading: selections === undefined,
     selections: selections ?? [],
   };
+}
+
+/**
+ * Subscribes to the session's final standings in real time.
+ *
+ * Automatically skips subscribing if `sessionId` is undefined.
+ *
+ * @param sessionId - The session ID. Pass `undefined` to skip subscribing.
+ * @returns An object containing the `results` array and an `isLoading` flag.
+ */
+export function useResults(sessionId: SessionID | undefined) {
+  const results = useQuery(api.selections.getResults, sessionId ? { sessionId } : "skip");
+
+  return {
+    isLoading: results === undefined,
+    results: results ?? [],
+  };
+}
+
+/** Records the caller's pick for a round. */
+export function useSaveSelection() {
+  return useMutation(api.selections.saveSelection);
+}
+
+/** Replaces the caller's pick for a round that is still open. */
+export function useEditSelection() {
+  return useMutation(api.selections.editSelection);
 }

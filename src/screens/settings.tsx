@@ -6,12 +6,11 @@ import { Container } from "components/container";
 import { PlayerList } from "components/lists/players";
 import { Loading } from "components/states/loading";
 import { useToast } from "components/toast/use-toast";
-import { api } from "convex/_generated/api";
-import { useMutation } from "convex/react";
 import type { SessionID } from "db/types";
-import { usePlayers } from "db/use-players";
+import { useKickFromGame, usePlayers } from "db/use-players";
+import { useAdvanceRound } from "db/use-round";
 import { useSelections } from "db/use-selections";
-import { useSession } from "db/use-sessions";
+import { useForfeitSession, useSession } from "db/use-sessions";
 import { useGameOver } from "hooks/use-game-over";
 import { getApiError } from "utils/api-error";
 import { tryCatch } from "utils/try-catch";
@@ -27,9 +26,9 @@ export function Settings({ sessionId, round }: Props) {
   const { isLoading: isSessionLoading, session } = useSession(sessionId);
   const { isLoading: isPlayersLoading, players, isHost } = usePlayers(sessionId);
   const { isLoading: isSelectionsLoading, selections } = useSelections(sessionId, round);
-  const advanceRound = useMutation(api.rounds.advanceRound);
-  const forfeitSession = useMutation(api.sessions.forfeitSession);
-  const kickFromGame = useMutation(api.players.kickFromGame);
+  const advanceRound = useAdvanceRound();
+  const forfeitSession = useForfeitSession();
+  const kickFromGame = useKickFromGame();
 
   useGameOver({ isHost, session });
 
