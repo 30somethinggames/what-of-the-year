@@ -66,10 +66,7 @@ const port = await new Promise<number>((resolve, reject) => {
 });
 
 // Deletes the deployment through the Convex Management API, which accepts the
-// preview deploy key for a preview in the key's own project. A failure is a
-// warning and nothing more: the run's verdict is Playwright's, and a preview
-// left behind expires in five days. A 404 is a run whose slug a re-push already
-// replaced, and that is done, not a failure of whatever holds the name now.
+// preview deploy key for a preview in the key's own project.
 async function deletePreview(slug: string) {
   try {
     const response = await fetch(`https://api.convex.dev/v1/deployments/${slug}/delete`, {
@@ -89,17 +86,16 @@ async function deletePreview(slug: string) {
 }
 
 const work = await mkdtemp(join(tmpdir(), "woty-e2e-"));
-let cloudUrl: string | undefined;
+// The deploy hands the new deployment's URL to the build, which bakes it into
+// the bundle Playwright serves. `--cmd` runs in a child process, so the URL has
+// to come back out through a file. Only the cloud URL is exposed, so the site
+// origin the test helpers POST to is derived from it.
+const urlFile = join(work, "url");
 try {
-  // The deploy hands the new deployment's URL to the build, which bakes it into
-  // the bundle Playwright serves. `--cmd` runs in a child process, so the URL
-  // has to come back out through a file. Only the cloud URL is exposed, so the
-  // site origin the test helpers POST to is derived from it.
-  const urlFile = join(work, "url");
   await $`bunx convex deploy --preview-create ${preview} \
     --cmd ${`printf %s "$VITE_CONVEX_URL" > ${urlFile} && bun run build`} \
     --cmd-url-env-var-name VITE_CONVEX_URL`;
-  cloudUrl = (await readFile(urlFile, "utf8")).trim();
+  const cloudUrl = (await readFile(urlFile, "utf8")).trim();
 
   // The deploy just regenerated convex/_generated. Checking here, rather than
   // after the suite, means a stale tree costs one deploy instead of a deploy
@@ -139,6 +135,12 @@ try {
     E2E_PORT: String(port),
   });
 } finally {
+  // Read the URL back rather than trusting the try body to have got that far:
+  // the deploy writes the file once the deployment exists, so a build that
+  // throws after it still leaves a deployment to delete.
+  const cloudUrl = await readFile(urlFile, "utf8")
+    .then((text) => text.trim())
+    .catch(() => undefined);
   await rm(work, { recursive: true, force: true });
   // The slug the deployment is addressed by, which is the host's first label —
   // not the preview name, which the API does not take.
