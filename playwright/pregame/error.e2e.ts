@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { testIds } from "test-ids";
 
 // A session ID that is not a well-formed Convex ID fails the `v.id("sessions")`
 // validator in `getSession`, so the query throws and the root ErrorBoundary
@@ -7,11 +8,11 @@ import { expect, test, type Page } from "@playwright/test";
 async function expectSessionIdRejected(page: Page, sessionId: string) {
   await page.goto(`/games/2026/${sessionId}`);
 
-  await expect(page.getByTestId("error-state")).toBeVisible();
+  await expect(page.getByTestId(testIds.error.state)).toBeVisible();
   await expect(page.getByText("Something went wrong")).toBeVisible();
-  await expect(page.getByTestId("error-retry")).toBeVisible();
-  await expect(page.getByTestId("name-input")).toHaveCount(0);
-  await expect(page.getByTestId("session-id")).toHaveCount(0);
+  await expect(page.getByTestId(testIds.error.retry)).toBeVisible();
+  await expect(page.getByTestId(testIds.topic.nameInput)).toHaveCount(0);
+  await expect(page.getByTestId(testIds.lobby.sessionId)).toHaveCount(0);
 }
 
 test("error: a malformed session ID shows the error state, not the join form", async ({ page }) => {

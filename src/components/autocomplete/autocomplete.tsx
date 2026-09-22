@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { testIds } from "test-ids";
 
 import type { Option } from "types/option";
 
@@ -82,7 +83,7 @@ export function Autocomplete({
           {filtered.map((item) => (
             <button
               key={String(item.id)}
-              data-testid="suggestion-item"
+              data-testid={testIds.autocomplete.suggestion}
               type="button"
               className="flex w-full flex-row items-center gap-sm p-sm text-left hover:bg-white-100"
               onMouseDown={(e) => e.preventDefault()}

@@ -1,4 +1,5 @@
 import { expect, test, type BrowserContext, type Page } from "@playwright/test";
+import { testIds } from "test-ids";
 
 import { seedGame, signIn } from "../helpers/convex";
 
@@ -63,15 +64,15 @@ async function onEveryPage(pages: Seat[], assert: (page: Page) => Promise<void>)
 }
 
 async function submitPick(page: Page, letter: string) {
-  await page.getByTestId("pick-input").fill(letter);
-  await expect(page.getByTestId("suggestion-item").first()).toBeVisible();
-  await page.getByTestId("suggestion-item").first().click();
-  await expect(page.getByTestId("submit-pick")).toBeEnabled();
-  await page.getByTestId("submit-pick").click();
+  await page.getByTestId(testIds.round.pickInput).fill(letter);
+  await expect(page.getByTestId(testIds.autocomplete.suggestion).first()).toBeVisible();
+  await page.getByTestId(testIds.autocomplete.suggestion).first().click();
+  await expect(page.getByTestId(testIds.round.submitPick)).toBeEnabled();
+  await page.getByTestId(testIds.round.submitPick).click();
 }
 
 function resultRows(page: Page) {
-  return page.getByTestId("results-list").locator("> *");
+  return page.getByTestId(testIds.results.list).locator("> *");
 }
 
 test("three browsers: a table of three plays round 3 to the results screen", async ({
@@ -109,22 +110,28 @@ test("three browsers: a table of three plays round 3 to the results screen", asy
     for (const player of [host, guests[0]!]) {
       await submitPick(player.page, player.picks[index]!.letter);
       // The locked button is the server's word that the pick landed.
-      await expect(player.page.getByTestId("submit-pick")).toBeDisabled();
+      await expect(player.page.getByTestId(testIds.round.submitPick)).toBeDisabled();
     }
 
     // Two of three in: the round is still open, so no page is revealing.
-    await onEveryPage(table, (page) => expect(page.getByTestId("reveal-container")).toHaveCount(0));
+    await onEveryPage(table, (page) =>
+      expect(page.getByTestId(testIds.reveal.container)).toHaveCount(0),
+    );
 
     await submitPick(guests[1]!.page, guests[1]!.picks[index]!.letter);
 
-    await onEveryPage(table, (page) => expect(page.getByTestId("reveal-container")).toBeVisible());
-    await onEveryPage(guests, (page) => expect(page.getByTestId("reveal-skip")).toHaveCount(0));
+    await onEveryPage(table, (page) =>
+      expect(page.getByTestId(testIds.reveal.container)).toBeVisible(),
+    );
+    await onEveryPage(guests, (page) =>
+      expect(page.getByTestId(testIds.reveal.skip)).toHaveCount(0),
+    );
 
-    await expect(host.page.getByTestId("reveal-skip")).toBeVisible();
-    await host.page.getByTestId("reveal-skip").click();
+    await expect(host.page.getByTestId(testIds.reveal.skip)).toBeVisible();
+    await host.page.getByTestId(testIds.reveal.skip).click();
   }
 
-  await onEveryPage(table, (page) => expect(page.getByTestId("results-list")).toBeVisible());
+  await onEveryPage(table, (page) => expect(page.getByTestId(testIds.results.list)).toBeVisible());
 
   const rows = resultRows(host.page);
   await expect(rows).toHaveCount(SEEDED.length + table.length * ROUNDS.length);

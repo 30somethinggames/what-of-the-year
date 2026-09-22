@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { testIds } from "test-ids";
 
 import { Button } from "components/button";
 import { Container } from "components/container";
@@ -23,7 +24,12 @@ export function Home() {
           animate={{ x: 0 }}
           transition={{ ...spring, delay: 0.5 }}
         >
-          <Picker testID="topic-picker" data={topics} value={topic} onValueChange={setTopic} />
+          <Picker
+            testID={testIds.picker.topic}
+            data={topics}
+            value={topic}
+            onValueChange={setTopic}
+          />
         </motion.div>
 
         <motion.span
@@ -41,7 +47,7 @@ export function Home() {
           animate={{ x: 0 }}
           transition={{ ...spring, delay: 0.65 }}
         >
-          <Picker testID="year-picker" data={years} value={year} onValueChange={setYear} />
+          <Picker testID={testIds.picker.year} data={years} value={year} onValueChange={setYear} />
         </motion.div>
       </div>
 
@@ -52,7 +58,7 @@ export function Home() {
         transition={{ type: "spring", damping: 14, stiffness: 120, delay: 0.95 }}
       >
         <Link to="/$topic/$year" params={{ topic: topic.value, year: String(year.value) }}>
-          <Button testID="home-start" label="Start" />
+          <Button testID={testIds.home.start} label="Start" />
         </Link>
       </motion.div>
     </Container>

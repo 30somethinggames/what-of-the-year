@@ -1,5 +1,6 @@
 import * as Sentry from "@sentry/react";
 import { useNavigate } from "@tanstack/react-router";
+import { testIds } from "test-ids";
 
 import { Button } from "components/button";
 import { Container } from "components/container";
@@ -72,17 +73,17 @@ export function Lobby({ topic, year, sessionId }: LobbyProps) {
 
   return (
     <Container>
-      <div data-testid="session-id" data-value={sessionId} className="hidden" />
+      <div data-testid={testIds.lobby.sessionId} data-value={sessionId} className="hidden" />
       <PlayerList data={players} maxPlayerCount={maxPlayerCount} onKick={onKick} />
 
       <div className="mt-auto flex flex-col gap-md">
         {isHost ? (
           <>
-            <Button testID="invite" label="Invite" onClick={handleOnShare} />
-            <Button testID="lobby-start" label="Start" onClick={onStart} />
+            <Button testID={testIds.lobby.invite} label="Invite" onClick={handleOnShare} />
+            <Button testID={testIds.lobby.start} label="Start" onClick={onStart} />
           </>
         ) : (
-          <Button testID="leave-lobby" label="Leave" onClick={onLeave} />
+          <Button testID={testIds.lobby.leave} label="Leave" onClick={onLeave} />
         )}
       </div>
     </Container>

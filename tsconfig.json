@@ -23,7 +23,8 @@
       "utils/*": ["./src/utils/*"],
       "db/*": ["./src/db/*"],
       "screens/*": ["./src/screens/*"],
-      "services/*": ["./src/services/*"]
+      "services/*": ["./src/services/*"],
+      "test-ids": ["./src/test-ids.ts"]
     }
   },
   "include": ["*.ts", "src", "convex", "playwright", "scripts"]

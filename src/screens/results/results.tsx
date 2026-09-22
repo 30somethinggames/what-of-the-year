@@ -1,3 +1,5 @@
+import { testIds } from "test-ids";
+
 import { Container } from "components/container";
 import { Picks } from "components/lists/picks";
 import { Loading } from "components/states/loading";
@@ -16,7 +18,7 @@ export function Results({ sessionId }: Props) {
 
   return (
     <Container>
-      <Picks testID="results-list" data={results} />
+      <Picks testID={testIds.results.list} data={results} />
     </Container>
   );
 }
