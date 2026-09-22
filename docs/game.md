@@ -4,7 +4,8 @@ What of the Year, as a player sees it: every screen, every rule, every limit.
 Written from the code and the e2e specs as they stand. Where the two disagree,
 the disagreement is a bullet under [Discrepancies](#discrepancies), not a fix.
 
-Every rule is numbered so another page can cite it. A prefix is a phase:
+Every rule is numbered so another page can cite it. What asserts each one, and
+what asserts none of them, is [coverage.md](coverage.md). A prefix is a phase:
 
 | prefix | phase |
 | --- | --- |
