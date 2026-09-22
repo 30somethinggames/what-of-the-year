@@ -1,5 +1,6 @@
 import * as Sentry from "@sentry/react";
 import { useState } from "react";
+import { testIds } from "test-ids";
 
 import { Autocomplete } from "components/autocomplete";
 import { Button } from "components/button";
@@ -147,14 +148,14 @@ export function Round({ sessionId, topic, year }: Props) {
   return (
     <Container>
       <Picks
-        testID="round-list"
+        testID={testIds.round.list}
         data={mySelections}
         onEdit={onEdit}
         editableRoundNumber={round?.state === "open" ? session.activeRoundNumber : undefined}
       />
       <div className="mt-auto flex flex-col gap-md pt-md">
         <Autocomplete
-          testID="pick-input"
+          testID={testIds.round.pickInput}
           value={inputValue}
           onChangeText={handleInputChange}
           onSelectOption={onSelectOption}
@@ -162,12 +163,14 @@ export function Round({ sessionId, topic, year }: Props) {
           placeholder={isEditing ? "Edit your pick" : "Enter your pick"}
         />
         <Button
-          testID="submit-pick"
+          testID={testIds.round.submitPick}
           label={isEditing ? "Save" : "Enter"}
           onClick={onEnter}
           disabled={isDisabled}
         />
-        {isEditing ? <Button testID="cancel-edit" label="Cancel" onClick={onCancelEdit} /> : null}
+        {isEditing ? (
+          <Button testID={testIds.round.cancelEdit} label="Cancel" onClick={onCancelEdit} />
+        ) : null}
       </div>
     </Container>
   );

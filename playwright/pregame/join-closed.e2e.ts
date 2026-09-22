@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { testIds } from "test-ids";
 
 import { seedGame, signIn } from "../helpers/convex";
 
@@ -15,15 +16,15 @@ test("join: a newcomer opening an active session lands on the error state", asyn
 
   // An active session renders the round in play for whoever opens it, where the
   // member-only round queries throw for a non-member.
-  await expect(page.getByTestId("error-state")).toBeVisible();
-  await expect(page.getByTestId("name-input")).toHaveCount(0);
-  await expect(page.getByTestId("pick-input")).toHaveCount(0);
+  await expect(page.getByTestId(testIds.error.state)).toBeVisible();
+  await expect(page.getByTestId(testIds.topic.nameInput)).toHaveCount(0);
+  await expect(page.getByTestId(testIds.round.pickInput)).toHaveCount(0);
 
   // Retry would only throw again for someone who is not a member — the home link
   // is the way out of the boundary.
-  await page.getByTestId("error-home").click();
+  await page.getByTestId(testIds.error.home).click();
   await expect(page).toHaveURL("/");
-  await expect(page.getByTestId("home-start")).toBeVisible();
+  await expect(page.getByTestId(testIds.home.start)).toBeVisible();
 });
 
 test("join: a newcomer opening an ended session is sent home", async ({ browser }) => {
@@ -39,21 +40,23 @@ test("join: a newcomer opening an ended session is sent home", async ({ browser 
   });
 
   await hostPage.goto(`/games/${YEAR}/${sessionId}`);
-  await expect(hostPage.getByTestId("pick-input")).toBeVisible();
+  await expect(hostPage.getByTestId(testIds.round.pickInput)).toBeVisible();
 
   // "Leave Game" ends the session outright when the host is the one leaving.
-  await hostPage.getByTestId("settings-button").click();
-  await hostPage.getByTestId("leave-game").click();
+  await hostPage.getByTestId(testIds.settings.button).click();
+  await hostPage.getByTestId(testIds.sidebar.leaveGame).click();
   await expect(hostPage).toHaveURL("/");
 
   const guestContext = await browser.newContext();
   const guestPage = await guestContext.newPage();
   await guestPage.goto(`/games/${YEAR}/${sessionId}`);
 
-  await expect(guestPage.getByTestId("toast")).toContainText("The host forfeited the game.");
+  await expect(guestPage.getByTestId(testIds.toast.root)).toContainText(
+    "The host forfeited the game.",
+  );
   await expect(guestPage).toHaveURL("/");
-  await expect(guestPage.getByTestId("home-start")).toBeVisible();
-  await expect(guestPage.getByTestId("name-input")).toHaveCount(0);
+  await expect(guestPage.getByTestId(testIds.home.start)).toBeVisible();
+  await expect(guestPage.getByTestId(testIds.topic.nameInput)).toHaveCount(0);
 
   await hostContext.close();
   await guestContext.close();

@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { testIds } from "test-ids";
 
 import { seedGame, signIn } from "../helpers/convex";
 
@@ -21,18 +22,18 @@ test("reveal: the scheduled job advances the round when the host never skips", a
   await expect(page.getByText("Round 10")).toBeVisible();
 
   // Submitting the only pick closes the round and schedules the reveal.
-  await page.getByTestId("pick-input").fill("a");
-  await expect(page.getByTestId("suggestion-item").first()).toBeVisible();
-  await page.getByTestId("suggestion-item").first().click();
-  await expect(page.getByTestId("submit-pick")).toBeEnabled();
-  await page.getByTestId("submit-pick").click();
+  await page.getByTestId(testIds.round.pickInput).fill("a");
+  await expect(page.getByTestId(testIds.autocomplete.suggestion).first()).toBeVisible();
+  await page.getByTestId(testIds.autocomplete.suggestion).first().click();
+  await expect(page.getByTestId(testIds.round.submitPick)).toBeEnabled();
+  await page.getByTestId(testIds.round.submitPick).click();
 
-  await expect(page.getByTestId("reveal-container")).toBeVisible();
-  await expect(page.getByTestId("reveal-skip")).toBeVisible();
+  await expect(page.getByTestId(testIds.reveal.container)).toBeVisible();
+  await expect(page.getByTestId(testIds.reveal.skip)).toBeVisible();
 
   // The countdown bar fills over the server's reveal window, so its width grows
   // while the reveal is in play.
-  const countdown = page.getByTestId("reveal-countdown");
+  const countdown = page.getByTestId(testIds.reveal.countdown);
   await expect(countdown).toBeVisible();
   const startWidth = (await countdown.boundingBox())?.width ?? 0;
   await expect
@@ -41,6 +42,6 @@ test("reveal: the scheduled job advances the round when the host never skips", a
 
   // No skip click anywhere in this spec — the scheduled job does the advancing.
   await expect(page.getByText("Round 9")).toBeVisible();
-  await expect(page.getByTestId("reveal-container")).toHaveCount(0);
-  await expect(page.getByTestId("pick-input")).toBeVisible();
+  await expect(page.getByTestId(testIds.reveal.container)).toHaveCount(0);
+  await expect(page.getByTestId(testIds.round.pickInput)).toBeVisible();
 });

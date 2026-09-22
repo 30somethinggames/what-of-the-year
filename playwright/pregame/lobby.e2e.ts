@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { testIds } from "test-ids";
 
 import { seedGame, seedLobby, signIn } from "../helpers/convex";
 
@@ -13,9 +14,9 @@ test("lobby: invite copies session URL to clipboard", async ({ browser }) => {
   const { sessionId } = await seedLobby({ name: "Host", year: YEAR, hostUid: await signIn(page) });
   await page.goto(`/games/${YEAR}/${sessionId}`);
 
-  await expect(page.getByTestId("invite")).toBeVisible();
+  await expect(page.getByTestId(testIds.lobby.invite)).toBeVisible();
 
-  await page.getByTestId("invite").click();
+  await page.getByTestId(testIds.lobby.invite).click();
 
   const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
   expect(clipboardText).toContain(`/games/${YEAR}/${sessionId}`);
@@ -48,8 +49,8 @@ test("lobby: player leaves and host sees update", async ({ browser }) => {
   await expect(hostPage.getByText("Guest")).toBeVisible();
 
   // Guest leaves
-  await expect(guestPage.getByTestId("leave-lobby")).toBeVisible();
-  await guestPage.getByTestId("leave-lobby").click();
+  await expect(guestPage.getByTestId(testIds.lobby.leave)).toBeVisible();
+  await guestPage.getByTestId(testIds.lobby.leave).click();
 
   // Guest redirected home
   await expect(guestPage).toHaveURL("/");
@@ -69,14 +70,14 @@ test("lobby: host reopening the lobby URL mid-game lands on the active round", a
   });
 
   await page.goto(`/games/${YEAR}/${sessionId}`);
-  await expect(page.getByTestId("lobby-start")).toBeVisible();
+  await expect(page.getByTestId(testIds.lobby.start)).toBeVisible();
 
-  await page.getByTestId("lobby-start").click();
-  await expect(page.getByTestId("pick-input")).toBeVisible();
+  await page.getByTestId(testIds.lobby.start).click();
+  await expect(page.getByTestId(testIds.round.pickInput)).toBeVisible();
 
   // Host reopens the lobby URL while the game is active
   await page.goto(`/games/${YEAR}/${sessionId}`);
 
-  await expect(page.getByTestId("pick-input")).toBeVisible();
-  await expect(page.getByTestId("lobby-start")).toHaveCount(0);
+  await expect(page.getByTestId(testIds.round.pickInput)).toBeVisible();
+  await expect(page.getByTestId(testIds.lobby.start)).toHaveCount(0);
 });

@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { testIds } from "test-ids";
 
 import { seedGame, signIn } from "../helpers/convex";
 import { pickRound } from "../helpers/session";
@@ -27,26 +28,26 @@ test("non-host: lobby UI and round experience", async ({ browser }) => {
   await guestPage.goto(`/games/${YEAR}/${sessionId}`);
 
   // Non-host lobby: sees Leave, no Invite or Start
-  await expect(guestPage.getByTestId("leave-lobby")).toBeVisible();
-  await expect(guestPage.getByTestId("invite")).not.toBeVisible();
-  await expect(guestPage.getByTestId("lobby-start")).not.toBeVisible();
+  await expect(guestPage.getByTestId(testIds.lobby.leave)).toBeVisible();
+  await expect(guestPage.getByTestId(testIds.lobby.invite)).not.toBeVisible();
+  await expect(guestPage.getByTestId(testIds.lobby.start)).not.toBeVisible();
 
   // Host starts game
-  await hostPage.getByTestId("lobby-start").click();
+  await hostPage.getByTestId(testIds.lobby.start).click();
   await expect(hostPage.getByText("Round 10")).toBeVisible();
 
   // Non-host auto-redirects to round 10
   await expect(guestPage.getByText("Round 10")).toBeVisible();
 
   // Non-host opens sidebar — no advance button
-  await guestPage.getByTestId("settings-button").click();
-  await expect(guestPage.getByTestId("sidebar-title")).toBeVisible();
-  await expect(guestPage.getByTestId("leave-game")).toBeVisible();
-  await expect(guestPage.getByTestId("advance-round")).not.toBeVisible();
+  await guestPage.getByTestId(testIds.settings.button).click();
+  await expect(guestPage.getByTestId(testIds.sidebar.title)).toBeVisible();
+  await expect(guestPage.getByTestId(testIds.sidebar.leaveGame)).toBeVisible();
+  await expect(guestPage.getByTestId(testIds.sidebar.advanceRound)).not.toBeVisible();
 
   // Close sidebar
-  await guestPage.getByTestId("close-sidebar").click();
-  await expect(guestPage.getByTestId("sidebar-title")).not.toBeVisible();
+  await guestPage.getByTestId(testIds.sidebar.close).click();
+  await expect(guestPage.getByTestId(testIds.sidebar.title)).not.toBeVisible();
 
   // Non-host makes a pick
   await pickRound(guestPage, "a");
@@ -55,13 +56,13 @@ test("non-host: lobby UI and round experience", async ({ browser }) => {
   await pickRound(hostPage, "b");
 
   // Reveal phase: host sees skip button, non-host does not
-  await expect(hostPage.getByTestId("reveal-container")).toBeVisible();
-  await expect(hostPage.getByTestId("reveal-skip")).toBeVisible();
-  await expect(guestPage.getByTestId("reveal-container")).toBeVisible();
-  await expect(guestPage.getByTestId("reveal-skip")).not.toBeVisible();
+  await expect(hostPage.getByTestId(testIds.reveal.container)).toBeVisible();
+  await expect(hostPage.getByTestId(testIds.reveal.skip)).toBeVisible();
+  await expect(guestPage.getByTestId(testIds.reveal.container)).toBeVisible();
+  await expect(guestPage.getByTestId(testIds.reveal.skip)).not.toBeVisible();
 
   // Host skips reveal → both advance to round 9
-  await hostPage.getByTestId("reveal-skip").click();
+  await hostPage.getByTestId(testIds.reveal.skip).click();
   await expect(guestPage.getByText("Round 9")).toBeVisible();
   await expect(hostPage.getByText("Round 9")).toBeVisible();
 
@@ -94,18 +95,18 @@ test("non-host: leaving game removes player from host sidebar", async ({ browser
   await expect(guestPage.getByText("Round 10")).toBeVisible();
 
   // Host opens sidebar — both players visible
-  await hostPage.getByTestId("settings-button").click();
-  await expect(hostPage.getByTestId("sidebar-title")).toBeVisible();
+  await hostPage.getByTestId(testIds.settings.button).click();
+  await expect(hostPage.getByTestId(testIds.sidebar.title)).toBeVisible();
   await expect(hostPage.getByText("Melissa")).toBeVisible();
   await expect(hostPage.getByText("Ryan")).toBeVisible();
 
   // Guest leaves game via sidebar
-  await guestPage.getByTestId("settings-button").click();
-  await expect(guestPage.getByTestId("leave-game")).toBeVisible();
-  await guestPage.getByTestId("leave-game").click();
+  await guestPage.getByTestId(testIds.settings.button).click();
+  await expect(guestPage.getByTestId(testIds.sidebar.leaveGame)).toBeVisible();
+  await guestPage.getByTestId(testIds.sidebar.leaveGame).click();
 
   // Guest is redirected to home
-  await expect(guestPage.getByTestId("home-start")).toBeVisible();
+  await expect(guestPage.getByTestId(testIds.home.start)).toBeVisible();
 
   // Host's sidebar updates — Guest is gone
   await expect(hostPage.getByText("Melissa")).not.toBeVisible();
@@ -141,15 +142,17 @@ test("non-host: host leaving game shows toast and redirects to home", async ({ b
   await expect(guestPage.getByText("Round 10")).toBeVisible();
 
   // Host leaves game mid-round (triggers forfeitSession)
-  await hostPage.getByTestId("settings-button").click();
-  await expect(hostPage.getByTestId("leave-game")).toBeVisible();
-  await hostPage.getByTestId("leave-game").click();
-  await expect(hostPage.getByTestId("home-start")).toBeVisible();
+  await hostPage.getByTestId(testIds.settings.button).click();
+  await expect(hostPage.getByTestId(testIds.sidebar.leaveGame)).toBeVisible();
+  await hostPage.getByTestId(testIds.sidebar.leaveGame).click();
+  await expect(hostPage.getByTestId(testIds.home.start)).toBeVisible();
 
   // Guest sees error toast and is redirected to home
-  await expect(guestPage.getByTestId("toast")).toBeVisible();
-  await expect(guestPage.getByTestId("toast")).toHaveText("The host forfeited the game.");
-  await expect(guestPage.getByTestId("home-start")).toBeVisible();
+  await expect(guestPage.getByTestId(testIds.toast.root)).toBeVisible();
+  await expect(guestPage.getByTestId(testIds.toast.root)).toHaveText(
+    "The host forfeited the game.",
+  );
+  await expect(guestPage.getByTestId(testIds.home.start)).toBeVisible();
 
   await hostContext.close();
   await guestContext.close();
@@ -185,9 +188,9 @@ test("non-host: host advancing mid-game moves the guest's round", async ({ brows
 
   // Host advances from the sidebar. Nobody has picked, so the round advances
   // directly — no reveal to skip.
-  await hostPage.getByTestId("settings-button").click();
-  await expect(hostPage.getByTestId("advance-round")).toBeVisible();
-  await hostPage.getByTestId("advance-round").click();
+  await hostPage.getByTestId(testIds.settings.button).click();
+  await expect(hostPage.getByTestId(testIds.sidebar.advanceRound)).toBeVisible();
+  await hostPage.getByTestId(testIds.sidebar.advanceRound).click();
 
   await expect(guestPage.getByText("Round 7")).toBeVisible();
   await expect(hostPage.getByText("Round 7")).toBeVisible();

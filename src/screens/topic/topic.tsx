@@ -1,6 +1,7 @@
 import * as Sentry from "@sentry/react";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { testIds } from "test-ids";
 
 import { Avatar, useRandomAvatar } from "components/avatar";
 import { Button } from "components/button";
@@ -67,11 +68,16 @@ export function Topic({ topic, year, existingSessionId }: Props) {
     <Container className="items-center justify-center gap-lg">
       <div className="flex w-full flex-row items-center justify-between">
         <Avatar source={avatar} size={120} />
-        <Button testID="random-avatar" label="Random" onClick={randomizeAvatar} className="w-30" />
+        <Button
+          testID={testIds.topic.randomAvatar}
+          label="Random"
+          onClick={randomizeAvatar}
+          className="w-30"
+        />
       </div>
       <div className="flex w-full flex-col gap-sm">
         <Input
-          testID="name-input"
+          testID={testIds.topic.nameInput}
           placeholder="User name"
           value={name}
           onChange={(e) => setName(e.target.value)}
@@ -80,7 +86,7 @@ export function Topic({ topic, year, existingSessionId }: Props) {
         />
         {nameError ? <span className="text-sm text-red-100 px-sm">{nameError}</span> : null}
       </div>
-      <Button testID="setup-submit" label={label} disabled={disabled} onClick={onSubmit} />
+      <Button testID={testIds.topic.submit} label={label} disabled={disabled} onClick={onSubmit} />
     </Container>
   );
 }

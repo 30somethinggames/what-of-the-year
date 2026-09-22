@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
+import { testIds } from "test-ids";
 
 import { Avatar } from "components/avatar";
 import type { Player, Selection } from "db/types";
@@ -38,7 +39,7 @@ export function Reveal({ selections, players, revealEndsAt, isHost, onSkip }: Pr
   const player = playerMap.get(current.uid);
 
   return (
-    <div data-testid="reveal-container" className="flex flex-1 flex-col px-md pb-md">
+    <div data-testid={testIds.reveal.container} className="flex flex-1 flex-col px-md pb-md">
       <div className="flex flex-1 flex-col items-center justify-center gap-lg">
         <AnimatePresence mode="wait">
           <motion.div
@@ -49,10 +50,10 @@ export function Reveal({ selections, players, revealEndsAt, isHost, onSkip }: Pr
             exit={{ opacity: 0, scale: 0.8, y: -20 }}
             transition={{ type: "spring", damping: 20, stiffness: 200 }}
           >
-            <div data-testid="reveal-pick" className="flex items-center gap-sm">
+            <div data-testid={testIds.reveal.pick} className="flex items-center gap-sm">
               {player ? <Avatar source={player.avatar} size={48} /> : null}
               <span
-                data-testid="reveal-player-name"
+                data-testid={testIds.reveal.playerName}
                 className="text-xl font-semibold text-black-100"
               >
                 {player?.name ?? "Unknown"}
@@ -88,12 +89,12 @@ export function Reveal({ selections, players, revealEndsAt, isHost, onSkip }: Pr
       {isHost ? (
         <button
           type="button"
-          data-testid="reveal-skip"
+          data-testid={testIds.reveal.skip}
           className="relative mt-auto w-full overflow-hidden rounded-lg bg-topic-light py-md"
           onClick={onSkip}
         >
           <motion.div
-            data-testid="reveal-countdown"
+            data-testid={testIds.reveal.countdown}
             className="absolute inset-0 bg-topic"
             initial={{ width: "0%" }}
             animate={{ width: "100%" }}

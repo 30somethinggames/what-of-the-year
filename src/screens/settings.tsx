@@ -1,5 +1,6 @@
 import * as Sentry from "@sentry/react";
 import { useNavigate } from "@tanstack/react-router";
+import { testIds } from "test-ids";
 
 import { Button } from "components/button";
 import { Container } from "components/container";
@@ -73,11 +74,11 @@ export function Settings({ sessionId, round }: Props) {
   return (
     <Container>
       <div className="flex flex-row items-center justify-between py-lg">
-        <span data-testid="settings-title" className="font-semibold text-lg text-black-100">
+        <span data-testid={testIds.settings.title} className="font-semibold text-lg text-black-100">
           Settings
         </span>
         <button
-          data-testid="close-settings"
+          data-testid={testIds.settings.close}
           type="button"
           onClick={() => window.history.back()}
           className="text-lg text-grey-100"
@@ -94,13 +95,13 @@ export function Settings({ sessionId, round }: Props) {
       <div className="mt-auto flex flex-col gap-md py-lg">
         {isHost ? (
           <Button
-            testID="advance-round"
+            testID={testIds.sidebar.advanceRound}
             label={round > 1 ? "Next Round" : "End Game"}
             onClick={onNextRound}
           />
         ) : null}
         <Button
-          testID="leave-game"
+          testID={testIds.sidebar.leaveGame}
           label="Leave Game"
           onClick={onLeaveGame}
           style={{ backgroundColor: "var(--color-red-100)" }}

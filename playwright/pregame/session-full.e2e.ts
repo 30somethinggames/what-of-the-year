@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { testIds } from "test-ids";
 
 import { MAX_PLAYERS } from "convex/constants";
 
@@ -22,15 +23,15 @@ test("join: a full session rejects the newcomer with the server's error", async 
   const guestPage = await guestContext.newPage();
 
   await guestPage.goto(`/games/2026/${sessionId}`);
-  await guestPage.getByTestId("name-input").fill("Latecomer");
-  await expect(guestPage.getByTestId("setup-submit")).toBeEnabled();
-  await guestPage.getByTestId("setup-submit").click();
+  await guestPage.getByTestId(testIds.topic.nameInput).fill("Latecomer");
+  await expect(guestPage.getByTestId(testIds.topic.submit)).toBeEnabled();
+  await guestPage.getByTestId(testIds.topic.submit).click();
 
-  await expect(guestPage.getByTestId("toast")).toContainText("Session is full");
+  await expect(guestPage.getByTestId(testIds.toast.root)).toContainText("Session is full");
 
   // Rejected: still on the join form, and never listed in the host's lobby.
-  await expect(guestPage.getByTestId("name-input")).toBeVisible();
-  await expect(guestPage.getByTestId("leave-lobby")).toHaveCount(0);
+  await expect(guestPage.getByTestId(testIds.topic.nameInput)).toBeVisible();
+  await expect(guestPage.getByTestId(testIds.lobby.leave)).toHaveCount(0);
   await expect(hostPage.getByText("Latecomer")).toHaveCount(0);
   await expect(hostPage.getByText(`${MAX_PLAYERS} of ${MAX_PLAYERS}`)).toBeVisible();
 

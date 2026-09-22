@@ -1,3 +1,5 @@
+import { testIds } from "test-ids";
+
 import type { Player } from "db/types";
 
 import { Avatar } from "../avatar";
@@ -25,7 +27,7 @@ export function PlayerList({ data, completedUids, maxPlayerCount, onKick }: Prop
             ) : null}
             {onKick && !item.isHost ? (
               <button
-                data-testid="kick-player"
+                data-testid={testIds.lists.kickPlayer}
                 type="button"
                 onClick={() => onKick(item.uid)}
                 className="text-lg text-red-100"
@@ -37,7 +39,7 @@ export function PlayerList({ data, completedUids, maxPlayerCount, onKick }: Prop
         );
       })}
       <div className="flex justify-end">
-        <span data-testid="player-count" className="text-sm text-white-100">
+        <span data-testid={testIds.lists.playerCount} className="text-sm text-white-100">
           {`${data.length} of ${maxPlayerCount}`}
         </span>
       </div>

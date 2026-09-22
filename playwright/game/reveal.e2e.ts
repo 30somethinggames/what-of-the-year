@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { testIds } from "test-ids";
 
 import { seedGame, signIn } from "../helpers/convex";
 import { pickRound } from "../helpers/session";
@@ -20,12 +21,12 @@ test("reveal: shows player name and pick, host can skip", async ({ page }) => {
   await pickRound(page, "a");
 
   // Verify reveal content
-  await expect(page.getByTestId("reveal-container")).toBeVisible();
-  await expect(page.getByTestId("reveal-player-name")).toContainText("E2E Tester");
-  await expect(page.getByTestId("reveal-skip")).toBeVisible();
+  await expect(page.getByTestId(testIds.reveal.container)).toBeVisible();
+  await expect(page.getByTestId(testIds.reveal.playerName)).toContainText("E2E Tester");
+  await expect(page.getByTestId(testIds.reveal.skip)).toBeVisible();
 
   // Skip reveal → next round
-  await page.getByTestId("reveal-skip").click();
+  await page.getByTestId(testIds.reveal.skip).click();
   await expect(page.getByText("Round 9")).toBeVisible();
 
   // The last round's reveal ends the game instead of opening another round —
@@ -38,10 +39,10 @@ test("reveal: shows player name and pick, host can skip", async ({ page }) => {
   });
 
   await page.goto(`/games/${YEAR}/${lastRound.sessionId}`);
-  await expect(page.getByTestId("reveal-skip")).toBeVisible();
-  await page.getByTestId("reveal-skip").click();
+  await expect(page.getByTestId(testIds.reveal.skip)).toBeVisible();
+  await page.getByTestId(testIds.reveal.skip).click();
 
-  await expect(page.getByTestId("results-list")).toBeVisible();
+  await expect(page.getByTestId(testIds.results.list)).toBeVisible();
 });
 
 test("reveal: non-host sees reveal but not skip button", async ({ browser }) => {
@@ -73,13 +74,13 @@ test("reveal: non-host sees reveal but not skip button", async ({ browser }) => 
   await pickRound(hostPage, "b");
 
   // Both see reveal; only host sees skip button
-  await expect(hostPage.getByTestId("reveal-container")).toBeVisible();
-  await expect(hostPage.getByTestId("reveal-skip")).toBeVisible();
-  await expect(guestPage.getByTestId("reveal-container")).toBeVisible();
-  await expect(guestPage.getByTestId("reveal-skip")).not.toBeVisible();
+  await expect(hostPage.getByTestId(testIds.reveal.container)).toBeVisible();
+  await expect(hostPage.getByTestId(testIds.reveal.skip)).toBeVisible();
+  await expect(guestPage.getByTestId(testIds.reveal.container)).toBeVisible();
+  await expect(guestPage.getByTestId(testIds.reveal.skip)).not.toBeVisible();
 
   // Host skips — both advance to round 9
-  await hostPage.getByTestId("reveal-skip").click();
+  await hostPage.getByTestId(testIds.reveal.skip).click();
   await expect(hostPage.getByText("Round 9")).toBeVisible();
   await expect(guestPage.getByText("Round 9")).toBeVisible();
 

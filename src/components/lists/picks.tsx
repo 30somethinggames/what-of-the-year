@@ -1,3 +1,5 @@
+import { testIds } from "test-ids";
+
 import type { MySelection, RankedPick } from "db/types";
 
 import { Row } from "./components/row";
@@ -47,7 +49,7 @@ function SelectionRow({
       <span className="flex-1 text-md text-black-100">{item.pick.name}</span>
       {onEdit ? (
         <button
-          data-testid="edit-pick"
+          data-testid={testIds.lists.editPick}
           type="button"
           onClick={() => onEdit(item)}
           className="font-bold text-sm text-grey-100"

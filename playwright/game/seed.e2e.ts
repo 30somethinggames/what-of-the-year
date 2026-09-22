@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { testIds } from "test-ids";
 
 import { seedGame, seedLobby, signIn } from "../helpers/convex";
 
@@ -26,9 +27,9 @@ test("seed: a lobby the host lands in without filling the setup form", async ({ 
 
   await page.goto(sessionUrl(sessionId));
 
-  await expect(page.getByTestId("lobby-start")).toBeVisible();
-  await expect(page.getByTestId("name-input")).toHaveCount(0);
-  await expect(page.getByTestId("player-count")).toHaveText("1 of 10");
+  await expect(page.getByTestId(testIds.lobby.start)).toBeVisible();
+  await expect(page.getByTestId(testIds.topic.nameInput)).toHaveCount(0);
+  await expect(page.getByTestId(testIds.lists.playerCount)).toHaveText("1 of 10");
 });
 
 test("seed: a round in play, without walking the rounds before it", async ({ page }) => {
@@ -42,7 +43,7 @@ test("seed: a round in play, without walking the rounds before it", async ({ pag
   await page.goto(sessionUrl(sessionId));
 
   await expect(page.getByText("Round 8")).toBeVisible();
-  await expect(page.getByTestId("pick-input")).toBeVisible();
+  await expect(page.getByTestId(testIds.round.pickInput)).toBeVisible();
 });
 
 test("seed: a reveal already running, with the picks it reveals", async ({ page }) => {
@@ -61,11 +62,11 @@ test("seed: a reveal already running, with the picks it reveals", async ({ page 
 
   await page.goto(sessionUrl(sessionId));
 
-  await expect(page.getByTestId("reveal-container")).toBeVisible();
-  await expect(page.getByTestId("reveal-countdown")).toBeVisible();
+  await expect(page.getByTestId(testIds.reveal.container)).toBeVisible();
+  await expect(page.getByTestId(testIds.reveal.countdown)).toBeVisible();
   // The host drives the reveal, so the skip button is the host-only proof that
   // the seeded uid really is the identity this page holds.
-  await expect(page.getByTestId("reveal-skip")).toBeVisible();
+  await expect(page.getByTestId(testIds.reveal.skip)).toBeVisible();
 });
 
 test("seed: results without playing ten rounds to reach them", async ({ page }) => {
@@ -83,8 +84,8 @@ test("seed: results without playing ten rounds to reach them", async ({ page }) 
 
   await page.goto(sessionUrl(sessionId));
 
-  await expect(page.getByTestId("results-list")).toBeVisible();
+  await expect(page.getByTestId(testIds.results.list)).toBeVisible();
   await expect(page.getByText("Blue Prince")).toBeVisible();
   await expect(page.getByText("Balatro")).toBeVisible();
-  await expect(page.getByTestId("pick-input")).toHaveCount(0);
+  await expect(page.getByTestId(testIds.round.pickInput)).toHaveCount(0);
 });

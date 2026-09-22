@@ -1,5 +1,6 @@
 import * as Sentry from "@sentry/react";
 import { useNavigate } from "@tanstack/react-router";
+import { testIds } from "test-ids";
 
 import { Button } from "components/button";
 import { PlayerList } from "components/lists/players";
@@ -73,12 +74,12 @@ export function SidebarContent({ sessionId, handleClose }: SidebarContentProps) 
   return (
     <div className="flex flex-1 flex-col px-md py-md">
       <div className="flex items-center justify-between pb-md">
-        <span data-testid="sidebar-title" className="font-semibold text-xl text-black-100">
+        <span data-testid={testIds.sidebar.title} className="font-semibold text-xl text-black-100">
           Players
         </span>
         {handleClose ? (
           <button
-            data-testid="close-sidebar"
+            data-testid={testIds.sidebar.close}
             type="button"
             onClick={handleClose}
             className="text-lg text-grey-100"
@@ -96,13 +97,13 @@ export function SidebarContent({ sessionId, handleClose }: SidebarContentProps) 
       <div className="mt-auto flex flex-col gap-md pt-lg">
         {isHost && activeRound ? (
           <Button
-            testID="advance-round"
+            testID={testIds.sidebar.advanceRound}
             label={activeRound > 1 ? "Next Round" : "End Game"}
             onClick={onNextRound}
           />
         ) : null}
         <Button
-          testID="leave-game"
+          testID={testIds.sidebar.leaveGame}
           label="Leave Game"
           onClick={onLeaveGame}
           className="bg-red-100"

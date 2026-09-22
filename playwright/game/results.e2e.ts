@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { testIds } from "test-ids";
 
 import { seedGame, signIn } from "../helpers/convex";
 
@@ -32,14 +33,14 @@ test("results: scoring breakdown with shared picks", async ({ page }) => {
   await page.goto(`/games/${YEAR}/${sessionId}`);
 
   // Results screen
-  await expect(page.getByTestId("results-list")).toBeVisible();
+  await expect(page.getByTestId(testIds.results.list)).toBeVisible();
 
   // "Elden Ring" picked by P2 in round 10 (1pt) + P3 in round 10 (1pt) + P2 in round 9 (2pts) = 4pts
   await expect(page.getByText("Elden Ring")).toBeVisible();
   await expect(page.getByText("4pts")).toBeVisible();
 
   // Results are sorted by total points descending
-  const results = page.getByTestId("results-list");
+  const results = page.getByTestId(testIds.results.list);
   const items = results.locator("> *");
 
   // #1: Elden Ring — 4pts, voted by Player 2 + Player 3

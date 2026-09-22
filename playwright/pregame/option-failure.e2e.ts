@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { testIds } from "test-ids";
 
 import { seedGame, signIn } from "../helpers/convex";
 
@@ -14,10 +15,10 @@ test("options: a failing option fetch replaces the join screen with the error st
 }) => {
   await page.goto(`/games/${FAILING_YEAR}`);
 
-  await expect(page.getByTestId("error-state")).toBeVisible();
+  await expect(page.getByTestId(testIds.error.state)).toBeVisible();
   await expect(page.getByText("Something went wrong")).toBeVisible();
-  await expect(page.getByTestId("error-retry")).toBeVisible();
-  await expect(page.getByTestId("name-input")).toHaveCount(0);
+  await expect(page.getByTestId(testIds.error.retry)).toBeVisible();
+  await expect(page.getByTestId(testIds.topic.nameInput)).toHaveCount(0);
 });
 
 test("options: a failing option fetch replaces the round screen with the error state", async ({
@@ -31,12 +32,12 @@ test("options: a failing option fetch replaces the round screen with the error s
   // A round in play, under a year whose options cannot load.
   await page.goto(`/games/${FAILING_YEAR}/${sessionId}`);
 
-  await expect(page.getByTestId("error-state")).toBeVisible();
-  await expect(page.getByTestId("error-retry")).toBeVisible();
+  await expect(page.getByTestId(testIds.error.state)).toBeVisible();
+  await expect(page.getByTestId(testIds.error.retry)).toBeVisible();
   // The ticket expected the pick input to stay usable through an option outage.
   // It does not: `throwOnError` in src/queries/use-games.ts sends the failure to
   // the root ErrorBoundary, so the whole round screen is replaced. This asserts
   // what ships; whether the app should degrade more gently is a call for the
   // reviewer — see the PR notes.
-  await expect(page.getByTestId("pick-input")).toHaveCount(0);
+  await expect(page.getByTestId(testIds.round.pickInput)).toHaveCount(0);
 });
