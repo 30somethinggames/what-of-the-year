@@ -1,5 +1,5 @@
 import { api } from "convex/_generated/api";
-import { useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import type { SessionID } from "db/types";
 
 /**
@@ -21,4 +21,9 @@ export function useRound(sessionId: SessionID | undefined, roundNumber: number |
     isLoading: round === undefined,
     round: round ?? null,
   };
+}
+
+/** Host-only: moves the round on — open to revealing, revealing to closed with the next round opened. */
+export function useAdvanceRound() {
+  return useMutation(api.rounds.advanceRound);
 }

@@ -10,9 +10,9 @@ import { DisplayError } from "components/states/error";
 import { Loading } from "components/states/loading";
 import { useToast } from "components/toast/use-toast";
 import type { TOPIC_KEY } from "constants/topics";
-import { api } from "convex/_generated/api";
-import { useMutation } from "convex/react";
 import type { SessionID } from "db/types";
+import { useAdvanceRound } from "db/use-round";
+import { useEditSelection, useSaveSelection } from "db/use-selections";
 import { useTopicData } from "queries/use-topic-data";
 import type { Option } from "types/option";
 import { getApiError } from "utils/api-error";
@@ -42,9 +42,9 @@ export function Round({ sessionId, topic, year }: Props) {
     isHost,
   } = useRoundState({ sessionId });
 
-  const saveSelection = useMutation(api.selections.saveSelection);
-  const editSelection = useMutation(api.selections.editSelection);
-  const advanceRound = useMutation(api.rounds.advanceRound);
+  const saveSelection = useSaveSelection();
+  const editSelection = useEditSelection();
+  const advanceRound = useAdvanceRound();
 
   const { data: options = [] } = useTopicData({ key: topic, year });
 

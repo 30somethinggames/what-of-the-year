@@ -79,7 +79,8 @@ not. It has to be here: `convex codegen` needs a live deployment, and this is
 the only command that has one.
 
 Server state is seeded and cleared through the HTTP helpers in
-`playwright/helpers/convex.ts`, never through the UI.
+`playwright/helpers/convex.ts`, never through the UI. What those routes are is
+the next section.
 
 Two settings in `playwright.config.ts` matter when reading results:
 
@@ -95,6 +96,84 @@ Two settings in `playwright.config.ts` matter when reading results:
   nor another checkout.
 
 Run `mise run test:e2e` before you open the PR; CI runs it either way.
+
+## Test routes
+
+The five `POST` routes a spec seeds through. `convex/http.ts` registers them,
+`convex/test/http.ts` wraps them and `convex/test/seed.ts` holds the mutations;
+`playwright/helpers/convex.ts` is the only client.
+
+They are registered only when `testRoutesEnabled()` holds — `TEST_SECRET` set
+on the deployment and `IS_PROD` unset — so prod serves none of them. Each
+request carries that secret in an `x-test-secret` header and gets `401
+Unauthorized` without it. The JSON body is checked by the mutation's own `args`
+validators. A mutation that returns nothing answers `{ "ok": true }`.
+
+The types below are those validators, `?` marking an optional field. `topic`
+defaults to `games` and `year` to 2026. Rounds count down: a game starts at
+`round:10` and ends at `round:1`.
+
+### `/test/create-session`
+
+| field | type | what it sets |
+| --- | --- | --- |
+| `name` | `string` | the host's display name |
+| `topic` | `string?` | the session's topic |
+| `year` | `number?` | the session's year |
+| `avatar` | `string?` | the host's avatar, else one from the seed's list |
+| `hostUid` | `string?` | the host's uid, else a generated `test-` one |
+
+Answers `{ sessionId, hostUid }`. Leaves a `LOBBY` session on round 1, its one
+player the host, and `MAX_ROUNDS` rounds all `pending`.
+
+### `/test/seed-game`
+
+| field | type | what it sets |
+| --- | --- | --- |
+| `phase` | `string` | `lobby`, `ended`, `round:<n>` or `revealing:<n>` |
+| `players` | `{ name: string, avatar?: string, uid?: string }[]` | the roster, first entry the host |
+| `selections` | `{ uid: string, roundNumber: number, pickName: string }[]?` | picks already made |
+| `topic` | `string?` | the session's topic |
+| `year` | `number?` | the session's year |
+
+Answers `{ sessionId, roundIds, players }`, each player `{ uid, name, isHost }`.
+Leaves the session at `phase` with `MAX_ROUNDS` rounds in the states it implies
+and the selections inserted, each scored by its round. A `revealing:<n>` phase
+also schedules the reveal job, so the round times out on its own.
+
+Only a player with no `uid` gets a generated one. A browser's uid comes from
+`signIn` in `playwright/helpers/convex.ts`, because a page can never adopt a
+uid the seed invented.
+
+### `/test/add-player`
+
+| field | type | what it sets |
+| --- | --- | --- |
+| `sessionId` | `Id<"sessions">` | the session to join |
+| `name` | `string` | the player's display name |
+| `avatar` | `string` | the player's avatar |
+
+Answers `{ uid }`. Leaves one more non-host player on the session and its
+`playerCount` raised by one. Throws when the session is gone.
+
+### `/test/make-selection`
+
+| field | type | what it sets |
+| --- | --- | --- |
+| `sessionId` | `Id<"sessions">` | the session picked in |
+| `uid` | `string` | whose pick it is |
+| `roundNumber` | `number` | the round picked in |
+| `pickName` | `string` | the pick, whose id is the slug of this |
+
+Answers `{ ok: true }`. Leaves a selection scored by its round and the round's
+`selectionsComplete` raised by one. When that reaches `playerCount` the round
+closes, and above round 1 the next one opens and becomes the active round.
+Throws when the round or the session is gone.
+
+### `/test/cleanup`
+
+Takes no body. Answers `{ ok: true }`. Empties `sessions`, `players`, `rounds`
+and `selections`.
 
 ## Which backend the suite runs against
 

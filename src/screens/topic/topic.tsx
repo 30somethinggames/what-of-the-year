@@ -9,10 +9,10 @@ import { Container } from "components/container";
 import { Input } from "components/input";
 import { useToast } from "components/toast/use-toast";
 import type { TopicType } from "constants/topics";
-import { api } from "convex/_generated/api";
-import { useMutation } from "convex/react";
 import { MAX_NAME_LENGTH, validateName } from "convex/utils/validate";
 import type { SessionID } from "db/types";
+import { useJoinSession } from "db/use-players";
+import { useCreateSession } from "db/use-sessions";
 import { useTopicData } from "queries/use-topic-data";
 import { getApiError } from "utils/api-error";
 import { tryCatch } from "utils/try-catch";
@@ -27,8 +27,8 @@ export function Topic({ topic, year, existingSessionId }: Props) {
   const navigate = useNavigate();
   const toast = useToast();
   const { isLoading } = useTopicData({ key: topic.value, year });
-  const mutateJoin = useMutation(api.players.joinSession);
-  const mutateCreate = useMutation(api.sessions.createSession);
+  const mutateJoin = useJoinSession();
+  const mutateCreate = useCreateSession();
   const { avatar, randomizeAvatar } = useRandomAvatar();
   const [name, setName] = useState("");
 

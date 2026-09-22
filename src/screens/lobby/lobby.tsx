@@ -8,8 +8,8 @@ import { PlayerList } from "components/lists/players";
 import { DisplayError } from "components/states/error";
 import { Loading } from "components/states/loading";
 import { useToast } from "components/toast/use-toast";
-import { api } from "convex/_generated/api";
-import { useMutation } from "convex/react";
+import { useKickFromLobby, useLeaveSession } from "db/use-players";
+import { useStartSession } from "db/use-sessions";
 import { getApiError } from "utils/api-error";
 import { tryCatch } from "utils/try-catch";
 
@@ -24,9 +24,9 @@ export function Lobby({ topic, year, sessionId }: LobbyProps) {
   });
 
   const toast = useToast();
-  const leaveSession = useMutation(api.players.leaveSession);
-  const kickFromLobby = useMutation(api.players.kickFromLobby);
-  const startSession = useMutation(api.sessions.startSession);
+  const leaveSession = useLeaveSession();
+  const kickFromLobby = useKickFromLobby();
+  const startSession = useStartSession();
 
   if (isLoading) return <Loading />;
   if (!session) return <DisplayError />;
