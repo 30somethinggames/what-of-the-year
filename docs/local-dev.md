@@ -106,9 +106,8 @@ The five `POST` routes a spec seeds through. `convex/http.ts` registers them,
 They are registered only when `testRoutesEnabled()` holds — `TEST_SECRET` set
 on the deployment and `IS_PROD` unset — so prod serves none of them. Each
 request carries that secret in an `x-test-secret` header and gets `401
-Unauthorized` without it. The JSON body reaches the mutation unvalidated: the
-mutation's own `args` validators are the check, and there is one of them rather
-than two. A mutation that returns nothing answers `{ "ok": true }`.
+Unauthorized` without it. The JSON body is checked by the mutation's own `args`
+validators. A mutation that returns nothing answers `{ "ok": true }`.
 
 The types below are those validators, `?` marking an optional field. `topic`
 defaults to `games` and `year` to 2026. Rounds count down: a game starts at

@@ -31,7 +31,7 @@ export function useJoinSession() {
   return useMutation(api.players.joinSession);
 }
 
-/** Removes the caller from a lobby. */
+/** Removes the caller from a session in any state, unless they are the host. */
 export function useLeaveSession() {
   return useMutation(api.players.leaveSession);
 }

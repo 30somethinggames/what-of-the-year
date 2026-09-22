@@ -23,7 +23,7 @@ export function useRound(sessionId: SessionID | undefined, roundNumber: number |
   };
 }
 
-/** Host-only: closes the current round and opens the next one. */
+/** Host-only: moves the round on — open to revealing, revealing to closed with the next round opened. */
 export function useAdvanceRound() {
   return useMutation(api.rounds.advanceRound);
 }
