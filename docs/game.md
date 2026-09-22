@@ -136,13 +136,15 @@ The screen behind the same session URL once the game has started.
   [sidebar](#sidebar-and-settings) — and the pick itself never leaves the
   server.
 - **R13** — The round closes the moment the picks in it reach the number of
-  players. That starts the [reveal](#reveal) for everyone.
+  players. That starts the [reveal](#reveal) for everyone, unless the number
+  was reached by a player leaving — see [R15](#rounds).
 - **R14** — The host can close a round early, from the sidebar. With at least
   one pick in, the reveal runs; with none, the next round opens immediately and
   nothing is revealed.
 - **R15** — A player who leaves or is removed mid-round takes their picks with
   them, from every round. If the players left have all picked, the round closes
-  there and then.
+  there and then — and this is the one close that runs no [reveal](#reveal):
+  the next round opens at once and that round's picks are never shown.
 
 ## Reveal
 
@@ -151,8 +153,9 @@ The screen behind the same session URL once the game has started.
   title and its cover. A row of dots, one per pick, fills as it goes.
 - **V3** — A pick is on screen for 3 seconds before the next one. The last pick
   stays until the reveal ends.
-- **V4** — Only picks actually submitted are shown, in the order they were
-  saved. A player who never picked is not mentioned.
+- **V4** — Only picks actually submitted are shown. Their order is the
+  server's, by player identity, not the order the picks were saved in. A
+  player who never picked is not mentioned.
 - **V5** — A reveal runs for `4 seconds per player plus 5`: 9 seconds for a
   single player, 45 for ten. When it ends the server closes the round and opens
   the next one.
@@ -174,8 +177,9 @@ The screen behind the same session URL once the game has started.
 - **S4** — A title picked by more than one player collects every one of those
   picks' points. A title picked in an early round beats the same title picked
   late.
-- **S5** — Only revealed rounds are counted. A round the host skipped with
-  nobody's pick in it is worth nothing to anyone.
+- **S5** — Only closed rounds are counted, the round closed by [R15](#rounds)
+  among them even though nobody saw it. A round the host skipped with nobody's
+  pick in it is worth nothing to anyone.
 
 ## Sidebar and settings
 
@@ -186,6 +190,10 @@ The screen behind the same session URL once the game has started.
   count.
 - **X3** — The host sees **Next Round** above **Leave Game** — **End Game** on
   round 1. A guest sees **Leave Game** alone.
+- **X9** — The sidebar is the same at [results](#results): the host still sees
+  **End Game**, which does nothing there but toast "Session is not in play".
+  **Leave Game** still works, and the host's still forfeits — a finished game's
+  results are taken off every guest's screen by it.
 - **X4** — **Next Round** is [R14](#rounds): it closes the round in play, or
   skips the reveal that round is already running.
 - **X5** — A guest's **Leave Game** removes them from the session and sends
@@ -203,9 +211,8 @@ The screen behind the same session URL once the game has started.
 
 - **E1** — The error state is a sad robot, a message, and up to two buttons:
   **Retry**, which reloads the page, and **Home**, which returns to `/`.
-- **E2** — Anything a live query throws lands there: a malformed or unknown
-  session ID, a read by somebody who is not a member, a topic the app does not
-  have. The message is the server's, or "Something went wrong" for anything
+- **E2** — Anything a live query throws lands there: a malformed session ID, a
+  read by somebody who is not a member, a topic the app does not have. The message is the server's, or "Something went wrong" for anything
   that did not come from the app's own error.
 - **E3** — The root error state offers both buttons. A failed sign-in offers
   **Retry** alone, since there is nothing to go home to.
@@ -217,6 +224,9 @@ The screen behind the same session URL once the game has started.
   state, not an invitation to join.
 - **E7** — A newcomer opening the link of a session the host ended is sent home
   with the forfeit toast.
+- **E8** — A well-formed session ID that names no session reads as nothing
+  rather than throwing, so the screen is "Something went wrong" with neither
+  button. Editing the URL is the only way out.
 
 ## Rate limits
 
@@ -236,8 +246,13 @@ it.
   try again" and nothing is written.
 - **T2** — Starting a game, ending it, leaving it and removing a player are not
   rate limited.
-- **T3** — A year's options are cached on the server for 24 hours and in the
-  browser for 24 hours, so a game costs its option allowance once.
+- **T3** — A year's options are cached on the server for 24 hours, so the
+  source behind them is called once a day at most. The allowance is spent
+  before that cache is read, so a cached answer costs the same as a fetched
+  one.
+- **T4** — The browser's copy of the options lives in memory for 24 hours,
+  which is as long as the tab. A reload or a second tab loads them again, and
+  spends the allowance again.
 
 ## Discrepancies
 
@@ -270,6 +285,10 @@ them is its own ticket; none is fixed here.
   forfeited game's results are seen by nobody.
 - [R8](#rounds) is enforced only in the browser: `saveSelection` accepts a
   title the same player already used in an earlier round.
+- [X9](#sidebar-and-settings) is a dead button: the sidebar renders at results
+  with `activeRoundNumber` still 1 (`src/db/use-sessions.ts`), so the host is
+  offered **End Game** for a game already over, and `advanceRound` refuses it
+  with "Session is not in play".
 - `joinSession` has a "Session is closed" message for a session past its lobby,
   but no player can see it: [E6](#errors) puts a newcomer on the error state
   before any join is attempted.
