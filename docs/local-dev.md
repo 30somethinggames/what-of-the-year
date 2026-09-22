@@ -188,16 +188,23 @@ that name, so a re-run reuses its own and nobody else's, and the preview is
 thrown away with the branch.
 
 The only credential involved is a preview deploy key (`CONVEX_DEPLOY_KEY`),
-which can create preview deployments and set env vars on them and nothing
-else — it cannot reach prod or a dev deployment. Each run mints its own
+which can create preview deployments, set env vars on them and delete them, and
+nothing else — it cannot reach prod or a dev deployment. Each run mints its own
 `TEST_SECRET` and auth keypair and sets
 `OPTIONS_FIXTURES=1`, so the suite stores no long-lived secret. CI holds the
 same key as a repository secret and, because Dependabot reads its own store,
 as a Dependabot secret too; a fork PR gets neither, so its `e2e` job fails
 until the change is pushed from a branch in this repo.
 
-Convex expires previews five days after creation, so there is nothing to clean
-up and no cron to run.
+The run deletes the deployment it created when it exits, pass or fail, so the
+team's deployment quota holds no slot for a finished run. A failed delete is a
+warning naming the slug and leaves the run's verdict alone. Convex expires
+previews five days after creation, which is the backstop for a run that was
+killed before it could tear down, so there is still no cron to run.
+
+`E2E_KEEP_PREVIEW=1 mise run test:e2e` keeps the deployment and logs its name
+and slug, for looking at the data a run left behind. It is off everywhere
+otherwise, CI included.
 
 ## A local backend per checkout
 

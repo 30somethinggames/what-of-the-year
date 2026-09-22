@@ -27,8 +27,8 @@ if (!process.env.CONVEX_DEPLOY_KEY) {
     "CONVEX_DEPLOY_KEY is empty, so there is no backend to test against.\n" +
       "Mint a preview deploy key in the Convex dashboard (project settings) and\n" +
       "put it in .env.local — bun loads that file, so nothing needs exporting.\n" +
-      "It can only create preview deployments and set env vars on them; it\n" +
-      "cannot reach prod or anyone's dev deployment.\n" +
+      "It can only create preview deployments, set env vars on them and delete\n" +
+      "them; it cannot reach prod or anyone's dev deployment.\n" +
       "Dependabot reads its own secrets store; add the key there too.\n" +
       "Fork PRs get no secrets at all; re-run the change from a branch in this repo.",
   );
@@ -65,13 +65,33 @@ const port = await new Promise<number>((resolve, reject) => {
   });
 });
 
+// Deletes the deployment through the Convex Management API, which accepts the
+// preview deploy key for a preview in the key's own project.
+async function deletePreview(slug: string) {
+  try {
+    const response = await fetch(`https://api.convex.dev/v1/deployments/${slug}/delete`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${process.env.CONVEX_DEPLOY_KEY}` },
+    });
+    if (response.ok) {
+      console.log(`Deleted preview deployment ${preview} (${slug}).`);
+    } else {
+      console.warn(
+        `Could not delete preview deployment ${slug}: ${response.status} ${await response.text()}`,
+      );
+    }
+  } catch (error) {
+    console.warn(`Could not delete preview deployment ${slug}: ${error}`);
+  }
+}
+
 const work = await mkdtemp(join(tmpdir(), "woty-e2e-"));
+// The deploy hands the new deployment's URL to the build, which bakes it into
+// the bundle Playwright serves. `--cmd` runs in a child process, so the URL has
+// to come back out through a file. Only the cloud URL is exposed, so the site
+// origin the test helpers POST to is derived from it.
+const urlFile = join(work, "url");
 try {
-  // The deploy hands the new deployment's URL to the build, which bakes it into
-  // the bundle Playwright serves. `--cmd` runs in a child process, so the URL
-  // has to come back out through a file. Only the cloud URL is exposed, so the
-  // site origin the test helpers POST to is derived from it.
-  const urlFile = join(work, "url");
   await $`bunx convex deploy --preview-create ${preview} \
     --cmd ${`printf %s "$VITE_CONVEX_URL" > ${urlFile} && bun run build`} \
     --cmd-url-env-var-name VITE_CONVEX_URL`;
@@ -115,5 +135,21 @@ try {
     E2E_PORT: String(port),
   });
 } finally {
+  // Read the URL back rather than trusting the try body to have got that far:
+  // the deploy writes the file once the deployment exists, so a build that
+  // throws after it still leaves a deployment to delete.
+  const cloudUrl = await readFile(urlFile, "utf8")
+    .then((text) => text.trim())
+    .catch(() => undefined);
   await rm(work, { recursive: true, force: true });
+  // The slug the deployment is addressed by, which is the host's first label —
+  // not the preview name, which the API does not take.
+  const slug = cloudUrl ? new URL(cloudUrl).hostname.split(".")[0] : undefined;
+  if (slug) {
+    if (process.env.E2E_KEEP_PREVIEW) {
+      console.log(`E2E_KEEP_PREVIEW is set: keeping preview ${preview} (${slug}) at ${cloudUrl}.`);
+    } else {
+      await deletePreview(slug);
+    }
+  }
 }
