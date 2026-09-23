@@ -98,6 +98,12 @@ Two settings in `playwright.config.ts` matter when reading results:
 
 Run `mise run test:e2e` before you open the PR; CI runs it either way.
 
+### Inside the Claude Code sandbox
+
+The sandbox sends egress through a proxy named in `HTTPS_PROXY`. Playwright is run with `NODE_USE_ENV_PROXY=1`, so node's `fetch` — the `/test/*` helpers and the global setup — honours it, and Chromium is launched with that proxy and `localhost`, `127.0.0.1` bypassed, so the preview server is still reached directly. Both are no-ops when no proxy variable is set, which is how CI runs.
+
+Two things are the session's, not the repo's, and stay in the user's own settings: `sandbox.network.allowLocalBinding`, because the port probe and `vite preview` listen on `127.0.0.1`, and allowing the hosts a run reaches — `api.convex.dev`, `*.convex.cloud` and `*.convex.site`. With those set the task needs no `excludedCommands` entry.
+
 ## Test routes
 
 The five `POST` routes a spec seeds through. `convex/http.ts` registers them,

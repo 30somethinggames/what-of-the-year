@@ -128,8 +128,12 @@ try {
   // Playwright directly, not `bun run test:web`: that script is this script.
   // Arguments after the script name are forwarded, so `--ui` and `--retries 0`
   // reach Playwright through the one supported entry point.
+  // NODE_USE_ENV_PROXY makes node's fetch honour HTTPS_PROXY / NO_PROXY, which
+  // the test helpers and the global setup need inside a sandbox that proxies
+  // egress. Unset, as in CI, it changes nothing.
   await $`bunx playwright test ${process.argv.slice(2)}`.env({
     ...process.env,
+    NODE_USE_ENV_PROXY: "1",
     TEST_SECRET: testSecret,
     CONVEX_SITE_URL: cloudUrl.replace(/\.cloud$/, ".site"),
     E2E_PORT: String(port),
