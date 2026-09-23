@@ -5,8 +5,6 @@ const port = process.env.E2E_PORT ?? "5173";
 
 // A sandbox that routes egress through a proxy names it here; Chromium reads no
 // such variable itself. The preview server is local, so it stays direct.
-// Credentials go through Playwright's own fields: Chromium ignores userinfo in a
-// proxy URL.
 const proxyUrl = process.env.HTTPS_PROXY ?? process.env.https_proxy;
 const proxied = proxyUrl ? new URL(proxyUrl) : undefined;
 const proxy = proxied
