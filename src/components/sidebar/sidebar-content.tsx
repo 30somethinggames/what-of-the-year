@@ -62,7 +62,6 @@ export function SidebarContent({ sessionId, handleClose }: SidebarContentProps) 
   };
 
   const onKick = async (uid: string) => {
-    if (!isHost) return;
     const { error } = await tryCatch(kickFromGame({ sessionId, uid }));
     if (error) {
       Sentry.captureException(error);
@@ -91,7 +90,7 @@ export function SidebarContent({ sessionId, handleClose }: SidebarContentProps) 
         data={players}
         completedUids={completedUids}
         maxPlayerCount={session?.maxPlayers}
-        onKick={onKick}
+        onKick={isHost ? onKick : undefined}
       />
       <div className="mt-auto flex flex-col gap-md pt-lg">
         {isHost && activeRound ? (

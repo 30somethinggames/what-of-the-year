@@ -80,8 +80,8 @@ not joined.
 
 - **L1** — The heading is `Lobby <Topic> of <year>`. Below it is the roster,
   and below that a count, `N of 10`.
-- **L2** — A roster row is the player's avatar and name, `Host` against the
-  host, and a ✕ to remove them.
+- **L2** — A roster row is the player's avatar and name, and `Host` against the
+  host. The host alone also sees a ✕ on every guest's row; a guest sees no ✕.
 - **L3** — A session holds at most 10 players, the host included.
 - **L4** — The host sees **Invite** and **Start**. A guest sees **Leave**.
 - **L5** — The host has no way to leave the lobby. The server refuses a host's
@@ -203,7 +203,7 @@ The screen behind the same session URL once the game has started.
   goes home; every guest is sent home with the toast "The host forfeited the
   game."
 - **X7** — The host can remove a guest from the sidebar at any point in the
-  game, with the ✕ on their row.
+  game, with the ✕ on their row. A guest's sidebar has no ✕.
 - **X8** — A player removed mid-game lands on the [error state](#errors),
   "Player not in session", with a way home. The session's link no longer admits
   them: the game has started.
@@ -265,9 +265,6 @@ them is its own ticket; none is fixed here.
   nothing links to it — ☰ opens the sidebar instead. Its **Leave Game** never
   calls `leaveSession` for a guest, so a guest who reaches it by URL goes home
   while staying in the session.
-- The remove ✕ renders for every viewer, not only the host:
-  `components/lists/players.tsx` is handed `onKick` unconditionally. A guest's
-  click is dropped by the handler, and the server would refuse it anyway.
 - The `N of 10` count of [L1](#lobby) is drawn in white on the white
   background (`text-white-100` in `components/lists/players.tsx`), so a player
   cannot read it. The specs assert its text, which a screen reader and

@@ -81,3 +81,43 @@ test("lobby: host reopening the lobby URL mid-game lands on the active round", a
   await expect(page.getByTestId(testIds.round.pickInput)).toBeVisible();
   await expect(page.getByTestId(testIds.lobby.start)).toHaveCount(0);
 });
+
+test("lobby: the remove ✕ is the host's alone, and never on the host's row", async ({
+  browser,
+}) => {
+  const hostContext = await browser.newContext();
+  const hostPage = await hostContext.newPage();
+  const guestContext = await browser.newContext();
+  const guestPage = await guestContext.newPage();
+
+  const hostUid = await signIn(hostPage);
+  const guestUid = await signIn(guestPage);
+
+  const { sessionId } = await seedGame({
+    phase: "lobby",
+    year: YEAR,
+    players: [
+      { name: "Ryan", uid: hostUid },
+      { name: "Melissa", uid: guestUid },
+    ],
+  });
+
+  await hostPage.goto(`/games/${YEAR}/${sessionId}`);
+  await guestPage.goto(`/games/${YEAR}/${sessionId}`);
+
+  // The guest's roster is loaded before its ✕ count means anything.
+  await expect(guestPage.getByText("Ryan")).toBeVisible();
+  await expect(guestPage.getByText("Melissa")).toBeVisible();
+  await expect(guestPage.getByTestId(testIds.lists.kickPlayer)).toHaveCount(0);
+
+  await expect(hostPage.getByText("Melissa")).toBeVisible();
+  await expect(
+    hostPage.getByText("Melissa").locator("..").getByTestId(testIds.lists.kickPlayer),
+  ).toHaveCount(1);
+  await expect(
+    hostPage.getByText("Ryan").locator("..").getByTestId(testIds.lists.kickPlayer),
+  ).toHaveCount(0);
+
+  await hostContext.close();
+  await guestContext.close();
+});

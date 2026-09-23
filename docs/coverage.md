@@ -52,7 +52,7 @@ browser.
 | rule | asserted by | what fails | gap |
 | --- | --- | --- | --- |
 | L1 | `playwright/game/seed.e2e.ts:32` | the count reads `1 of 10` | the heading's `Lobby ` prefix has no assertion |
-| L2 | `playwright/game/multiplayer.e2e.ts:19` | `Host` renders against the host's row | the row's avatar, and the lobby's own ✕, have no assertion |
+| L2 | `playwright/game/multiplayer.e2e.ts:19` | `Host` renders against the host's row; `pregame/lobby.e2e.ts:111` pins no ✕ for a guest, `:116` one on the guest's row for the host | the row's avatar has no assertion |
 | L3 | `convex/__tests__/players.test.ts:215` (unit) | `joinSession` throws `SESSION_FULL` at `maxPlayers` | — |
 | L4 | `playwright/game/non-host.e2e.ts:31` | a guest sees **Leave** and neither **Invite** nor **Start** | — |
 | L5 | `convex/__tests__/players.test.ts:326` (unit) | `leaveSession` throws `HOST_CANNOT_LEAVE` and keeps the host's row | nothing asserts the host's lobby renders no **Leave** |
@@ -61,7 +61,7 @@ browser.
 | L8 | `playwright/pregame/session-full.e2e.ts:30` | the toast reads "Session is full" and the newcomer is never listed | — |
 | L9 | `playwright/pregame/identity.e2e.ts:28` | a member reopening the link gets **Leave**, not the join form | — |
 | L10 | `playwright/pregame/identity.e2e.ts:50` | the host's count drops to `1 of 10`, and the rejoiner shows under a new name | — |
-| L11 | `convex/__tests__/players.test.ts:527` (unit) | `kickFromLobby` throws `CANNOT_KICK_HOST` | no spec clicks the ✕ in the lobby, and none asserts the host's row has none |
+| L11 | `convex/__tests__/players.test.ts:527` (unit) | `kickFromLobby` throws `CANNOT_KICK_HOST`; `pregame/lobby.e2e.ts:119` pins no ✕ on the host's own row | no spec clicks the ✕ in the lobby |
 | L12 | none | — | **Proposal**: a guest removed from the lobby is back on the join form and can join again, in `pregame/lobby.e2e.ts` |
 | L13 | `playwright/game/non-host.e2e.ts:36` | the host starts and the guest's page reaches Round 10 without navigating | — |
 
@@ -118,7 +118,7 @@ browser.
 | X4 | `playwright/game/multiplayer.e2e.ts:96` | **Next Round** closes the round in play, and the reveal appears | — |
 | X5 | `playwright/game/non-host.e2e.ts:109` | the guest lands home and drops off the host's roster | — |
 | X6 | `playwright/game/non-host.e2e.ts:152` | every guest gets "The host forfeited the game." and goes home | — |
-| X7 | `playwright/game/sidebar.e2e.ts:69` | the kicked player leaves the host's list mid-game | — |
+| X7 | `playwright/game/sidebar.e2e.ts:69` | the kicked player leaves the host's list mid-game; `:141` pins no ✕ in a guest's sidebar | — |
 | X8 | `playwright/game/sidebar.e2e.ts:113` | the kicked player gets "Player not in session" and a way home | "the session's link no longer admits them" has no assertion |
 | X9 | none | — | **Proposal**: at results, **End Game** toasts "Session is not in play" and the host's **Leave Game** still forfeits, in `game/results.e2e.ts` |
 

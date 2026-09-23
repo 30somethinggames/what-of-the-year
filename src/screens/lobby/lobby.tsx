@@ -63,7 +63,6 @@ export function Lobby({ topic, year, sessionId }: LobbyProps) {
   };
 
   const onKick = async (uid: string) => {
-    if (!isHost) return;
     const { error } = await tryCatch(kickFromLobby({ sessionId, uid }));
     if (error) {
       Sentry.captureException(error);
@@ -74,7 +73,11 @@ export function Lobby({ topic, year, sessionId }: LobbyProps) {
   return (
     <Container>
       <div data-testid={testIds.lobby.sessionId} data-value={sessionId} className="hidden" />
-      <PlayerList data={players} maxPlayerCount={maxPlayerCount} onKick={onKick} />
+      <PlayerList
+        data={players}
+        maxPlayerCount={maxPlayerCount}
+        onKick={isHost ? onKick : undefined}
+      />
 
       <div className="mt-auto flex flex-col gap-md">
         {isHost ? (

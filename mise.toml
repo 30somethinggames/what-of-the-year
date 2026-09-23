@@ -59,13 +59,20 @@ run = "bun scripts/e2e.ts --grep @smoke"
 [tasks.backend]
 description = "A local Convex backend for this checkout, written into .env.local — what a worktree develops against"
 # Three stock commands. CONVEX_AGENT_MODE picks an anonymous local deployment
-# only while none is configured, and the CLI picks a free port itself, so two
-# checkouts run two backends. A checkout whose .env.local already names a
+# only while none is configured. A checkout whose .env.local already names a
 # cloud deployment is refused first: a person's own loop is never replaced.
 # A cloud deployment named in the environment is ignored instead: Ronco runs
 # this in a worktree with the root checkout's .env.local exported, and the CLI
 # would otherwise refuse the preview deploy key, or push to the dev deployment
 # that CONVEX_DEPLOYMENT names. The unset covers every command below.
+#
+# The commands run under a lock every checkout on the machine shares. Each one
+# starts this checkout's backend on a port the CLI checked was free, and stops
+# it on exit — but the check comes seconds before the backend binds. Two
+# checkouts inside that window pick the same port, and the loser fails with
+# BadAdminKey against the winner's backend (#277). The lock is a mkdir, since
+# macOS has no flock, in /tmp rather than $TMPDIR, which differs by process. One
+# older than five minutes is a crashed run's, and is broken.
 run = """
 if grep -qsE '^CONVEX_DEPLOYMENT=.?(dev|prod|preview):' .env.local; then
   echo ".env.local already names a cloud deployment. Keep using it, or remove CONVEX_DEPLOYMENT and VITE_CONVEX_URL from it to get a local backend." >&2
@@ -73,9 +80,20 @@ if grep -qsE '^CONVEX_DEPLOYMENT=.?(dev|prod|preview):' .env.local; then
 fi
 unset CONVEX_DEPLOY_KEY CONVEX_DEPLOYMENT CONVEX_SELF_HOSTED_URL CONVEX_SELF_HOSTED_ADMIN_KEY
 export CONVEX_AGENT_MODE=anonymous
+lock=/tmp/what-of-the-year-convex-backend.lock
+until mkdir "$lock" 2>/dev/null; do
+  if [ -n "$(find "$lock" -maxdepth 0 -mmin +5 2>/dev/null)" ]; then
+    rmdir "$lock" 2>/dev/null
+    continue
+  fi
+  sleep 1
+done
+trap 'rmdir "$lock" 2>/dev/null' EXIT
 bunx convex dev --once --tail-logs disable
 bunx @convex-dev/auth --skip-git-check --web-server-url http://localhost:5173 </dev/null
 bunx convex env set OPTIONS_FIXTURES 1
+rmdir "$lock"
+trap - EXIT
 echo "Local backend ready. Keep 'bunx convex dev' running and start 'mise run dev'."
 """
 
