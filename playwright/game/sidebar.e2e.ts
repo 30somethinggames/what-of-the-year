@@ -119,3 +119,24 @@ test("kick: the kicked player's own screen reacts", async ({ browser }) => {
   await hostContext.close();
   await guestContext.close();
 });
+
+test("kick: a guest's sidebar has no remove ✕", async ({ page }) => {
+  const { sessionId } = await seedGame({
+    phase: "round:10",
+    year: YEAR,
+    players: [
+      { name: "Ryan", avatar: "🎮" },
+      { name: "Melissa", uid: await signIn(page) },
+    ],
+  });
+
+  await page.goto(`/games/${YEAR}/${sessionId}`);
+  await expect(page.getByText("Round 10")).toBeVisible();
+
+  await page.getByTestId(testIds.settings.button).click();
+  await expect(page.getByTestId(testIds.sidebar.title)).toBeVisible();
+  await expect(page.getByText("Ryan")).toBeVisible();
+  await expect(page.getByText("Melissa")).toBeVisible();
+
+  await expect(page.getByTestId(testIds.lists.kickPlayer)).toHaveCount(0);
+});
