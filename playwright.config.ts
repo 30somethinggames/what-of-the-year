@@ -3,6 +3,19 @@ import { defineConfig, devices } from "@playwright/test";
 // `mise run e2e` picks a free port so two checkouts can run at once.
 const port = process.env.E2E_PORT ?? "5173";
 
+// A sandbox that routes egress through a proxy names it here; Chromium reads no
+// such variable itself. The preview server is local, so it stays direct.
+const proxyUrl = process.env.HTTPS_PROXY ?? process.env.https_proxy;
+const proxied = proxyUrl ? new URL(proxyUrl) : undefined;
+const proxy = proxied
+  ? {
+      server: proxied.origin,
+      bypass: "localhost, 127.0.0.1",
+      ...(proxied.username ? { username: decodeURIComponent(proxied.username) } : {}),
+      ...(proxied.password ? { password: decodeURIComponent(proxied.password) } : {}),
+    }
+  : undefined;
+
 export default defineConfig({
   globalSetup: "./playwright/helpers/global-setup.ts",
   testDir: "./playwright",
@@ -21,6 +34,7 @@ export default defineConfig({
   },
   use: {
     baseURL: `http://localhost:${port}`,
+    proxy,
     // There is no retry in CI, so the trace has to come off the failure itself.
     trace: process.env.CI ? "retain-on-failure" : "on-first-retry",
     screenshot: "only-on-failure",
