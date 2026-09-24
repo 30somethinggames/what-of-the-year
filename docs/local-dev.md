@@ -79,6 +79,12 @@ checks that the result matches what is committed and stops the run when it does
 not. It has to be here: `convex codegen` needs a live deployment, and this is
 the only command that has one.
 
+A checkout that is never going to be committed — an agent's throwaway worktree,
+where `convex/_generated` is untracked — is stopped by that check too.
+`E2E_ALLOW_GENERATED_DRIFT=1 mise run test:e2e` turns the stop into a warning.
+It is ignored when `CI` is set, so CI still fails on a stale
+`convex/_generated`.
+
 Server state is seeded and cleared through the HTTP helpers in
 `playwright/helpers/convex.ts`, never through the UI. What those routes are is
 the next section.
@@ -102,7 +108,17 @@ Run `mise run test:e2e` before you open the PR; CI runs it either way.
 
 The sandbox sends egress through a proxy named in `HTTPS_PROXY`. Playwright is run with `NODE_USE_ENV_PROXY=1`, so node's `fetch` — the `/test/*` helpers and the global setup — honours it, and Chromium is launched with that proxy and `localhost`, `127.0.0.1` bypassed, so the preview server is still reached directly. Both are no-ops when no proxy variable is set, which is how CI runs.
 
-Two things are the session's, not the repo's, and stay in the user's own settings: `sandbox.network.allowLocalBinding`, because the port probe and `vite preview` listen on `127.0.0.1`, and allowing the hosts a run reaches — `api.convex.dev`, `*.convex.cloud` and `*.convex.site`. With those set the task needs no `excludedCommands` entry.
+On macOS that is as far as settings go: **Chromium cannot launch inside the sandbox.** Its browser process registers a bootstrap name for its Mach port rendezvous server, Seatbelt refuses the registration, and every test dies in 0 ms at `browserType.launch` with `bootstrap_check_in org.chromium.Chromium.MachPortRendezvousServer…: Permission denied (1100)`. `sandbox.network.allowMachLookup` grants Mach *lookups* and there is no setting for registering a name, so no sandbox configuration reaches it. `--single-process` is not a way round it either: the launch succeeds, but Chromium cannot serve a second browser context, and Playwright makes one per test, so the second test onwards fails with `Target page, context or browser has been closed`. Probed against the installed headless shell, `--no-zygote`, `--disable-features=MachPortRendezvousEnabled` and a plain launch all abort at the bootstrap name.
+
+So a run inside the sandbox needs the command exempted from it, in the user's own settings. Every part of a compound command has to match a `sandbox.excludedCommands` pattern, and an agent whose cwd resets each call runs `cd <checkout> && mise run test:e2e`, so both parts need an entry:
+
+```json
+"sandbox": { "excludedCommands": ["cd", "mise run test:e2e"] }
+```
+
+That is the only form that works from any directory. `mise run test:e2e` alone covers a run typed in the checkout and nothing else.
+
+The rest is the session's, not the repo's, and stays in the user's own settings too: `sandbox.network.allowLocalBinding`, because the port probe and `vite preview` listen on `127.0.0.1`, and allowing the hosts a run reaches — `api.convex.dev`, `*.convex.cloud` and `*.convex.site`.
 
 ## Test routes
 
