@@ -79,6 +79,12 @@ checks that the result matches what is committed and stops the run when it does
 not. It has to be here: `convex codegen` needs a live deployment, and this is
 the only command that has one.
 
+A checkout that is never going to be committed — an agent's throwaway worktree,
+where `convex/_generated` is untracked — is stopped by that check too.
+`E2E_ALLOW_GENERATED_DRIFT=1 mise run test:e2e` turns the stop into a warning.
+It is ignored when `CI` is set, so CI still fails on a stale
+`convex/_generated`.
+
 Server state is seeded and cleared through the HTTP helpers in
 `playwright/helpers/convex.ts`, never through the UI. What those routes are is
 the next section.
@@ -102,7 +108,9 @@ Run `mise run test:e2e` before you open the PR; CI runs it either way.
 
 The sandbox sends egress through a proxy named in `HTTPS_PROXY`. Playwright is run with `NODE_USE_ENV_PROXY=1`, so node's `fetch` — the `/test/*` helpers and the global setup — honours it, and Chromium is launched with that proxy and `localhost`, `127.0.0.1` bypassed, so the preview server is still reached directly. Both are no-ops when no proxy variable is set, which is how CI runs.
 
-Two things are the session's, not the repo's, and stay in the user's own settings: `sandbox.network.allowLocalBinding`, because the port probe and `vite preview` listen on `127.0.0.1`, and allowing the hosts a run reaches — `api.convex.dev`, `*.convex.cloud` and `*.convex.site`. With those set the task needs no `excludedCommands` entry.
+macOS Seatbelt also refuses the bootstrap name Chromium's browser process checks in for its Mach port rendezvous server, and every test dies in 0 ms at `browserType.launch` with `bootstrap_check_in org.chromium.Chromium.MachPortRendezvousServer…: Permission denied (1100)`. No sandbox setting reaches it, so `playwright.config.ts` launches Chromium with `--single-process` when `SANDBOX_RUNTIME` is set, which is the variable the sandbox sets. One process checks in no bootstrap name. It costs site isolation and makes a renderer crash take the browser with it, which is why it is on only there; unsandboxed runs and CI are untouched.
+
+Two things are the session's, not the repo's, and stay in the user's own settings: `sandbox.network.allowLocalBinding`, because the port probe and `vite preview` listen on `127.0.0.1`, and allowing the hosts a run reaches — `api.convex.dev`, `*.convex.cloud` and `*.convex.site`. With those set the task needs no `excludedCommands` entry, from any directory.
 
 ## Test routes
 
