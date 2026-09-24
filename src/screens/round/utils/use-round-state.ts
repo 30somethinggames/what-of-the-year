@@ -1,9 +1,9 @@
-import type { SessionID } from "db/types";
 import { useMySelections } from "db/use-my-selections";
 import { usePlayers } from "db/use-players";
 import { useRound } from "db/use-round";
 import { useSelections } from "db/use-selections";
 import { useSession } from "db/use-sessions";
+import type { SessionID } from "types/backend";
 
 interface Props {
   sessionId: SessionID;

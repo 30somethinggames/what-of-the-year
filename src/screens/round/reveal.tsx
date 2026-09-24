@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { testIds } from "test-ids";
 
 import { Avatar } from "components/avatar";
-import type { Player, Selection } from "db/types";
+import type { Player, Selection } from "types/backend";
 import { cn } from "utils/cn";
 
 interface Props {

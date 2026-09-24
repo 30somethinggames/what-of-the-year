@@ -1,6 +1,6 @@
 import { testIds } from "test-ids";
 
-import type { MySelection, RankedPick } from "db/types";
+import type { MySelection, RankedPick } from "types/backend";
 
 import { Row } from "./components/row";
 

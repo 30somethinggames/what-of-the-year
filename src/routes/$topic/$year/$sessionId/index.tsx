@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { type TOPIC_KEY, requireTopic } from "constants/topics";
-import type { SessionID } from "db/types";
 import { Session } from "screens/session";
+import type { SessionID } from "types/backend";
 
 export const Route = createFileRoute("/$topic/$year/$sessionId/")({
   component: SessionRoute,

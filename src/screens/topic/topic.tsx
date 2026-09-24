@@ -10,10 +10,10 @@ import { Input } from "components/input";
 import { useToast } from "components/toast/use-toast";
 import type { TopicType } from "constants/topics";
 import { MAX_NAME_LENGTH, validateName } from "convex/utils/validate";
-import type { SessionID } from "db/types";
 import { useJoinSession } from "db/use-players";
 import { useCreateSession } from "db/use-sessions";
 import { useTopicData } from "queries/use-topic-data";
+import type { SessionID } from "types/backend";
 import { getApiError } from "utils/api-error";
 import { tryCatch } from "utils/try-catch";
 

@@ -1,9 +1,14 @@
 import { api } from "convex/_generated/api";
 import { useMutation, useQuery } from "convex/react";
-import type { SessionID } from "db/types";
+import type { Backend } from "types/backend";
 
-export function useSession(sessionId: SessionID | undefined) {
-  const session = useQuery(api.sessions.getSession, sessionId ? { sessionId } : "skip");
+import { toSessionId } from "./ids";
+
+export const useSession: Backend["useSession"] = (sessionId) => {
+  const session = useQuery(
+    api.sessions.getSession,
+    sessionId ? { sessionId: toSessionId(sessionId) } : "skip",
+  );
 
   const activeRound = session?.activeRoundNumber;
 
@@ -12,19 +17,20 @@ export function useSession(sessionId: SessionID | undefined) {
     session: session ?? null,
     activeRound,
   };
-}
+};
 
 /** Creates a session for a topic and year, with the caller as host. */
-export function useCreateSession() {
-  return useMutation(api.sessions.createSession);
-}
+export const useCreateSession: Backend["useCreateSession"] = () =>
+  useMutation(api.sessions.createSession);
 
 /** Flips a lobby to ACTIVE and opens its first round. */
-export function useStartSession() {
-  return useMutation(api.sessions.startSession);
-}
+export const useStartSession: Backend["useStartSession"] = () => {
+  const start = useMutation(api.sessions.startSession);
+  return ({ sessionId }) => start({ sessionId: toSessionId(sessionId) });
+};
 
 /** Ends a session the host is walking away from. */
-export function useForfeitSession() {
-  return useMutation(api.sessions.forfeitSession);
-}
+export const useForfeitSession: Backend["useForfeitSession"] = () => {
+  const forfeit = useMutation(api.sessions.forfeitSession);
+  return ({ sessionId }) => forfeit({ sessionId: toSessionId(sessionId) });
+};

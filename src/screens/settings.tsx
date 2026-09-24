@@ -7,12 +7,12 @@ import { Container } from "components/container";
 import { PlayerList } from "components/lists/players";
 import { Loading } from "components/states/loading";
 import { useToast } from "components/toast/use-toast";
-import type { SessionID } from "db/types";
 import { useKickFromGame, usePlayers } from "db/use-players";
 import { useAdvanceRound } from "db/use-round";
 import { useSelections } from "db/use-selections";
 import { useForfeitSession, useSession } from "db/use-sessions";
 import { useGameOver } from "hooks/use-game-over";
+import type { SessionID } from "types/backend";
 import { getApiError } from "utils/api-error";
 import { tryCatch } from "utils/try-catch";
 

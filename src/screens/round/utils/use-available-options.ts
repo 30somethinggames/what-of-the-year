@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-import type { MySelection } from "db/types";
+import type { MySelection } from "types/backend";
 import type { Option } from "types/option";
 
 /**

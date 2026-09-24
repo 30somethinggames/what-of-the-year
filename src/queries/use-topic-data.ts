@@ -1,11 +1,11 @@
 import { TOPIC_KEY } from "constants/topics";
+import type { Backend } from "types/backend";
 
-import type { QUERY_ARGS } from "./types";
 import { useBooks } from "./use-books";
 import { useGames } from "./use-games";
 import { useMovies } from "./use-movies";
 
-export function useTopicData(args: QUERY_ARGS) {
+export const useTopicData: Backend["useTopicData"] = (args) => {
   const games = useGames(args);
   const movies = useMovies(args);
   const books = useBooks(args);
@@ -13,4 +13,4 @@ export function useTopicData(args: QUERY_ARGS) {
   if (args.key === TOPIC_KEY.GAMES) return games;
   if (args.key === TOPIC_KEY.MOVIES) return movies;
   return books;
-}
+};

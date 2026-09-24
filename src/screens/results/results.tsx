@@ -3,7 +3,7 @@ import { testIds } from "test-ids";
 import { Container } from "components/container";
 import { Picks } from "components/lists/picks";
 import { Loading } from "components/states/loading";
-import type { SessionID } from "db/types";
+import type { SessionID } from "types/backend";
 
 import { useResultsState } from "./use-results-state";
 
