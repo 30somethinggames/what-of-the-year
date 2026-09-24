@@ -1,6 +1,6 @@
-import type { SessionID } from "db/types";
 import { usePlayers } from "db/use-players";
 import { useSession } from "db/use-sessions";
+import type { SessionID } from "types/backend";
 
 interface Props {
   sessionId: SessionID;

@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { Loading } from "components/states/loading";
-import type { SessionID } from "db/types";
 import { useSession } from "db/use-sessions";
 import { Settings } from "screens/settings";
+import type { SessionID } from "types/backend";
 
 export const Route = createFileRoute("/$topic/$year/$sessionId/settings")({
   component: SettingsRoute,

@@ -1,6 +1,6 @@
 import { testIds } from "test-ids";
 
-import type { Player } from "db/types";
+import type { Player } from "types/backend";
 
 import { Avatar } from "../avatar";
 import { Row } from "./components/row";

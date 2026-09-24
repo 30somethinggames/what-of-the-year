@@ -1,22 +1,20 @@
 import { api } from "convex/_generated/api";
 import { useMutation, useQuery } from "convex/react";
-import type { SessionID } from "db/types";
+import type { Backend } from "types/backend";
+
+import { toSessionId } from "./ids";
 
 /**
- * Subscribes to the players list and current user's player doc for a session in real time.
- *
- * Automatically skips subscribing if `sessionId` is undefined. `getPlayers` is
- * member-only and throws for everyone else, so the roster subscription waits for
- * `getMyPlayer` to confirm membership — an invitee holding the session link sits
- * on the join screen instead of the error boundary.
- *
- * @param sessionId - The session to listen to. Pass `undefined` to skip subscribing.
- * @returns An object containing the `players` array, `currentUser` player doc, `isHost` flag, and an `isLoading` flag.
+ * `getPlayers` is member-only and throws for everyone else, so the roster
+ * subscription waits for `getMyPlayer` to confirm membership — an invitee
+ * holding the session link sits on the join screen instead of the error
+ * boundary.
  */
-export function usePlayers(sessionId: SessionID | undefined) {
-  const currentUser = useQuery(api.players.getMyPlayer, sessionId ? { sessionId } : "skip");
+export const usePlayers: Backend["usePlayers"] = (sessionId) => {
+  const args = sessionId ? { sessionId: toSessionId(sessionId) } : "skip";
+  const currentUser = useQuery(api.players.getMyPlayer, args);
   const isMember = Boolean(currentUser);
-  const players = useQuery(api.players.getPlayers, sessionId && isMember ? { sessionId } : "skip");
+  const players = useQuery(api.players.getPlayers, isMember ? args : "skip");
 
   return {
     isLoading: currentUser === undefined || (isMember && players === undefined),
@@ -24,24 +22,28 @@ export function usePlayers(sessionId: SessionID | undefined) {
     currentUser,
     isHost: currentUser?.isHost ?? false,
   };
-}
+};
 
 /** Adds the caller to a session as a player. */
-export function useJoinSession() {
-  return useMutation(api.players.joinSession);
-}
+export const useJoinSession: Backend["useJoinSession"] = () => {
+  const join = useMutation(api.players.joinSession);
+  return ({ sessionId, ...rest }) => join({ sessionId: toSessionId(sessionId), ...rest });
+};
 
 /** Removes the caller from a session in any state, unless they are the host. */
-export function useLeaveSession() {
-  return useMutation(api.players.leaveSession);
-}
+export const useLeaveSession: Backend["useLeaveSession"] = () => {
+  const leave = useMutation(api.players.leaveSession);
+  return ({ sessionId }) => leave({ sessionId: toSessionId(sessionId) });
+};
 
 /** Host-only: removes another player from a lobby. */
-export function useKickFromLobby() {
-  return useMutation(api.players.kickFromLobby);
-}
+export const useKickFromLobby: Backend["useKickFromLobby"] = () => {
+  const kick = useMutation(api.players.kickFromLobby);
+  return ({ sessionId, uid }) => kick({ sessionId: toSessionId(sessionId), uid });
+};
 
 /** Host-only: removes another player from a game in progress. */
-export function useKickFromGame() {
-  return useMutation(api.players.kickFromGame);
-}
+export const useKickFromGame: Backend["useKickFromGame"] = () => {
+  const kick = useMutation(api.players.kickFromGame);
+  return ({ sessionId, uid }) => kick({ sessionId: toSessionId(sessionId), uid });
+};

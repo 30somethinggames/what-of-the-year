@@ -4,6 +4,26 @@ What runs where, and the things about the local setup that are not obvious
 from the code. What the app you are running actually does, phase by phase and
 rule by rule, is `game.md`.
 
+## The backend seam
+
+Everything that reaches a server is in five places, and nothing else in `src/`
+imports a backend's client. Replacing the backend is rewriting these; the
+screens do not change.
+
+| path | what it is |
+| --- | --- |
+| `convex/` | the server: schema, queries, mutations, actions |
+| `src/main.tsx` | the client entry, and the provider the app is wrapped in |
+| `src/hooks/use-anonymous-auth.ts` | sign-in, and the identity every call carries |
+| `src/db/use-*.ts` | a hook per session, player, round and selection call |
+| `src/queries/use-*.ts` | the option lists a topic and year offers |
+
+What those hooks owe the screens is `src/types/backend.ts`: the `Backend`
+interface, naming every call with its arguments, its result and its loading
+state, in types that name no vendor. It sits outside the seam, so it survives
+deleting it, and each hook is declared as a member of it, so `mise run types`
+fails when one drifts.
+
 ## Checks
 
 The toolchain is pinned in `mise.toml`: install [mise](https://mise.jdx.dev),

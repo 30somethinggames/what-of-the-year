@@ -3,7 +3,7 @@ import { useEffect } from "react";
 
 import { useToast } from "components/toast";
 import { SessionStatus } from "convex/constants";
-import type { Session } from "db/types";
+import type { Session } from "types/backend";
 
 interface Args {
   isHost: boolean;

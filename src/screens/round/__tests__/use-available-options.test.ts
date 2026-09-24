@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test";
 
-import type { MySelection } from "db/types";
+import type { MySelection } from "types/backend";
 import type { Option } from "types/option";
 
 import { computeAvailableOptions } from "../utils/use-available-options";
