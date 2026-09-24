@@ -134,6 +134,8 @@ browser.
 | E6 | `playwright/pregame/join-closed.e2e.ts:19` | a newcomer on a live game gets the error state, not the join form | — |
 | E7 | `playwright/pregame/join-closed.e2e.ts:54` | a newcomer on an ended session goes home with the forfeit toast | — |
 | E8 | none | — | **Proposal**: unreachable today — `error.e2e.ts:26` records why the checksum blocks it; the ticket is to reach it, by deleting one session through a test route, in `pregame/error.e2e.ts` |
+| E9 | `convex/__tests__/options.test.ts:131` (unit) | all three actions reject `1900`, `9999` and `not-a-year`, call no API and cache nothing | the 1987 floor and the current-year ceiling are never tried at their edges |
+| E10 | `playwright/pregame/option-failure.e2e.ts:19` | the join screen under a refused year reads "Something went wrong" | a source outage is asserted nowhere: fixtures cannot fail, so only the refused year reaches this screen |
 
 ## Rate limits
 
@@ -143,6 +145,8 @@ browser.
 | T2 | none | — | **Proposal**: starting, ending, leaving and kicking stay under no bucket, in `convex/__tests__/ratelimits.test.ts` (new file) |
 | T3 | `convex/__tests__/options.test.ts:149` (unit) | a repeat year is served from the cache with no API call | "the allowance is spent before the cache is read" has no assertion |
 | T4 | none | — | **Proposal**: a reload refetches the year's options and spends the allowance again, in `pregame/option-failure.e2e.ts` |
+| T5 | `convex/__tests__/options.test.ts:119` (unit) | ten option calls in a row pass and the eleventh throws `RateLimited`, so the bucket starts full at the allowance | the refill is asserted nowhere — **Proposal**: an eleventh call passes once the clock has moved a token's worth on, in `convex/__tests__/ratelimits.test.ts` (new file) |
+| T6 | `convex/__tests__/options.test.ts:124` (unit) | a second user's call passes with the first user's bucket empty | the burst it allows, and the wait being a token rather than a minute, follow from T5 and share its gap |
 
 ## Three rows verified
 
@@ -212,8 +216,8 @@ known to be running.
 
 ## Proposals, in the order to cut them
 
-Twelve: the eleven rules nothing asserts, and V2, which is asserted only in
-part. Most player-visible loss first, and each is one ticket under #263.
+Thirteen: the eleven rules nothing asserts, and V2 and T5, each asserted only
+in part. Most player-visible loss first, and each is one ticket under #263.
 
 1. **V4** — only submitted picks are revealed, in the server's order, and a player who never picked is not named. `game/reveal.e2e.ts`.
 2. **V3** — a pick holds the screen about 3 seconds, and the last one stays until the reveal ends. `game/reveal.e2e.ts`.
@@ -227,3 +231,4 @@ part. Most player-visible loss first, and each is one ticket under #263.
 10. **I4** — **Random** draws a different avatar. `pregame/identity.e2e.ts`.
 11. **T4** — a reload refetches the year's options and spends the allowance again. `pregame/option-failure.e2e.ts`.
 12. **T2** — starting, ending, leaving and kicking are under no bucket. `convex/__tests__/ratelimits.test.ts`, a new file.
+13. **T5** — an emptied bucket takes a call again once one token's worth of time has passed. `convex/__tests__/ratelimits.test.ts`, the same new file.

@@ -177,10 +177,41 @@ Answers `{ ok: true }`. Leaves a selection scored by its round and the round's
 closes, and above round 1 the next one opens and becomes the active round.
 Throws when the round or the session is gone.
 
+Filling round 1 closes that round and stops there. No reveal runs and the
+session's status is left `active`, so the game does not end and results never
+render. Seed `phase: "ended"` for a game that is over.
+
 ### `/test/cleanup`
 
 Takes no body. Answers `{ ok: true }`. Empties `sessions`, `players`, `rounds`
 and `selections`.
+
+## Option fixtures
+
+`OPTIONS_FIXTURES=1` on a deployment makes the option actions answer from
+`convex/test/fixtures.ts` instead of calling IGDB, TMDB or Open Library. It is
+ignored on prod (`convex/utils/env.ts`), and both the e2e preview and `mise run
+backend` set it.
+
+The list is the NATO alphabet, `Alpha` through `Zulu` — `Juliett` and `Xray` as
+that file spells them — one title per letter, so any letter typed into the pick
+field surfaces a suggestion. Each carries its topic's suffix: `Alpha Quest` for
+games, `Alpha Picture` for movies, `Alpha Chronicles` for books.
+
+The same 26 come back for every year, since only the release date in the
+payload is built from the year asked for. So a spec names a title without
+caring which year it seeded.
+
+Two things rely on that. `pickRound` in `playwright/helpers/session.ts` types
+one letter and takes the first suggestion, which needs a title for whatever
+letter it is given. `playwright/game/three-browsers.e2e.ts` names nine of them
+outright, matching a letter typed to the title it expects on the results
+screen.
+
+A fixture answer costs the caller's rate-limit allowance and is refused for an
+out-of-range year, both of which run before the fixture branch. Fixtures never
+fail otherwise, which is why `playwright/pregame/option-failure.e2e.ts` uses a
+year outside the range to fail a fetch.
 
 ## Which backend the suite runs against
 
@@ -197,7 +228,8 @@ The only credential involved is a preview deploy key (`CONVEX_DEPLOY_KEY`),
 which can create preview deployments, set env vars on them and delete them, and
 nothing else — it cannot reach prod or a dev deployment. Each run mints its own
 `TEST_SECRET` and auth keypair and sets
-`OPTIONS_FIXTURES=1`, so the suite stores no long-lived secret. CI holds the
+[`OPTIONS_FIXTURES=1`](#option-fixtures), so the suite stores no long-lived
+secret. CI holds the
 same key as a repository secret and, because Dependabot reads its own store,
 as a Dependabot secret too; a fork PR gets neither, so its `e2e` job fails
 until the change is pushed from a branch in this repo.
@@ -221,8 +253,8 @@ anyone else's client. It is three stock commands: `convex dev --once` under
 `CONVEX_AGENT_MODE=anonymous`, which creates the deployment, picks a free port
 and writes the URLs into `.env.local`; the auth library's own setup, which
 mints and sets the JWT keypair; and `convex env set OPTIONS_FIXTURES 1`, so
-the pick autocomplete serves fixtures instead of calling APIs whose keys a
-local deployment does not have. A cloud deployment named in the environment
+the pick autocomplete serves [fixtures](#option-fixtures) instead of calling
+APIs whose keys a local deployment does not have. A cloud deployment named in the environment
 rather than in this checkout's `.env.local` is ignored: Ronco runs the task in
 a worktree with the root checkout's env file exported, and the CLI would
 otherwise refuse the preview deploy key or push to the dev deployment. After that `bunx convex dev` and `mise run
