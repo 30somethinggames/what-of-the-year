@@ -229,10 +229,9 @@ which can create preview deployments, set env vars on them and delete them, and
 nothing else — it cannot reach prod or a dev deployment. Each run mints its own
 `TEST_SECRET` and auth keypair and sets
 [`OPTIONS_FIXTURES=1`](#option-fixtures), so the suite stores no long-lived
-secret. CI holds the
-same key as a repository secret and, because Dependabot reads its own store,
-as a Dependabot secret too; a fork PR gets neither, so its `e2e` job fails
-until the change is pushed from a branch in this repo.
+secret. CI holds the same key as a repository secret and, because Dependabot
+reads its own store, as a Dependabot secret too; a fork PR gets neither, so its
+`e2e` job fails until the change is pushed from a branch in this repo.
 
 The run deletes the deployment it created when it exits, pass or fail, so the
 team's deployment quota holds no slot for a finished run. A failed delete is a
@@ -254,13 +253,14 @@ anyone else's client. It is three stock commands: `convex dev --once` under
 and writes the URLs into `.env.local`; the auth library's own setup, which
 mints and sets the JWT keypair; and `convex env set OPTIONS_FIXTURES 1`, so
 the pick autocomplete serves [fixtures](#option-fixtures) instead of calling
-APIs whose keys a local deployment does not have. A cloud deployment named in the environment
-rather than in this checkout's `.env.local` is ignored: Ronco runs the task in
-a worktree with the root checkout's env file exported, and the CLI would
-otherwise refuse the preview deploy key or push to the dev deployment. After that `bunx convex dev` and `mise run
-dev` use it with no extra flags, the same two-terminal loop the README
-describes. The backend process itself lives inside `convex dev` and stops with
-it, so keep that terminal open while you work.
+APIs whose keys a local deployment does not have. A cloud deployment named in
+the environment rather than in this checkout's `.env.local` is ignored: Ronco
+runs the task in a worktree with the root checkout's env file exported, and the
+CLI would otherwise refuse the preview deploy key or push to the dev
+deployment. After that `bunx convex dev` and `mise run dev` use it with no
+extra flags, the same two-terminal loop the README describes. The backend
+process itself lives inside `convex dev` and stops with it, so keep that
+terminal open while you work.
 
 It is what a worktree develops against: an agent working a ticket, or you with
 several branches checked out at once. Reach for it when you are changing

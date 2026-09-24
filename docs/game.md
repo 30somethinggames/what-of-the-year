@@ -232,15 +232,17 @@ The screen behind the same session URL once the game has started.
   year, the range the picker offers in [H3](#home). Any other year in the URL —
   out of range, or not a number — is refused before a source is called, so it
   loads no options and reaches the [E4](#errors) screen.
-- **E10** — A failed option fetch says "Something went wrong", never a reason.
-  A refused year and a source that is down are both failures of the app's
-  plumbing rather than its own errors, so [E2](#errors) gives the generic
-  message.
+- **E10** — A refused year and a source that is down are both failures of the
+  app's plumbing rather than its own errors, so [E2](#errors) gives "Something
+  went wrong" with no reason. An option fetch over its allowance is the app's
+  own error, and that screen reads "Slow down and try again" instead.
 
 ## Rate limits
 
-Each is a per-player allowance per minute, and only calls that succeed spend
-it.
+Each is a per-player allowance per minute. A refused mutation spends nothing,
+since its token rolls back with everything else the call wrote. An option fetch
+is an action, which has no transaction to roll back, and its year is checked
+after the token is spent, so a refused year costs the allowance anyway.
 
 | action | allowance |
 | --- | --- |

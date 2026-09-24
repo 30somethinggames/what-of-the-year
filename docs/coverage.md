@@ -135,7 +135,7 @@ browser.
 | E7 | `playwright/pregame/join-closed.e2e.ts:54` | a newcomer on an ended session goes home with the forfeit toast | — |
 | E8 | none | — | **Proposal**: unreachable today — `error.e2e.ts:26` records why the checksum blocks it; the ticket is to reach it, by deleting one session through a test route, in `pregame/error.e2e.ts` |
 | E9 | `convex/__tests__/options.test.ts:131` (unit) | all three actions reject `1900`, `9999` and `not-a-year`, call no API and cache nothing | the 1987 floor and the current-year ceiling are never tried at their edges |
-| E10 | `playwright/pregame/option-failure.e2e.ts:19` | the join screen under a refused year reads "Something went wrong" | a source outage is asserted nowhere: fixtures cannot fail, so only the refused year reaches this screen |
+| E10 | `playwright/pregame/option-failure.e2e.ts:19` | the join screen under a refused year reads "Something went wrong" | a source outage is asserted nowhere: fixtures cannot fail, so only the refused year reaches this screen; the "Slow down and try again" an over-allowance fetch gives is asserted only on `getApiError` itself, in `src/shared/__tests__/api-error.test.ts:17` |
 
 ## Rate limits
 
