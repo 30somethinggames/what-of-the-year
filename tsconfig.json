@@ -13,8 +13,6 @@
     "types": ["vite/client", "bun-types"],
     "paths": {
       "convex/_generated/*": ["./convex/_generated/*"],
-      "convex/constants": ["./convex/constants"],
-      "convex/utils/*": ["./convex/utils/*"],
       "components/*": ["./src/components/*"],
       "constants/*": ["./src/constants/*"],
       "hooks/*": ["./src/hooks/*"],
@@ -24,6 +22,7 @@
       "db/*": ["./src/db/*"],
       "screens/*": ["./src/screens/*"],
       "services/*": ["./src/services/*"],
+      "shared/*": ["./src/shared/*"],
       "test-ids": ["./src/test-ids.ts"]
     }
   },

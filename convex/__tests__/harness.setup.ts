@@ -2,7 +2,7 @@ import { Glob } from "bun";
 
 import { convexTest } from "convex-test";
 
-import { MAX_ROUNDS } from "../constants";
+import { MAX_ROUNDS } from "../../src/shared/constants";
 import schema from "../schema";
 import type { Phase, SeededGame } from "../test/phases";
 import { seedSession } from "../test/phases";

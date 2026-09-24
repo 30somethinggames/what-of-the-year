@@ -1,7 +1,6 @@
 import { expect, test } from "@playwright/test";
+import { MAX_PLAYERS } from "shared/constants";
 import { testIds } from "test-ids";
-
-import { MAX_PLAYERS } from "convex/constants";
 
 import { addPlayer, seedLobby, signIn } from "../helpers/convex";
 

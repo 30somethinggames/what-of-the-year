@@ -1,9 +1,9 @@
 import { v } from "convex/values";
 
+import { MAX_ROUNDS } from "../src/shared/constants";
 import { internal } from "./_generated/api";
 import type { Doc } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
-import { MAX_ROUNDS } from "./constants";
 import { rateLimiter } from "./ratelimits";
 import { requireSessionMember } from "./utils/auth";
 import { apiError } from "./utils/errors";

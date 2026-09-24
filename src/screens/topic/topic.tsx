@@ -1,6 +1,7 @@
 import * as Sentry from "@sentry/react";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { MAX_NAME_LENGTH, validateName } from "shared/validate";
 import { testIds } from "test-ids";
 
 import { Avatar, useRandomAvatar } from "components/avatar";
@@ -9,7 +10,6 @@ import { Container } from "components/container";
 import { Input } from "components/input";
 import { useToast } from "components/toast/use-toast";
 import type { TopicType } from "constants/topics";
-import { MAX_NAME_LENGTH, validateName } from "convex/utils/validate";
 import type { SessionID } from "db/types";
 import { useJoinSession } from "db/use-players";
 import { useCreateSession } from "db/use-sessions";

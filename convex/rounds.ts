@@ -1,10 +1,10 @@
 import { v } from "convex/values";
 
+import { SessionStatus } from "../src/shared/constants";
 import { internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
 import type { MutationCtx } from "./_generated/server";
 import { internalMutation, mutation, query } from "./_generated/server";
-import { SessionStatus } from "./constants";
 import { rateLimiter } from "./ratelimits";
 import { requireSessionMember } from "./utils/auth";
 import { apiError } from "./utils/errors";
