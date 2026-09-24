@@ -102,9 +102,7 @@ try {
   // plus the whole suite — and it still gets reported when a test fails, which
   // it would not if the check ran last. `git status --porcelain` rather than
   // `git diff` so a file the CLI newly emits counts too.
-  // E2E_ALLOW_GENERATED_DRIFT is for a working tree nobody is going to commit —
-  // a throwaway checkout whose convex/_generated is untracked. CI ignores it, so
-  // the check there is the same as it ever was.
+  // `E2E_ALLOW_GENERATED_DRIFT` downgrades the stop to a warning; CI ignores it.
   const drift = (await $`git status --porcelain -- convex/_generated`.text()).trim();
   if (drift && process.env.E2E_ALLOW_GENERATED_DRIFT && !process.env.CI) {
     console.warn(

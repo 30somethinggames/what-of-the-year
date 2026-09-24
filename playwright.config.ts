@@ -16,13 +16,6 @@ const proxy = proxied
     }
   : undefined;
 
-// macOS Seatbelt refuses the bootstrap name Chromium's browser process checks in
-// for its Mach port rendezvous server, and the process aborts before the first
-// test. One process needs no rendezvous, so a sandboxed run launches with
-// `--single-process`. The variable is set by the sandbox, so this is a no-op
-// everywhere else, CI included.
-const launchOptions = process.env.SANDBOX_RUNTIME ? { args: ["--single-process"] } : {};
-
 export default defineConfig({
   globalSetup: "./playwright/helpers/global-setup.ts",
   testDir: "./playwright",
@@ -42,7 +35,6 @@ export default defineConfig({
   use: {
     baseURL: `http://localhost:${port}`,
     proxy,
-    launchOptions,
     // There is no retry in CI, so the trace has to come off the failure itself.
     trace: process.env.CI ? "retain-on-failure" : "on-first-retry",
     screenshot: "only-on-failure",
