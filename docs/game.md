@@ -228,11 +228,21 @@ The screen behind the same session URL once the game has started.
 - **E8** — A well-formed session ID that names no session reads as nothing
   rather than throwing, so the screen is "Something went wrong" with neither
   button. Editing the URL is the only way out.
+- **E9** — The server serves options only for a year from 1987 to the current
+  year, the range the picker offers in [H3](#home). Any other year in the URL —
+  out of range, or not a number — is refused before a source is called, so it
+  loads no options and reaches the [E4](#errors) screen.
+- **E10** — A refused year and a source that is down are both failures of the
+  app's plumbing rather than its own errors, so [E2](#errors) gives "Something
+  went wrong" with no reason. An option fetch over its allowance is the app's
+  own error, and that screen reads "Slow down and try again" instead.
 
 ## Rate limits
 
-Each is a per-player allowance per minute, and only calls that succeed spend
-it.
+Each is a per-player allowance per minute. A refused mutation spends nothing,
+since its token rolls back with everything else the call wrote. An option fetch
+is an action, which has no transaction to roll back, and its year is checked
+after the token is spent, so a refused year costs the allowance anyway.
 
 | action | allowance |
 | --- | --- |
@@ -254,6 +264,12 @@ it.
 - **T4** — The browser's copy of the options lives in memory for 24 hours,
   which is as long as the tab. A reload or a second tab loads them again, and
   spends the allowance again.
+- **T5** — Every allowance above is a bucket that refills, not a window that
+  turns over. It starts full, and gains a token at its own rate: a 20-a-minute
+  bucket gains one every 3 seconds and never holds more than 20.
+- **T6** — So a player may spend a whole allowance at once, and waits only for
+  the next token rather than for a minute to end. Nothing resets on the minute,
+  and no two players share a bucket.
 
 ## Discrepancies
 
