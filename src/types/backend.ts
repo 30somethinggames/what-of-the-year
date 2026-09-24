@@ -68,8 +68,6 @@ export interface Round extends Row {
   closedAt: number | null;
   /** When the reveal ends and the next round opens. Set only while `revealing`. */
   revealEndsAt?: number;
-  /** Handle on the job that ends the reveal. The client reads neither. */
-  revealJobId?: string;
 }
 
 /** What a player picked. `id` is the option's id as a string, or a slug of `name` for a seeded pick. */

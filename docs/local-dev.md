@@ -15,14 +15,11 @@ screens do not change.
 | `convex/` | the server: schema, queries, mutations, actions |
 | `src/main.tsx` | the client entry, and the provider the app is wrapped in |
 | `src/hooks/use-anonymous-auth.ts` | sign-in, and the identity every call carries |
-| `src/db/use-*.ts` | a hook per session, player, round and selection call |
+| `src/db/*.ts` | a hook per session, player, round and selection call |
 | `src/queries/use-*.ts` | the option lists a topic and year offers |
 
-What those hooks owe the screens is `src/types/backend.ts`: the `Backend`
-interface, naming every call with its arguments, its result and its loading
-state, in types that name no vendor. It sits outside the seam, so it survives
-deleting it, and each hook is declared as a member of it, so `mise run types`
-fails when one drifts.
+What those hooks owe the screens is `src/types/backend.ts`, which states the
+contract and sits outside the seam.
 
 ## Checks
 
