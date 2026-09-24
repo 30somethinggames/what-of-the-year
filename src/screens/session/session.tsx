@@ -1,6 +1,7 @@
+import { SessionStatus } from "shared/constants";
+
 import { DisplayError } from "components/states/error";
 import { Loading } from "components/states/loading";
-import { SessionStatus } from "convex/constants";
 import { Lobby } from "screens/lobby";
 import { Results } from "screens/results";
 import { Round } from "screens/round";

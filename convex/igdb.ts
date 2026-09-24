@@ -1,8 +1,8 @@
 import { v } from "convex/values";
 
+import { Topic } from "../src/shared/constants";
 import { action } from "./_generated/server";
 import type { ActionCtx } from "./_generated/server";
-import { Topic } from "./constants";
 import { fixtureGames } from "./test/fixtures";
 import { requireOptionsAccess } from "./utils/auth";
 import {

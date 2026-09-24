@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 
+import { Topic } from "../src/shared/constants";
 import { action } from "./_generated/server";
-import { Topic } from "./constants";
 import { fixtureBooks } from "./test/fixtures";
 import { requireOptionsAccess } from "./utils/auth";
 import { OPTIONS_TTL_MS, optionsKey, readCache, writeCache } from "./utils/cache";

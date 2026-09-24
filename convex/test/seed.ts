@@ -1,8 +1,8 @@
 // internal: test-only seeding; plain Error throws are fine here (never reachable on prod)
 import { v } from "convex/values";
 
+import { MAX_ROUNDS } from "../../src/shared/constants";
 import { internalMutation } from "../_generated/server";
-import { MAX_ROUNDS } from "../constants";
 import { getRoundByNumber } from "../utils/rounds";
 import { pickId, seedSession, testUid } from "./phases";
 

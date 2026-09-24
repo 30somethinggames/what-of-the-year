@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 
+import { MAX_ROUNDS, SessionStatus } from "../../src/shared/constants";
 import type { Doc, Id } from "../_generated/dataModel";
-import { MAX_ROUNDS, SessionStatus } from "../constants";
 import { setupTest } from "./harness.setup";
 
 const SECRET = "secret-of-exactly-this-length-ok";

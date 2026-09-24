@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test";
 
-import { MAX_NAME_LENGTH, validateAvatar, validateName } from "convex/utils/validate";
+import { MAX_NAME_LENGTH, validateAvatar, validateName } from "shared/validate";
 
 describe("validateName", () => {
   it("returns null for valid names", () => {

@@ -1,6 +1,6 @@
+import type { TopicKey } from "../../src/shared/constants";
 import { internal } from "../_generated/api";
 import type { ActionCtx } from "../_generated/server";
-import type { TopicKey } from "../constants";
 
 /** Option lists for a finished year barely move; a day is plenty. */
 export const OPTIONS_TTL_MS = 24 * 60 * 60 * 1000;
