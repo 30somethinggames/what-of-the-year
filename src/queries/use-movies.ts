@@ -3,14 +3,14 @@ import { useQuery } from "@tanstack/react-query";
 import { TOPIC_KEY } from "constants/topics";
 import { api } from "convex/_generated/api";
 import { useAction } from "convex/react";
-import type { Backend } from "types/backend";
 
 import { DEFAULT_STALE_TIME } from "./constants";
 import { formMovieOptions } from "./transforms";
+import type { QUERY_ARGS } from "./types";
 
 const MOVIES_QUERY_KEY = TOPIC_KEY.MOVIES;
 
-export const useMovies: Backend["useMovies"] = ({ key, year }) => {
+export function useMovies({ key, year }: QUERY_ARGS) {
   const enabled = key === MOVIES_QUERY_KEY && !!year;
   const getMovies = useAction(api.tmdb.getMovies);
 
@@ -22,4 +22,4 @@ export const useMovies: Backend["useMovies"] = ({ key, year }) => {
     enabled,
     throwOnError: true,
   });
-};
+}

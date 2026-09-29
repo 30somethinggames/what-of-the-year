@@ -1,9 +1,9 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
+import { SessionStatus } from "shared/constants";
 
 import { useToast } from "components/toast";
-import { SessionStatus } from "convex/constants";
-import type { Session } from "types/backend";
+import type { Session } from "db/types";
 
 interface Args {
   isHost: boolean;

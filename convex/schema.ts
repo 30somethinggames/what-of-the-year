@@ -3,7 +3,7 @@ import { authTables } from "@convex-dev/auth/server";
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
-import { SessionStatus } from "./constants";
+import { SessionStatus } from "../src/shared/constants";
 
 export default defineSchema({
   ...authTables,

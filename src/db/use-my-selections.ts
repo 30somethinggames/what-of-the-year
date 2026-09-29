@@ -1,17 +1,22 @@
 import { api } from "convex/_generated/api";
 import { useQuery } from "convex/react";
-import type { Backend } from "types/backend";
+import type { SessionID } from "db/types";
 
-import { toSessionId } from "./ids";
-
-export const useMySelections: Backend["useMySelections"] = (sessionId) => {
-  const data = useQuery(
-    api.selections.getMySelections,
-    sessionId ? { sessionId: toSessionId(sessionId) } : "skip",
-  );
+/**
+ * Subscribes to the current user's selections across all rounds in real time.
+ *
+ * Member-only. The caller's own picks are readable before their rounds reveal.
+ * Results are sorted ascending by round number.
+ * Automatically skips subscribing if `sessionId` is undefined.
+ *
+ * @param sessionId - The session ID. Pass `undefined` to skip subscribing.
+ * @returns An object containing the `mySelections` array and an `isLoading` flag.
+ */
+export function useMySelections(sessionId: SessionID | undefined) {
+  const data = useQuery(api.selections.getMySelections, sessionId ? { sessionId } : "skip");
 
   return {
     isLoading: data === undefined,
     mySelections: data ?? [],
   };
-};
+}

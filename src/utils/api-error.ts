@@ -1,5 +1,6 @@
-import type { ApiErrorData, ErrorCode } from "convex/utils/errors";
-import { ConvexError } from "convex/values";
+import type { ApiErrorData, ErrorCode } from "shared/errors";
+
+import { errorData } from "db/error-data";
 
 /** Client-only codes for failures that did not originate from `apiError`. */
 type ClientErrorCode = ErrorCode | "RATE_LIMITED" | "UNKNOWN";
@@ -18,16 +19,10 @@ function isApiErrorData(data: unknown): data is ApiErrorData {
   );
 }
 
-/**
- * Normalizes anything thrown by a Convex call into `{ code, message }`.
- * Never surfaces the underlying message for non-app errors — on prod it is
- * redacted to "Server Error" anyway, and on dev it may leak internals.
- */
-export function getApiError(error: unknown): ClientError {
-  if (!(error instanceof ConvexError)) return UNKNOWN;
-  const data: unknown = error.data;
+/** Maps the data an error carried into `{ code, message }`. */
+export function toClientError(data: unknown): ClientError {
   if (isApiErrorData(data)) return { code: data.code, message: data.message };
-  // Shape thrown by @convex-dev/rate-limiter with `throws: true`.
+  // Shape thrown by the rate limiter with `throws: true`.
   if (
     typeof data === "object" &&
     data !== null &&
@@ -35,4 +30,13 @@ export function getApiError(error: unknown): ClientError {
   )
     return RATE_LIMITED;
   return UNKNOWN;
+}
+
+/**
+ * Normalizes anything thrown by a backend call into `{ code, message }`.
+ * Never surfaces the underlying message for non-app errors — on prod it is
+ * redacted to "Server Error" anyway, and on dev it may leak internals.
+ */
+export function getApiError(error: unknown): ClientError {
+  return toClientError(errorData(error));
 }

@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Header } from "components/header";
 import { SettingsButton } from "components/settings-button";
 import { Sidebar } from "components/sidebar";
-import type { SessionID } from "types/backend";
+import type { SessionID } from "db/types";
 
 interface Props {
   title: string;

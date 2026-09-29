@@ -18,8 +18,9 @@ screens do not change.
 | `src/db/*.ts` | a hook per session, player, round and selection call |
 | `src/queries/use-*.ts` | the option lists a topic and year offers |
 
-What those hooks owe the screens is `src/types/backend.ts`, which states the
-contract and sits outside the seam.
+What the hooks owe the screens is on the hooks: each one's doc comment says who
+may call it and what it answers. Their types come from `convex/` through
+`src/db/types.ts`.
 
 ## Checks
 

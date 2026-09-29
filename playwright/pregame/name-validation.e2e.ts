@@ -39,7 +39,7 @@ test("join: the name field stops accepting input at the server's max length", as
 
   await page.getByTestId(testIds.topic.nameInput).pressSequentially("abcdefghijklmnopqrstuvwxyz");
 
-  // MAX_NAME_LENGTH is 20 (convex/utils/validate.ts): the field drops the last
+  // MAX_NAME_LENGTH is 20 (src/shared/validate.ts): the field drops the last
   // six characters, so the over-length name never reaches the server.
   await expect(page.getByTestId(testIds.topic.nameInput)).toHaveValue("abcdefghijklmnopqrst");
   await expect(page.getByTestId(testIds.topic.submit)).toBeEnabled();

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test";
 
+import { MAX_ROUNDS, SessionStatus } from "../../src/shared/constants";
 import { api, internal } from "../_generated/api";
-import { MAX_ROUNDS, SessionStatus } from "../constants";
 import {
   HOST_UID,
   MEMBER_UID,

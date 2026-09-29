@@ -270,7 +270,7 @@ them is its own ticket; none is fixed here.
   cannot read it. The specs assert its text, which a screen reader and
   Playwright both get.
 - The name error message names "letters, numbers, spaces, hyphens, and
-  periods", but `convex/utils/validate.ts` also allows apostrophes.
+  periods", but `src/shared/validate.ts` also allows apostrophes.
 - [I8](#identity) is the behaviour, not the intent:
   `playwright/pregame/name-validation.e2e.ts` pins whitespace-only and
   duplicate names as accepted and says the ticket expected them blocked.
@@ -278,7 +278,7 @@ them is its own ticket; none is fixed here.
   `playwright/pregame/option-failure.e2e.ts` says the round screen was expected
   to stay usable through an option outage, and `throwOnError` in
   `src/queries/use-*.ts` replaces it instead.
-- `convex/constants.ts` says a forfeited session renders results for the other
+- `src/shared/constants.ts` says a forfeited session renders results for the other
   players. `src/hooks/use-game-over.ts` sends every guest home first, so a
   forfeited game's results are seen by nobody.
 - [R8](#rounds) is enforced only in the browser: `saveSelection` accepts a

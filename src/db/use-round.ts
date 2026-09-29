@@ -1,24 +1,30 @@
 import { api } from "convex/_generated/api";
 import { useMutation, useQuery } from "convex/react";
-import type { Backend } from "types/backend";
+import type { SessionID } from "db/types";
 
-import { toSessionId } from "./ids";
-
-export const useRound: Backend["useRound"] = (sessionId, roundNumber) => {
+/**
+ * Subscribes to a single round document in real time.
+ *
+ * Member-only: rejects for a caller not in the session.
+ * Automatically skips subscribing if `sessionId` or `roundNumber` is undefined.
+ *
+ * @param sessionId - The session ID. Pass `undefined` to skip subscribing.
+ * @param roundNumber - The round number. Pass `undefined` to skip subscribing.
+ * @returns An object containing the `round` data and an `isLoading` flag.
+ */
+export function useRound(sessionId: SessionID | undefined, roundNumber: number | undefined) {
   const round = useQuery(
     api.rounds.getRound,
-    sessionId && roundNumber ? { sessionId: toSessionId(sessionId), number: roundNumber } : "skip",
+    sessionId && roundNumber ? { sessionId, number: roundNumber } : "skip",
   );
 
   return {
     isLoading: round === undefined,
     round: round ?? null,
   };
-};
+}
 
-/** Host-only: moves the round on — open to revealing, revealing to closed with the next round opened. */
-export const useAdvanceRound: Backend["useAdvanceRound"] = () => {
-  const advance = useMutation(api.rounds.advanceRound);
-  return ({ sessionId, currentRoundNumber }) =>
-    advance({ sessionId: toSessionId(sessionId), currentRoundNumber });
-};
+/** Host-only, while the session is in play: moves the round on — open to revealing, revealing to closed with the next round opened. */
+export function useAdvanceRound() {
+  return useMutation(api.rounds.advanceRound);
+}

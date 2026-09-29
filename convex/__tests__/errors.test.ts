@@ -1,7 +1,8 @@
 import { describe, expect, it } from "bun:test";
 
-import { apiError } from "convex/utils/errors";
 import { ConvexError } from "convex/values";
+
+import { apiError } from "../utils/errors";
 
 describe("apiError", () => {
   it("returns a ConvexError carrying exactly { code, message }", () => {
