@@ -8,7 +8,8 @@ import type { SessionID } from "db/types";
  * Automatically skips subscribing if `sessionId` is undefined. `getPlayers` is
  * member-only and throws for everyone else, so the roster subscription waits for
  * `getMyPlayer` to confirm membership — an invitee holding the session link sits
- * on the join screen instead of the error boundary.
+ * on the join screen instead of the error boundary. For a caller who has not
+ * joined, `currentUser` is null and `players` stays empty.
  *
  * @param sessionId - The session to listen to. Pass `undefined` to skip subscribing.
  * @returns An object containing the `players` array, `currentUser` player doc, `isHost` flag, and an `isLoading` flag.
@@ -26,7 +27,7 @@ export function usePlayers(sessionId: SessionID | undefined) {
   };
 }
 
-/** Adds the caller to a session as a player. */
+/** Any signed-in caller: adds them to a session as a player, while it is in the lobby and not full. */
 export function useJoinSession() {
   return useMutation(api.players.joinSession);
 }

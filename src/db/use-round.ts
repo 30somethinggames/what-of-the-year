@@ -5,6 +5,7 @@ import type { SessionID } from "db/types";
 /**
  * Subscribes to a single round document in real time.
  *
+ * Member-only: rejects for a caller not in the session.
  * Automatically skips subscribing if `sessionId` or `roundNumber` is undefined.
  *
  * @param sessionId - The session ID. Pass `undefined` to skip subscribing.
@@ -23,7 +24,7 @@ export function useRound(sessionId: SessionID | undefined, roundNumber: number |
   };
 }
 
-/** Host-only: moves the round on — open to revealing, revealing to closed with the next round opened. */
+/** Host-only, while the session is in play: moves the round on — open to revealing, revealing to closed with the next round opened. */
 export function useAdvanceRound() {
   return useMutation(api.rounds.advanceRound);
 }

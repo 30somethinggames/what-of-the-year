@@ -6,7 +6,11 @@ export type Player = Doc<"players">;
 export type SessionID = Id<"sessions">;
 export type Session = Doc<"sessions">;
 export type Round = Doc<"rounds">;
-/** A round selection as the server hands it out — `pick` is null pre-reveal. */
+/**
+ * A round selection as the server hands it out — `pick` is null pre-reveal.
+ * `pick.id` is a string: the option's id for a real pick, a slug of the name
+ * for one seeded through `/test/*`.
+ */
 export type Selection = FunctionReturnType<typeof api.selections.getSelections>[number];
 export type MySelection = Doc<"selections"> & { roundNumber: number };
 export type RankedPick = FunctionReturnType<typeof api.selections.getResults>[number];

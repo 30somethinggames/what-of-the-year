@@ -5,6 +5,7 @@ import type { SessionID } from "db/types";
 /**
  * Subscribes to the current user's selections across all rounds in real time.
  *
+ * Member-only. The caller's own picks are readable before their rounds reveal.
  * Results are sorted ascending by round number.
  * Automatically skips subscribing if `sessionId` is undefined.
  *
