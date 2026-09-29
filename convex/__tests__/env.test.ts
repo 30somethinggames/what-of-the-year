@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 
-import { isProd, testRoutesEnabled, timingSafeEqual, useFixtures } from "convex/utils/env";
+import { isProd, testRoutesEnabled, timingSafeEqual, useFixtures } from "../utils/env";
 
 const KEYS = ["IS_PROD", "OPTIONS_FIXTURES", "TEST_SECRET"] as const;
 let saved: Record<string, string | undefined>;

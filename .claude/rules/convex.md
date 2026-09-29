@@ -9,7 +9,7 @@ paths:
 
 - Named `export const` using `query`/`mutation`/`action`/`internalMutation` from `./_generated/server`, with `args` validators and an async `handler` that destructures args in its signature.
 - Validate every argument with `v.*`; hoist reused shapes to a module-level `const xArg = v.object({...})`.
-- Shared helpers live in `convex/utils/*.ts` as plain async functions taking `ctx`/`db` first. Shared constants/enums live in `convex/constants.ts` as `as const` objects — always import them, never redefine locally.
+- Shared helpers live in `convex/utils/*.ts` as plain async functions taking `ctx`/`db` first. Shared constants/enums the client also uses live in `src/shared/constants.ts` as `as const` objects — always import them, never redefine locally.
 - `export default` only for framework entrypoints (`schema.ts`, `http.ts`, `crons.ts`, `auth.config.ts`, `convex.config.ts`).
 
 ## The guard ladder (every mutation, in this order, before any db write)

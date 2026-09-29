@@ -1,12 +1,12 @@
 import { v } from "convex/values";
 
+import { SessionStatus } from "../src/shared/constants";
+import { validateAvatar, validateName } from "../src/shared/validate";
 import { mutation, query } from "./_generated/server";
-import { SessionStatus } from "./constants";
 import { rateLimiter } from "./ratelimits";
 import { requireSessionMember } from "./utils/auth";
 import { apiError } from "./utils/errors";
 import { getRoundByNumber } from "./utils/rounds";
-import { validateAvatar, validateName } from "./utils/validate";
 
 export const joinSession = mutation({
   args: {

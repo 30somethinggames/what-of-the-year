@@ -1,3 +1,4 @@
+import { MAX_PLAYERS, MAX_ROUNDS, SessionStatus, Topic } from "../../src/shared/constants";
 /**
  * One definition of what a phase looks like, shared by the `convex-test`
  * harness (`convex/__tests__/harness.setup.ts`) and the `/test/seed-game`
@@ -9,7 +10,6 @@
 import { internal } from "../_generated/api";
 import type { Doc, Id } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
-import { MAX_PLAYERS, MAX_ROUNDS, SessionStatus, Topic } from "../constants";
 import { revealDurationMs } from "../utils/rounds";
 
 /** A uid for a player no browser will ever sign in as. */

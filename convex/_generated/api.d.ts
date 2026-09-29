@@ -10,7 +10,6 @@
 
 import type * as auth from "../auth.js";
 import type * as cache from "../cache.js";
-import type * as constants from "../constants.js";
 import type * as crons from "../crons.js";
 import type * as health from "../health.js";
 import type * as http from "../http.js";
@@ -34,7 +33,6 @@ import type * as utils_env from "../utils/env.js";
 import type * as utils_errors from "../utils/errors.js";
 import type * as utils_pick from "../utils/pick.js";
 import type * as utils_rounds from "../utils/rounds.js";
-import type * as utils_validate from "../utils/validate.js";
 
 import type {
   ApiFromModules,
@@ -45,7 +43,6 @@ import type {
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   cache: typeof cache;
-  constants: typeof constants;
   crons: typeof crons;
   health: typeof health;
   http: typeof http;
@@ -69,7 +66,6 @@ declare const fullApi: ApiFromModules<{
   "utils/errors": typeof utils_errors;
   "utils/pick": typeof utils_pick;
   "utils/rounds": typeof utils_rounds;
-  "utils/validate": typeof utils_validate;
 }>;
 
 /**

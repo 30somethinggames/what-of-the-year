@@ -31,8 +31,8 @@
             "message": "Screen internals are private. Move shared functionality to a top-level dir (hooks/, utils/, db/, etc.)."
           },
           {
-            "group": ["convex/react", "@convex-dev/auth/react", "convex/_generated/*"],
-            "message": "The backend is reached through the seam. Add a hook in src/db (session state) or src/queries (topic data) and call that."
+            "group": ["convex/*", "convex/**", "@convex-dev/auth/react"],
+            "message": "The backend is reached through the seam. Add a hook in src/db (session state) or src/queries (topic data) and call that, and put anything both sides share in src/shared."
           }
         ]
       }
@@ -40,7 +40,13 @@
   },
   "overrides": [
     {
-      "files": ["src/db/**", "src/queries/**", "src/hooks/use-anonymous-auth.ts", "src/main.tsx"],
+      "files": [
+        "convex/**",
+        "src/db/**",
+        "src/queries/**",
+        "src/hooks/use-anonymous-auth.ts",
+        "src/main.tsx"
+      ],
       "rules": {
         "no-restricted-imports": [
           "error",
