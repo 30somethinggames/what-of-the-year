@@ -102,8 +102,13 @@ try {
   // plus the whole suite — and it still gets reported when a test fails, which
   // it would not if the check ran last. `git status --porcelain` rather than
   // `git diff` so a file the CLI newly emits counts too.
+  // `E2E_ALLOW_GENERATED_DRIFT` downgrades the stop to a warning; CI ignores it.
   const drift = (await $`git status --porcelain -- convex/_generated`.text()).trim();
-  if (drift) {
+  if (drift && process.env.E2E_ALLOW_GENERATED_DRIFT && !process.env.CI) {
+    console.warn(
+      `E2E_ALLOW_GENERATED_DRIFT is set: running with a stale convex/_generated:\n${drift}`,
+    );
+  } else if (drift) {
     await $`git diff -- convex/_generated`.nothrow();
     console.error(
       `${process.env.GITHUB_ACTIONS ? "::error::" : ""}convex/_generated is stale. The deploy ` +
